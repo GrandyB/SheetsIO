@@ -19,7 +19,7 @@ package application.models.json;
 import java.util.HashMap;
 import java.util.Map;
 
-import applications.models.CellData;
+import application.models.CellData;
 
 /**
  * Bean represenatation of json object received back from the google

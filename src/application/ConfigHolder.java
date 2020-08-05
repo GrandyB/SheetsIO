@@ -34,9 +34,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import application.models.CellData;
+import application.models.JsonValidationException;
 import application.models.json.Config;
-import applications.models.CellData;
-import applications.models.JsonValidationException;
 import lombok.Getter;
 import lombok.Setter;
 

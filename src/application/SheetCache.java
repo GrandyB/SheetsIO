@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import application.models.CellData;
 import application.models.json.Config;
 import application.models.json.GoogleSheetsResponse;
-import applications.models.CellData;
 
 /**
  * Keep track of current values from the google spreadsheet; when an update

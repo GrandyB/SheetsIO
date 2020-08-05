@@ -25,8 +25,8 @@ import java.util.Map;
 
 import com.google.gson.GsonBuilder;
 
+import application.models.CellData;
 import application.models.json.GoogleSheetsResponse;
-import applications.models.CellData;
 
 /**
  * Makes the calls to update the sheet. May be used within threads, e.g.

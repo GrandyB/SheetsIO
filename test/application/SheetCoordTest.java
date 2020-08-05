@@ -7,7 +7,7 @@ package application;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import applications.models.CellData;
+import application.models.CellData;
 
 public class SheetCoordTest {
 	private static final String FILE = "file";

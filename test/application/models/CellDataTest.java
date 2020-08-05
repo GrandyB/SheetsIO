@@ -19,7 +19,7 @@ package application.models;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import applications.models.CellData;
+import application.models.CellData;
 
 /**
  * 

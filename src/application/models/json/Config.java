@@ -23,7 +23,7 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-import applications.models.CellData;
+import application.models.CellData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

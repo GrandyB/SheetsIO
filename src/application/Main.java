@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import com.google.gson.JsonSyntaxException;
 
-import applications.models.JsonValidationException;
+import application.models.JsonValidationException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

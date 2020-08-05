@@ -18,7 +18,7 @@ package application.models.json;
 
 import javax.validation.constraints.NotBlank;
 
-import applications.models.CellData;
+import application.models.CellData;
 
 /**
  * Bean equivalent of the [ { "cell": "C4", "file": "file.txt" } ] individual

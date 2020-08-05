@@ -3,3 +3,6 @@ files/
 target/
 .settings/
 .classpath
+bin/
+build.fxbuild
+.project
