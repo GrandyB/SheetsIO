@@ -40,13 +40,6 @@ import javafx.stage.Stage;
  * {@link IExceptionHandler} - exceptions should make their way here and then be
  * handled/shown to the user where appropriate; we also use threads, so we use
  * this to allow threads to pass back exception info to be handled nicely.
- * 
- * <pre>
- * 		TODO: Separate out the updating from the setting up of the config (e.g. no deletes when toggling autoupdate)
- * 		TODO: Logging of errors
- * 		TODO: 'Clean all files' button (w/confirmation dialog)
- * 		TODO: Update CellDataTest
- * </pre>
  *
  * @author Mark "Grandy" Bishop
  */

@@ -7,13 +7,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * TODO: Update these.
- * 
- * TODO: Proper creation/tidyup of files and checks.
- *
- * @author Mark "Grandy" Bishop
- */
 class FileUpdaterTest {
 
 	private FileUpdater fileUpdater = new FileUpdater();
