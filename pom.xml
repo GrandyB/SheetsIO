@@ -71,5 +71,16 @@
 	   <artifactId>javax.el</artifactId>
 	   <version>2.2.4</version>
 	</dependency>
+	<!-- Apache Log4j 2 -->
+	<dependency>
+	    <groupId>org.apache.logging.log4j</groupId>
+	    <artifactId>log4j-api</artifactId>
+	    <version>2.13.3</version>
+	  </dependency>
+	  <dependency>
+	    <groupId>org.apache.logging.log4j</groupId>
+	    <artifactId>log4j-core</artifactId>
+	    <version>2.13.3</version>
+	  </dependency>
   </dependencies>
 </project>

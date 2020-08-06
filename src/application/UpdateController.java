@@ -23,6 +23,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.GsonBuilder;
 
 import application.models.CellData;
@@ -35,6 +38,8 @@ import application.models.json.GoogleSheetsResponse;
  * @author Mark "Grandy" Bishop
  */
 public class UpdateController {
+	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class);
+
 	private final SheetCache cache = new SheetCache();
 	private final FileUpdater fileUpdater = new FileUpdater();
 
@@ -54,7 +59,7 @@ public class UpdateController {
 		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
 				+ config.getWorksheetName() + /* "!rangeHere" + */ "?key=" + config.getApiKey()
 				+ "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-		System.out.println("URL:\t" + this.urlString);
+		LOGGER.debug("URL:\t" + this.urlString);
 
 		if (fromScratch) {
 			this.cache.setup(config.getCells());
@@ -73,10 +78,10 @@ public class UpdateController {
 	 */
 	public void update() throws IOException {
 		if (config == null) {
-			System.err.println("No config provided");
+			LOGGER.warn("No config provided");
 			return;
 		}
-		System.out.println("Updating...");
+		LOGGER.debug("Updating...");
 
 		Map<CellData, String> updatedCells = updateCache(getLatestState());
 		if (!updatedCells.isEmpty()) {

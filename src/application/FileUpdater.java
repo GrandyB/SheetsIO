@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import application.models.CellData;
 
 /**
@@ -31,6 +34,8 @@ import application.models.CellData;
  * @author Mark "Grandy" Bishop
  */
 public class FileUpdater {
+	private static final Logger LOGGER = LogManager.getLogger(FileUpdater.class);
+
 	private static final String PREFIX = "files";
 
 	private String folderName;
@@ -72,7 +77,7 @@ public class FileUpdater {
 		this.folder = new File(path);
 		this.folder.mkdirs();
 		if (this.folder.exists()) {
-			System.out.println("Folder prepped: " + path);
+			LOGGER.debug("Folder prepped: " + path);
 		} else {
 			throw new IOException("Unable to create folder for text file output: " + path);
 		}
@@ -97,10 +102,10 @@ public class FileUpdater {
 	 */
 	public void cleanUp() throws IOException {
 		if (this.folder == null) {
-			System.out.println("No files to clean up; no project folder existing");
+			LOGGER.debug("No files to clean up; no project folder existing");
 			return;
 		}
-		System.out.println(String.format("Cleaning project folder '%s'", this.folder.getAbsolutePath()));
+		LOGGER.debug(String.format("Cleaning project folder '%s'", this.folder.getAbsolutePath()));
 		if (!deleteFiles(this.folder)) {
 			throw new IOException("Unable to delete project files for folder: " + this.folder.getAbsolutePath());
 		}
@@ -116,7 +121,7 @@ public class FileUpdater {
 				deleteFiles(file);
 			}
 		}
-		System.out.println("\tDeleting " + dirForDelete.getAbsolutePath());
+		LOGGER.debug("\tDeleting " + dirForDelete.getAbsolutePath());
 		return dirForDelete.delete();
 	}
 }

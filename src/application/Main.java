@@ -19,6 +19,9 @@ package application;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.JsonSyntaxException;
 
 import application.models.JsonValidationException;
@@ -44,6 +47,8 @@ import javafx.stage.Stage;
  * @author Mark "Grandy" Bishop
  */
 public class Main extends Application implements IExceptionHandler {
+	private static final Logger LOGGER = LogManager.getLogger(Main.class);
+
 	private static final long DISABLE_CONTROL_TIME = 1000L;
 
 	private final FileChooser configChooser = new FileChooser();
@@ -139,6 +144,7 @@ public class Main extends Application implements IExceptionHandler {
 	}
 
 	public static void main(String[] args) {
+		LOGGER.info("Starting up");
 		launch(args);
 	}
 
@@ -163,7 +169,7 @@ public class Main extends Application implements IExceptionHandler {
 				ctrl.setDisable(true);
 				Thread.sleep(DISABLE_CONTROL_TIME);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				handleException(e);
 			} finally {
 				ctrl.setDisable(false);
 			}
@@ -172,12 +178,12 @@ public class Main extends Application implements IExceptionHandler {
 
 	@Override
 	public void handleException(Exception e) {
-		e.printStackTrace();
+		LOGGER.error(e);
 	}
 
 	@Override
 	public void stop() {
-		System.out.println("Stage is closing");
+		LOGGER.info("Stage is closing");
 		// Shut down the thread
 		runnable.doStop();
 	}

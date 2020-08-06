@@ -28,6 +28,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -46,6 +48,8 @@ import lombok.Setter;
  * @author Mark "Grandy" Bishop
  */
 public class ConfigHolder {
+	private static final Logger LOGGER = LogManager.getLogger(ConfigHolder.class);
+
 	/**
 	 * "This version of the Google Sheets API has a limit of 500 requests per 100
 	 * seconds per project, and 100 requests per 100 seconds per user. Limits for
@@ -115,11 +119,11 @@ public class ConfigHolder {
 	public void loadFile(File file) throws IOException, JsonSyntaxException, JsonValidationException {
 		String jsonStr = fileToString(file);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
-		System.out.println("Loaded file: " + root.toString());
+		LOGGER.debug("Loaded file: " + root.toString());
 
 		// Load json into java beans
 		Config conf = new GsonBuilder().create().fromJson(jsonStr, Config.class);
-		System.out.println(conf);
+		LOGGER.debug(conf);
 
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
