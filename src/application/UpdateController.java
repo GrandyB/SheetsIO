@@ -48,7 +48,7 @@ public class UpdateController {
 	 * @param config
 	 * @throws IOException
 	 */
-	public synchronized void setConfig(ConfigHolder config) throws IOException {
+	public synchronized void setConfig(ConfigHolder config, boolean fromScratch) throws IOException {
 		this.config = config;
 
 		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
@@ -56,9 +56,12 @@ public class UpdateController {
 				+ "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
 		System.out.println("URL:\t" + this.urlString);
 
+		if (fromScratch) {
+			this.cache.setup(config.getCells());
+			this.fileUpdater.cleanUp();
+		}
+
 		this.url = new URL(this.urlString);
-		this.cache.setup(config.getCells());
-		this.fileUpdater.cleanUp();
 		this.fileUpdater.setup(config.getProjectName(), config);
 
 	}

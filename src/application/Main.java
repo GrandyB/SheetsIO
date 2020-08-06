@@ -92,7 +92,7 @@ public class Main extends Application implements IExceptionHandler {
 			updateNowButton.setDisable(!updateNowButton.isDisabled());
 			try {
 				if (config.isLoaded()) {
-					runnable.updateConfig(config);
+					runnable.updateConfig(config, false);
 				}
 			} catch (IOException e) {
 				handleException(e);
@@ -154,7 +154,7 @@ public class Main extends Application implements IExceptionHandler {
 		// Update labels and config
 		chosenConfigName.setText(file.getName());
 		config.loadFile(file);
-		runnable.updateConfig(config);
+		runnable.updateConfig(config, true);
 	}
 
 	private void disableThenReenable(Control ctrl) {

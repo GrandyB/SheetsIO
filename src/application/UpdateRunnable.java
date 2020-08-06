@@ -55,14 +55,14 @@ public class UpdateRunnable implements Runnable {
 		}
 	}
 
-	public synchronized void updateConfig(ConfigHolder config) throws IOException {
+	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch) throws IOException {
 		this.updateInterval = config.getUpdateInterval();
 		this.autoUpdate = config.isAutoUpdate();
 
 		if (this.updater == null) {
 			this.updater = new UpdateController();
 		}
-		this.updater.setConfig(config);
+		this.updater.setConfig(config, fromScratch);
 	}
 
 	/** Perform a single update, on next update iteration. */
