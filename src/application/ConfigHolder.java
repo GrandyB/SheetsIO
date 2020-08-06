@@ -40,7 +40,6 @@ import application.models.CellData;
 import application.models.JsonValidationException;
 import application.models.json.Config;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Wrapper around {@link Config}, accessing its data and reading in data.
@@ -63,7 +62,6 @@ public class ConfigHolder {
 	private File lastFile;
 
 	@Getter
-	@Setter
 	private boolean autoUpdate = true;
 
 	/** The latest loaded config. */
@@ -98,6 +96,11 @@ public class ConfigHolder {
 		return lastFile != null;
 	}
 
+	public void setAutoUpdate(boolean update) {
+		LOGGER.debug("Autoupdate set to {}", update);
+		this.autoUpdate = update;
+	}
+
 	/**
 	 * Reloads the most recently successful config file.
 	 * 
@@ -106,6 +109,7 @@ public class ConfigHolder {
 	 */
 	public void reload() throws JsonSyntaxException, IOException, JsonValidationException {
 		assert lastFile != null : "There is no existing config file loaded";
+		LOGGER.debug("Reloading.");
 		loadFile(lastFile);
 	}
 
@@ -117,9 +121,9 @@ public class ConfigHolder {
 	 *             if validation of the incoming config goes awry.
 	 */
 	public void loadFile(File file) throws IOException, JsonSyntaxException, JsonValidationException {
-		String jsonStr = fileToString(file);
+		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
-		LOGGER.debug("Loaded file: " + root.toString());
+		LOGGER.debug("Loaded file: {}", root.toString());
 
 		// Load json into java beans
 		Config conf = new GsonBuilder().create().fromJson(jsonStr, Config.class);
@@ -135,10 +139,6 @@ public class ConfigHolder {
 		} else {
 			throw new JsonValidationException(violations);
 		}
-	}
-
-	private String fileToString(File file) throws IOException {
-		return FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 	}
 
 	/** @return the update interval for querying the sheet. */

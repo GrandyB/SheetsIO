@@ -1,0 +1,11 @@
+{
+	"projectName": "myProject",
+	"worksheetName": "Sheet1",
+	"apiKey": "get_your_key_from_https://console.developers.google.com/",
+	"spreadsheetId": "12YrqfVJENT6FJZB5NZrv2fHKg36XEy2jTE5X-mwC61g",
+	"cells": [
+		{ "cell": "B1", "file": "b1.txt" },
+		{ "cell": "B2", "file": "b2.txt" },
+		{ "cell": "B3", "file": "b3.txt" }
+	]
+}

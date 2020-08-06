@@ -105,7 +105,7 @@ public class FileUpdater {
 			LOGGER.debug("No files to clean up; no project folder existing");
 			return;
 		}
-		LOGGER.debug(String.format("Cleaning project folder '%s'", this.folder.getAbsolutePath()));
+		LOGGER.debug("Cleaning project folder '{}'", this.folder.getAbsolutePath());
 		if (!deleteFiles(this.folder)) {
 			throw new IOException("Unable to delete project files for folder: " + this.folder.getAbsolutePath());
 		}
@@ -121,7 +121,7 @@ public class FileUpdater {
 				deleteFiles(file);
 			}
 		}
-		LOGGER.debug("\tDeleting " + dirForDelete.getAbsolutePath());
+		LOGGER.debug("Deleting {}", dirForDelete.getAbsolutePath());
 		return dirForDelete.delete();
 	}
 }

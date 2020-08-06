@@ -144,7 +144,16 @@ public class Main extends Application implements IExceptionHandler {
 	}
 
 	public static void main(String[] args) {
-		LOGGER.info("Starting up");
+		LOGGER.info("____________________");
+		LOGGER.info("Starting up...");
+		LOGGER.info("     _____");
+		LOGGER.info("   .'     `.");
+		LOGGER.info("  /  .-=-.  \\  \\  __");
+		LOGGER.info("  | (  C\\ \\  \\_.'')");
+		LOGGER.info(" _\\  `--' |,'   _/");
+		LOGGER.info("/__`.____.'__.-'");
+		LOGGER.info("____________________");
+
 		launch(args);
 	}
 

@@ -59,7 +59,7 @@ public class UpdateController {
 		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
 				+ config.getWorksheetName() + /* "!rangeHere" + */ "?key=" + config.getApiKey()
 				+ "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-		LOGGER.debug("URL:\t" + this.urlString);
+		LOGGER.debug("URL: {}", this.urlString);
 
 		if (fromScratch) {
 			this.cache.setup(config.getCells());
