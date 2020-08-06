@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 /**
+ * TODO: Update these.
+ * 
  * TODO: Proper creation/tidyup of files and checks.
  *
  * @author Mark "Grandy" Bishop
@@ -15,14 +17,15 @@ import org.junit.jupiter.api.Test;
 class FileUpdaterTest {
 
 	private FileUpdater fileUpdater = new FileUpdater();
+	private ConfigHolder configHolder = new ConfigHolder();
 
 	@Test
 	void test() throws IOException {
-		fileUpdater.setup("testing123");
+		fileUpdater.setup("testing123", configHolder);
 	}
 
 	@Test
 	void test2() throws IOException {
-		fileUpdater.setup("fourtyfour");
+		fileUpdater.setup("fourtyfour", configHolder);
 	}
 }

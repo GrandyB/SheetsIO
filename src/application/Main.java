@@ -23,12 +23,14 @@ import com.google.gson.JsonSyntaxException;
 
 import application.models.JsonValidationException;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -41,6 +43,7 @@ import javafx.stage.Stage;
  * 
  * <pre>
  * 		TODO: Update layout/styling of main app
+ * 		TODO: Separate out the updating from the setting up of the config (e.g. no deletes when toggling autoupdate)
  * 		TODO: Logging of errors
  * 		TODO: 'Clean all files' button (w/confirmation dialog)
  * 		TODO: Update CellDataTest
@@ -68,12 +71,10 @@ public class Main extends Application implements IExceptionHandler {
 
 		doInit();
 
-		FlowPane root = new FlowPane();
-		root.getStyleClass().add("root");
-		doLayout(root);
-
-		Scene scene = new Scene(root, 400, 400);
+		Pane root = doLayout();
+		Scene scene = new Scene(root, 300, 120);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
@@ -113,8 +114,36 @@ public class Main extends Application implements IExceptionHandler {
 		});
 	}
 
-	private void doLayout(Pane root) {
-		root.getChildren().addAll(chosenConfigName, chooserButton, autoUpdateCheck, updateNowButton);
+	private Pane doLayout() {
+		VBox root = new VBox();
+		root.getStyleClass().add("root");
+		root.setSpacing(3);
+
+		Text configText = new Text("Config file");
+		configText.getStyleClass().add("config-file-label");
+		root.getChildren().add(configText);
+
+		HBox configBox = new HBox(chooserButton, chosenConfigName);
+		configBox.setSpacing(5);
+		configBox.setAlignment(Pos.CENTER_LEFT);
+		configBox.getStyleClass().add("config-box-layout");
+		chosenConfigName.getStyleClass().add("config-name-label");
+		chooserButton.getStyleClass().add("choose-config-button");
+		root.getChildren().add(configBox);
+
+		Text updateMethodText = new Text("Update method");
+		updateMethodText.getStyleClass().add("update-method-label");
+		root.getChildren().add(updateMethodText);
+
+		HBox updateBox = new HBox(updateNowButton, autoUpdateCheck);
+		updateBox.setSpacing(5);
+		updateBox.setAlignment(Pos.CENTER_LEFT);
+		updateBox.getStyleClass().add("update-box-layout");
+		updateNowButton.getStyleClass().add("update-now-button");
+		autoUpdateCheck.getStyleClass().add("auto-update-checkbox");
+		root.getChildren().add(updateBox);
+
+		return root;
 	}
 
 	public static void main(String[] args) {

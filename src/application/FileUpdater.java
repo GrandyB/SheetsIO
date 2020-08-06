@@ -43,6 +43,9 @@ public class FileUpdater {
 	 *             if folder cannot be made.
 	 */
 	public void setup(String projectName, ConfigHolder config) throws IOException {
+		assert projectName != null : "projectName cannot be null";
+		assert config != null : "config cannot be null";
+
 		this.folderName = projectName;
 		writeFolders();
 		createInitialFiles(config);

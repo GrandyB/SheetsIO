@@ -1,1 +1,9 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.root {
+	-fx-padding: 10px;
+}
+.config-file-label, .update-method-label {
+	-fx-font-weight: bold;
+}
+.config-name-label {
+	-fx-font-style: italic;
+}
