@@ -42,17 +42,24 @@ public class UpdateController {
 	private String urlString;
 	private URL url;
 
+	/**
+	 * Set a new config, thus needing to reset state and start anew.
+	 * 
+	 * @param config
+	 * @throws IOException
+	 */
 	public synchronized void setConfig(ConfigHolder config) throws IOException {
 		this.config = config;
 
 		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
 				+ config.getWorksheetName() + /* "!rangeHere" + */ "?key=" + config.getApiKey()
 				+ "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-		System.out.println("URL:\n" + this.urlString);
+		System.out.println("URL:\t" + this.urlString);
 
 		this.url = new URL(this.urlString);
 		this.cache.setup(config.getCells());
-		this.fileUpdater.setup(config.getProjectName());
+		this.fileUpdater.cleanUp();
+		this.fileUpdater.setup(config.getProjectName(), config);
 
 	}
 

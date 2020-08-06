@@ -34,6 +34,7 @@ public class FileUpdater {
 	private static final String PREFIX = "files";
 
 	private String folderName;
+	private File folder;
 
 	/**
 	 * Prime the FileUpdater with the folder we'll be using.
@@ -41,18 +42,10 @@ public class FileUpdater {
 	 * @throws IOException
 	 *             if folder cannot be made.
 	 */
-	public void setup(String projectName) throws IOException {
+	public void setup(String projectName, ConfigHolder config) throws IOException {
 		this.folderName = projectName;
-
-		// Create folder if it doesn't exist
-		String path = PREFIX + File.separator + projectName;
-		File folder = new File(path);
-		folder.mkdirs();
-		if (folder.exists()) {
-			System.out.println("Folder prepped: " + path);
-		} else {
-			throw new IOException("Unable to create folder for text file output: " + path);
-		}
+		writeFolders();
+		createInitialFiles(config);
 	}
 
 	public void updateFiles(Map<CellData, String> updatedCells) throws IOException {
@@ -60,9 +53,67 @@ public class FileUpdater {
 			String fileName = entry.getKey().getFileName();
 			String newValue = entry.getValue();
 
-			FileWriter myWriter = new FileWriter(PREFIX + File.separator + this.folderName + File.separator + fileName);
-			myWriter.write(newValue);
-			myWriter.close();
+			writeFile(fileName, newValue);
 		}
+	}
+
+	private void writeFile(String fileName, String newValue) throws IOException {
+		FileWriter myWriter = new FileWriter(PREFIX + File.separator + this.folderName + File.separator + fileName);
+		myWriter.write(newValue);
+		myWriter.close();
+	}
+
+	private void writeFolders() throws IOException {
+		// Create folder if it doesn't exist
+		String path = PREFIX + File.separator + this.folderName;
+		this.folder = new File(path);
+		this.folder.mkdirs();
+		if (this.folder.exists()) {
+			System.out.println("Folder prepped: " + path);
+		} else {
+			throw new IOException("Unable to create folder for text file output: " + path);
+		}
+	}
+
+	/**
+	 * Creates empty files for all the cells we're interested in. Must be run after
+	 * {@link #writeFolders()}
+	 */
+	private void createInitialFiles(ConfigHolder config) throws IOException {
+		for (CellData data : config.getCells()) {
+			writeFile(data.getFileName(), "");
+		}
+	}
+
+	/**
+	 * Perform a general cleanup of the files dir; if you change configs, it'll
+	 * remove the files from the existing config.
+	 * 
+	 * @throws IOException
+	 *             if it cannot delete the folder/files
+	 */
+	public void cleanUp() throws IOException {
+		if (this.folder == null) {
+			System.out.println("No files to clean up; no project folder existing");
+			return;
+		}
+		System.out.println(String.format("Cleaning project folder '%s'", this.folder.getAbsolutePath()));
+		if (!deleteFiles(this.folder)) {
+			throw new IOException("Unable to delete project files for folder: " + this.folder.getAbsolutePath());
+		}
+	}
+
+	private boolean deleteFiles(File dirForDelete) {
+		if (dirForDelete == null) {
+			return false;
+		}
+		File[] allContents = dirForDelete.listFiles();
+		if (allContents != null) {
+			for (File file : allContents) {
+				deleteFiles(file);
+			}
+		}
+		System.out.println("\tDeleting " + dirForDelete.getAbsolutePath());
+		return dirForDelete.delete();
 	}
 }

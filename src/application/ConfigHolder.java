@@ -90,6 +90,10 @@ public class ConfigHolder {
 		return config.getMutatedMappings();
 	}
 
+	public boolean isLoaded() {
+		return lastFile != null;
+	}
+
 	/**
 	 * Reloads the most recently successful config file.
 	 * 

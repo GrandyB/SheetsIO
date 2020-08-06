@@ -40,10 +40,10 @@ import javafx.stage.Stage;
  * this to allow threads to pass back exception info to be handled nicely.
  * 
  * <pre>
- * 		TODO: Update CellDataTest
  * 		TODO: Update layout/styling of main app
  * 		TODO: Logging of errors
- * 		TODO: Pre-generation of all interested-in cells
+ * 		TODO: 'Clean all files' button (w/confirmation dialog)
+ * 		TODO: Update CellDataTest
  * </pre>
  *
  * @author Mark "Grandy" Bishop
@@ -98,7 +98,9 @@ public class Main extends Application implements IExceptionHandler {
 			config.setAutoUpdate(autoUpdateCheck.isSelected());
 			updateNowButton.setDisable(!updateNowButton.isDisabled());
 			try {
-				runnable.updateConfig(config);
+				if (config.isLoaded()) {
+					runnable.updateConfig(config);
+				}
 			} catch (IOException e) {
 				handleException(e);
 			}

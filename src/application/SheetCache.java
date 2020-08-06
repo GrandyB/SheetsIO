@@ -40,7 +40,8 @@ public class SheetCache {
 	 * from our {@link Config}. This should be the only place we're changing the
 	 * cache's size.
 	 *
-	 * Should be called each time config is updated, to wipe the cache clean.
+	 * Should be called each time config is updated, to wipe the cache clean and
+	 * prep it for the next config.
 	 */
 	public void setup(List<CellData> cellsOfInterest) {
 		values.clear();
