@@ -42,7 +42,6 @@ import javafx.stage.Stage;
  * this to allow threads to pass back exception info to be handled nicely.
  * 
  * <pre>
- * 		TODO: Update layout/styling of main app
  * 		TODO: Separate out the updating from the setting up of the config (e.g. no deletes when toggling autoupdate)
  * 		TODO: Logging of errors
  * 		TODO: 'Clean all files' button (w/confirmation dialog)
