@@ -47,12 +47,7 @@ public class UpdateController {
 	private String urlString;
 	private URL url;
 
-	/**
-	 * Set a new config, thus needing to reset state and start anew.
-	 * 
-	 * @param config
-	 * @throws IOException
-	 */
+	/** Set a new config, thus needing to reset state and start anew. */
 	public synchronized void setConfig(ConfigHolder config, boolean fromScratch) throws IOException {
 		this.config = config;
 
@@ -75,6 +70,7 @@ public class UpdateController {
 	 * Perform an update loop, based on the given config.
 	 * 
 	 * @throws IOException
+	 *             should the {@link FileUpdater} fail
 	 */
 	public void update() throws IOException {
 		if (config == null) {
@@ -89,7 +85,13 @@ public class UpdateController {
 		}
 	}
 
-	/** @return {@link GoogleSheetsResponse} from our request to the API. */
+	/**
+	 * Makes a request outwards to our prepared Google Sheets API url.
+	 *
+	 * @return {@link GoogleSheetsResponse} from our request to the API
+	 * @throws IOException
+	 *             should the connection or input stream fail
+	 */
 	private GoogleSheetsResponse getLatestState() throws IOException {
 		URLConnection request = this.url.openConnection();
 		request.connect();

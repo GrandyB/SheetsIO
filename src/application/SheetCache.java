@@ -74,6 +74,7 @@ public class SheetCache {
 		return changedElements;
 	}
 
+	/** @return String the data from the cell, from the cache. */
 	public String get(CellData cellData) {
 		return values.get(cellData);
 	}

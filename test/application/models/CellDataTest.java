@@ -19,23 +19,35 @@ package application.models;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import application.models.CellData;
-
-/**
- * 
- *
- * @author Mark "Grandy" Bishop
- */
 class CellDataTest {
 
 	@Test
-	void test() {
+	public void test_equality() {
+		// Especially important as we hit this in {@link SheetCache} with Map keys
+
 		CellData data1 = new CellData(1, 3);
 		CellData data2 = new CellData("B4", "file");
 
-		Assert.assertTrue(data2.getCol() == 1);
-		Assert.assertTrue(data2.getRow() == 3);
-		Assert.assertTrue("Expected the two to be equal", data1.equals(data2));
+		Assert.assertEquals(1, data2.getCol());
+		Assert.assertEquals(3, data2.getRow());
+		Assert.assertTrue("Expected data1 to equal data2", data1.equals(data2));
 	}
 
+	@Test
+	public void test_constructor_fromCoord() {
+		CellData data = new CellData("F7", "file");
+
+		Assert.assertEquals("F7", data.getCoordString());
+		Assert.assertEquals(5, data.getCol());
+		Assert.assertEquals(6, data.getRow());
+	}
+
+	@Test
+	public void test_constructor_fromInts() {
+		CellData data = new CellData(5, 6);
+
+		Assert.assertEquals("N/A", data.getCoordString()); // not calculated as not needed
+		Assert.assertEquals(5, data.getCol());
+		Assert.assertEquals(6, data.getRow());
+	}
 }

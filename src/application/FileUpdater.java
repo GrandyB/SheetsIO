@@ -17,7 +17,6 @@
 package application;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,11 +37,13 @@ public class FileUpdater {
 
 	private static final String PREFIX = "files";
 
+	private FileIO fileIO;
 	private String folderName;
 	private File folder;
 
 	/**
-	 * Prime the FileUpdater with the folder we'll be using.
+	 * Prime the FileUpdater with the folder we'll be using; create empty initial
+	 * files.
 	 * 
 	 * @throws IOException
 	 *             if folder cannot be made.
@@ -52,35 +53,25 @@ public class FileUpdater {
 		assert config != null : "config cannot be null";
 
 		this.folderName = projectName;
+		this.fileIO = createFileIO();
 		writeFolders();
 		createInitialFiles(config);
 	}
 
+	/** Update all the files from the Map with their new values. */
 	public void updateFiles(Map<CellData, String> updatedCells) throws IOException {
 		for (Entry<CellData, String> entry : updatedCells.entrySet()) {
 			String fileName = entry.getKey().getFileName();
 			String newValue = entry.getValue();
 
-			writeFile(fileName, newValue);
+			this.fileIO.writeFile(createFilePath(this.folderName, fileName), newValue);
 		}
 	}
 
-	private void writeFile(String fileName, String newValue) throws IOException {
-		FileWriter myWriter = new FileWriter(PREFIX + File.separator + this.folderName + File.separator + fileName);
-		myWriter.write(newValue);
-		myWriter.close();
-	}
-
+	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
-		// Create folder if it doesn't exist
-		String path = PREFIX + File.separator + this.folderName;
-		this.folder = new File(path);
-		this.folder.mkdirs();
-		if (this.folder.exists()) {
-			LOGGER.debug("Folder prepped: " + path);
-		} else {
-			throw new IOException("Unable to create folder for text file output: " + path);
-		}
+		String folderPath = createFolderPath(this.folderName);
+		this.folder = this.fileIO.createFolder(folderPath);
 	}
 
 	/**
@@ -89,7 +80,7 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles(ConfigHolder config) throws IOException {
 		for (CellData data : config.getCells()) {
-			writeFile(data.getFileName(), "");
+			fileIO.writeFile(data.getFileName(), "");
 		}
 	}
 
@@ -106,22 +97,24 @@ public class FileUpdater {
 			return;
 		}
 		LOGGER.debug("Cleaning project folder '{}'", this.folder.getAbsolutePath());
-		if (!deleteFiles(this.folder)) {
-			throw new IOException("Unable to delete project files for folder: " + this.folder.getAbsolutePath());
-		}
+		this.fileIO.deleteFiles(this.folder);
 	}
 
-	private boolean deleteFiles(File dirForDelete) {
-		if (dirForDelete == null) {
-			return false;
-		}
-		File[] allContents = dirForDelete.listFiles();
-		if (allContents != null) {
-			for (File file : allContents) {
-				deleteFiles(file);
-			}
-		}
-		LOGGER.debug("Deleting {}", dirForDelete.getAbsolutePath());
-		return dirForDelete.delete();
+	/** @return the file path, using prefix and folder name. */
+	protected String createFilePath(String folderName, String fileName) {
+		return PREFIX + File.separator + folderName + File.separator + fileName;
+	}
+
+	/** @return the folder path, using prefix and separator. */
+	protected String createFolderPath(String folderName) {
+		return PREFIX + File.separator + folderName;
+	}
+
+	/**
+	 * @return {@link FileIO} the instantiated FileIO. Protected and separate as to
+	 *         more easily extend and test.
+	 */
+	protected FileIO createFileIO() {
+		return new FileIO();
 	}
 }

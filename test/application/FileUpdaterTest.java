@@ -3,22 +3,54 @@
  */
 package application;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-class FileUpdaterTest {
+import application.models.CellData;
 
-	private FileUpdater fileUpdater = new FileUpdater();
+public class FileUpdaterTest {
+	private static final String FILE_NAME = "test123";
+
+	@Mock
+	private FileIO io;
+	@Mock
 	private ConfigHolder configHolder = new ConfigHolder();
 
-	@Test
-	void test() throws IOException {
-		fileUpdater.setup("testing123", configHolder);
+	private TestFileUpdater fileUpdater = new TestFileUpdater();
+
+	@Before
+	public void setUp() throws IOException {
+		MockitoAnnotations.initMocks(this);
+		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FILE_NAME));
+		Mockito.when(configHolder.getCells()).thenReturn(Arrays.asList(new CellData("A3", FILE_NAME)));
+	}
+
+	@After
+	public void tearDown() {
+		Mockito.verifyNoMoreInteractions(io);
 	}
 
 	@Test
-	void test2() throws IOException {
-		fileUpdater.setup("fourtyfour", configHolder);
+	public void test() throws IOException {
+		fileUpdater.setup("testing123", configHolder);
+
+		Mockito.verify(io, Mockito.times(1)).writeFile(FILE_NAME, "");
+		Mockito.verify(io).createFolder(fileUpdater.createFolderPath("testing123"));
+	}
+
+	private class TestFileUpdater extends FileUpdater {
+		@Override
+		protected FileIO createFileIO() {
+			return io;
+		}
+
 	}
 }

@@ -82,5 +82,11 @@
 	    <artifactId>log4j-core</artifactId>
 	    <version>2.13.3</version>
 	  </dependency>
+	  <!-- Mockito -->
+	  <dependency>
+	    <groupId>org.mockito</groupId>
+	    <artifactId>mockito-all</artifactId>
+	    <version>1.9.5</version>
+	  </dependency>
   </dependencies>
 </project>
