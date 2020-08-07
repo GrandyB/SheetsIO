@@ -35,7 +35,7 @@ import application.models.CellData;
 public class FileUpdater {
 	private static final Logger LOGGER = LogManager.getLogger(FileUpdater.class);
 
-	private static final String PREFIX = "files";
+	public static final String FOLDER_PREFIX = "files";
 
 	private FileIO fileIO;
 	private String folderName;
@@ -53,7 +53,6 @@ public class FileUpdater {
 		assert config != null : "config cannot be null";
 
 		this.folderName = projectName;
-		this.fileIO = createFileIO();
 		writeFolders();
 		createInitialFiles(config);
 	}
@@ -64,14 +63,14 @@ public class FileUpdater {
 			String fileName = entry.getKey().getFileName();
 			String newValue = entry.getValue();
 
-			this.fileIO.writeFile(createFilePath(this.folderName, fileName), newValue);
+			getFileIO().writeFile(createFilePath(this.folderName, fileName), newValue);
 		}
 	}
 
 	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
 		String folderPath = createFolderPath(this.folderName);
-		this.folder = this.fileIO.createFolder(folderPath);
+		this.folder = getFileIO().createFolder(folderPath);
 	}
 
 	/**
@@ -80,7 +79,7 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles(ConfigHolder config) throws IOException {
 		for (CellData data : config.getCells()) {
-			fileIO.writeFile(data.getFileName(), "");
+			getFileIO().writeFile(data.getFileName(), "");
 		}
 	}
 
@@ -97,24 +96,27 @@ public class FileUpdater {
 			return;
 		}
 		LOGGER.debug("Cleaning project folder '{}'", this.folder.getAbsolutePath());
-		this.fileIO.deleteFiles(this.folder);
+		getFileIO().deleteFiles(this.folder);
 	}
 
 	/** @return the file path, using prefix and folder name. */
 	protected String createFilePath(String folderName, String fileName) {
-		return PREFIX + File.separator + folderName + File.separator + fileName;
+		return FOLDER_PREFIX + File.separator + folderName + File.separator + fileName;
 	}
 
 	/** @return the folder path, using prefix and separator. */
 	protected String createFolderPath(String folderName) {
-		return PREFIX + File.separator + folderName;
+		return FOLDER_PREFIX + File.separator + folderName;
 	}
 
 	/**
 	 * @return {@link FileIO} the instantiated FileIO. Protected and separate as to
 	 *         more easily extend and test.
 	 */
-	protected FileIO createFileIO() {
-		return new FileIO();
+	protected FileIO getFileIO() {
+		if (this.fileIO == null) {
+			this.fileIO = new FileIO();
+		}
+		return this.fileIO;
 	}
 }
