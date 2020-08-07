@@ -56,7 +56,7 @@ public class ConfigHolder {
 	 * 
 	 * https://developers.google.com/sheets/api/limits
 	 */
-	private static final long UPDATE_INTERVAL = 1000L;
+	public static final long UPDATE_INTERVAL = 1000L;
 
 	/** Cached version of most recent config {@link File}. */
 	private File lastFile;

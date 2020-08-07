@@ -41,7 +41,7 @@ public class UpdateController {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class);
 
 	private final SheetCache cache = new SheetCache();
-	private final FileUpdater fileUpdater = new FileUpdater();
+	private final FileUpdater fileUpdater = new FileUpdater(new FileIO());
 
 	private ConfigHolder config;
 	private String urlString;

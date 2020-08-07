@@ -41,13 +41,14 @@ public class FileUpdaterTest {
 	@Mock
 	private ConfigHolder configHolder = new ConfigHolder();
 
-	private TestFileUpdater fileUpdater = new TestFileUpdater();
+	private FileUpdater fileUpdater;
 
 	@Before
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
 		Mockito.when(configHolder.getCells()).thenReturn(Arrays.asList(new CellData("A3", FILE_NAME)));
+		fileUpdater = new FileUpdater(io);
 	}
 
 	@After
@@ -107,13 +108,6 @@ public class FileUpdaterTest {
 	public void test_createFilePath() {
 		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME;
 		Assert.assertEquals(expected, fileUpdater.createFilePath(FOLDER_NAME, FILE_NAME));
-	}
-
-	private class TestFileUpdater extends FileUpdater {
-		@Override
-		protected FileIO getFileIO() {
-			return io;
-		}
 	}
 
 	private void verifySetup(String folderName) throws IOException {

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateRunnable implements Runnable {
 	/** Set a default of 1s update, until we have loaded a config. */
-	private long updateInterval = 1000L;
+	private long updateInterval = ConfigHolder.UPDATE_INTERVAL;
 	private boolean autoUpdate = true;
 
 	private UpdateController updater;

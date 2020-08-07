@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.models.CellData;
+import lombok.RequiredArgsConstructor;
 
 /**
  * For all file-related operations, taking {@link CellData} and a String value,
@@ -32,12 +33,13 @@ import application.models.CellData;
  *
  * @author Mark "Grandy" Bishop
  */
+@RequiredArgsConstructor
 public class FileUpdater {
 	private static final Logger LOGGER = LogManager.getLogger(FileUpdater.class);
 
 	public static final String FOLDER_PREFIX = "files";
 
-	private FileIO fileIO;
+	private final FileIO fileIO;
 	private String folderName;
 	private File folder;
 
@@ -63,14 +65,14 @@ public class FileUpdater {
 			String fileName = entry.getKey().getFileName();
 			String newValue = entry.getValue();
 
-			getFileIO().writeFile(createFilePath(this.folderName, fileName), newValue);
+			fileIO.writeFile(createFilePath(this.folderName, fileName), newValue);
 		}
 	}
 
 	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
 		String folderPath = createFolderPath(this.folderName);
-		this.folder = getFileIO().createFolder(folderPath);
+		this.folder = fileIO.createFolder(folderPath);
 	}
 
 	/**
@@ -79,7 +81,7 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles(ConfigHolder config) throws IOException {
 		for (CellData data : config.getCells()) {
-			getFileIO().writeFile(data.getFileName(), "");
+			fileIO.writeFile(data.getFileName(), "");
 		}
 	}
 
@@ -96,7 +98,7 @@ public class FileUpdater {
 			return;
 		}
 		LOGGER.debug("Cleaning project folder '{}'", this.folder.getAbsolutePath());
-		getFileIO().deleteFiles(this.folder);
+		fileIO.deleteFiles(this.folder);
 	}
 
 	/** @return the file path, using prefix and folder name. */
@@ -107,16 +109,5 @@ public class FileUpdater {
 	/** @return the folder path, using prefix and separator. */
 	protected String createFolderPath(String folderName) {
 		return FOLDER_PREFIX + File.separator + folderName;
-	}
-
-	/**
-	 * @return {@link FileIO} the instantiated FileIO. Protected and separate as to
-	 *         more easily extend and test.
-	 */
-	protected FileIO getFileIO() {
-		if (this.fileIO == null) {
-			this.fileIO = new FileIO();
-		}
-		return this.fileIO;
 	}
 }
