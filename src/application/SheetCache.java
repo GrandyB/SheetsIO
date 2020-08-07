@@ -49,7 +49,8 @@ public class SheetCache {
 	}
 
 	/**
-	 * Update the cache, provide a list of changed cell info so we can update files.
+	 * Update the cache, provide a list of changed cell info (from the data source)
+	 * so we can update files.
 	 *
 	 * @param fullValueMap
 	 *            mutated from {@link GoogleSheetsResponse}, the raw data in full
@@ -64,6 +65,11 @@ public class SheetCache {
 
 			// Look up value in new map, and contrast to stored value
 			String newVal = fullValueMap.get(cacheEntry.getKey());
+
+			if (newVal == null) {
+				// We didn't find the cell (from config) in the update (from sheet)
+				continue;
+			}
 
 			if (!newVal.equals(cacheEntry.getValue())) {
 				changedElements.put(cacheEntry.getKey(), newVal);
