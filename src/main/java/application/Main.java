@@ -84,6 +84,13 @@ public class Main extends Application implements IExceptionHandler {
 	}
 
 	private void doInit() {
+		FileIO fileIO = new FileIO();
+		try {
+			fileIO.createFolder("logs");
+		} catch (IOException e) {
+			handleException(e);
+		}
+
 		configChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
 		chooserButton.setOnAction(ev -> {
 			try {
@@ -161,6 +168,14 @@ public class Main extends Application implements IExceptionHandler {
 	}
 
 	public static void main(String[] args) {
+		// TODO: Fix log4j for dist
+		// System.setProperty("log4j.configurationFile", "resources/log4j2.xml"); //
+		// "src/main/application/resources/log4j2.xml");
+		// LoggerContext context = (org.apache.logging.log4j.core.LoggerContext)
+		// LogManager.getContext(false);
+		// File file = new File("resources/log4j2.xml");
+		// context.setConfigLocation(file.toURI());
+
 		LOGGER.info("____________________");
 		LOGGER.info("Starting up...");
 		LOGGER.info("     _____");
