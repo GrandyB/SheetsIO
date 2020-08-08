@@ -1,5 +1,3 @@
-[![Actions Status](https://github.com/GrandyB/SheeTXT/workflows/run_tests/badge.svg)](https://github.com/GrandyB/SheeTXT/actions)
-
 # SheeTXT
 
 The aim of the project is to create a simple way to use Google Spreadsheet data as text files within OBS.
