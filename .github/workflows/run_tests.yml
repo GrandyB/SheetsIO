@@ -19,4 +19,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build with Maven
+        with:
+          java-version: '1.8'
+          javafx: true
         run: mvn -B package --file pom.xml
