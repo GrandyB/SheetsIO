@@ -62,7 +62,7 @@ public class ConfigHolder {
 	private File lastFile;
 
 	@Getter
-	private boolean autoUpdate = true;
+	private boolean autoUpdate = false;
 
 	/** The latest loaded config. */
 	private Config config;
