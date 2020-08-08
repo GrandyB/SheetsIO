@@ -112,6 +112,6 @@ public class FileUpdaterTest {
 
 	private void verifySetup(String folderName) throws IOException {
 		Mockito.verify(io).createFolder(fileUpdater.createFolderPath(folderName));
-		Mockito.verify(io, Mockito.times(1)).writeFile(FILE_NAME, "");
+		Mockito.verify(io, Mockito.times(1)).writeFile(fileUpdater.createFilePath(folderName, FILE_NAME), "");
 	}
 }

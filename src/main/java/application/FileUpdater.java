@@ -81,7 +81,7 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles(ConfigHolder config) throws IOException {
 		for (CellData data : config.getCells()) {
-			fileIO.writeFile(data.getFileName(), "");
+			fileIO.writeFile(createFilePath(data.getFileName(), this.folderName), "");
 		}
 	}
 
