@@ -31,6 +31,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -53,6 +54,7 @@ public class Main extends Application implements IExceptionHandler {
 
 	private final FileChooser configChooser = new FileChooser();
 	private final Button chooserButton = new Button("Select config");
+	private final Hyperlink reloadConfigLink = new Hyperlink("Reload");
 	private final Text chosenConfigName = new Text();
 	private final CheckBox autoUpdateCheck = new CheckBox("Auto update");
 	private final Button updateNowButton = new Button("Update now");
@@ -85,13 +87,24 @@ public class Main extends Application implements IExceptionHandler {
 		chooserButton.setOnAction(ev -> {
 			try {
 				chooseFile();
+				disableThenReenable(chooserButton);
 			} catch (JsonSyntaxException | IOException | JsonValidationException e) {
 				handleException(e);
 			}
-			disableThenReenable(chooserButton);
 		});
 
-		autoUpdateCheck.setSelected(true);
+		reloadConfigLink.setOnAction(ev -> {
+			if (config.isLoaded()) {
+				try {
+					config.reload();
+					disableThenReenable(reloadConfigLink);
+				} catch (Exception e) {
+					handleException(e);
+				}
+			}
+		});
+
+		autoUpdateCheck.setSelected(false);
 		autoUpdateCheck.setOnAction(ev -> {
 			config.setAutoUpdate(autoUpdateCheck.isSelected());
 			updateNowButton.setDisable(!updateNowButton.isDisabled());
@@ -104,7 +117,7 @@ public class Main extends Application implements IExceptionHandler {
 			}
 		});
 
-		updateNowButton.setDisable(true);
+		updateNowButton.setDisable(false);
 		updateNowButton.setOnAction(ev -> {
 			runnable.runOnce();
 			disableThenReenable(updateNowButton);
@@ -118,7 +131,10 @@ public class Main extends Application implements IExceptionHandler {
 
 		Text configText = new Text("Config file");
 		configText.getStyleClass().add("config-file-label");
-		root.getChildren().add(configText);
+		reloadConfigLink.setVisible(false);
+		reloadConfigLink.getStyleClass().add("config-reload-link");
+		HBox configLabelLayout = new HBox(configText, reloadConfigLink);
+		root.getChildren().add(configLabelLayout);
 
 		HBox configBox = new HBox(chooserButton, chosenConfigName);
 		configBox.setSpacing(5);
@@ -166,10 +182,13 @@ public class Main extends Application implements IExceptionHandler {
 		// Remember the directory you used
 		configChooser.setInitialDirectory(file.getParentFile());
 
-		// Update labels and config
-		chosenConfigName.setText(file.getName());
+		// Update config
 		config.loadFile(file);
 		runnable.updateConfig(config, true);
+
+		chosenConfigName.setText(file.getName());
+		reloadConfigLink.setVisible(true);
+		autoUpdateCheck.setSelected(config.isAutoUpdate());
 	}
 
 	private void disableThenReenable(Control ctrl) {
