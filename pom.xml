@@ -27,6 +27,13 @@
     </plugins>
   </build>
   <dependencies>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx</artifactId>
+	    <version>11</version>
+	    <type>pom</type>
+	</dependency>
   	<dependency>
   		<groupId>com.google.code.gson</groupId>
   		<artifactId>gson</artifactId>
@@ -62,31 +69,37 @@
 	    <version>6.0.2.Final</version>
 	</dependency>
 	<dependency>
-	   <groupId>javax.el</groupId>
-	   <artifactId>javax.el-api</artifactId>
-	   <version>3.0.0</version>
+		<groupId>javax.el</groupId>
+		<artifactId>javax.el-api</artifactId>
+		<version>3.0.0</version>
 	</dependency>
 	<dependency>
-	   <groupId>org.glassfish.web</groupId>
-	   <artifactId>javax.el</artifactId>
-	   <version>2.2.4</version>
+		<groupId>org.glassfish.web</groupId>
+		<artifactId>javax.el</artifactId>
+		<version>2.2.4</version>
 	</dependency>
 	<!-- Apache Log4j 2 -->
 	<dependency>
-	    <groupId>org.apache.logging.log4j</groupId>
-	    <artifactId>log4j-api</artifactId>
-	    <version>2.13.3</version>
-	  </dependency>
-	  <dependency>
-	    <groupId>org.apache.logging.log4j</groupId>
-	    <artifactId>log4j-core</artifactId>
-	    <version>2.13.3</version>
-	  </dependency>
-	  <!-- Mockito -->
-	  <dependency>
-	    <groupId>org.mockito</groupId>
-	    <artifactId>mockito-all</artifactId>
-	    <version>1.9.5</version>
-	  </dependency>
+    	<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-api</artifactId>
+		<version>2.13.3</version>
+  	</dependency>
+  	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-core</artifactId>
+		<version>2.13.3</version>
+	</dependency>
+	<!-- Mockito -->
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-all</artifactId>
+		<version>1.9.5</version>
+	</dependency>
+	<dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>5.4.0</version>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

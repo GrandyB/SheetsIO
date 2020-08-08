@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/GrandyB/SheeTXT/workflows/run-junits/badge.svg)](https://github.com/GrandyB/SheeTXT/actions)
+[![Actions Status](https://github.com/GrandyB/SheeTXT/workflows/run_tests/badge.svg)](https://github.com/GrandyB/SheeTXT/actions)
 
 # SheeTXT
 
