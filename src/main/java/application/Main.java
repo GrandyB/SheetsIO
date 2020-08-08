@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonSyntaxException;
 
+import application.models.IExceptionHandler;
 import application.models.JsonValidationException;
 import javafx.application.Application;
 import javafx.geometry.Pos;

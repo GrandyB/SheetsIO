@@ -22,10 +22,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -43,7 +43,7 @@ public class FileUpdaterTest {
 
 	private FileUpdater fileUpdater;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
@@ -51,7 +51,7 @@ public class FileUpdaterTest {
 		fileUpdater = new FileUpdater(io);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		Mockito.verifyNoMoreInteractions(io);
 	}
@@ -101,13 +101,13 @@ public class FileUpdaterTest {
 	@Test
 	public void test_createFolderPath() {
 		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME;
-		Assert.assertEquals(expected, fileUpdater.createFolderPath(FOLDER_NAME));
+		Assertions.assertEquals(expected, fileUpdater.createFolderPath(FOLDER_NAME));
 	}
 
 	@Test
 	public void test_createFilePath() {
 		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME;
-		Assert.assertEquals(expected, fileUpdater.createFilePath(FOLDER_NAME, FILE_NAME));
+		Assertions.assertEquals(expected, fileUpdater.createFilePath(FOLDER_NAME, FILE_NAME));
 	}
 
 	private void verifySetup(String folderName) throws IOException {

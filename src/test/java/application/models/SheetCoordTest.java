@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.models;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import application.models.CellData;
 
 public class SheetCoordTest {
 	private static final String FILE = "file";
@@ -27,32 +25,32 @@ public class SheetCoordTest {
 	@Test
 	void test_B3() {
 		CellData coord = new CellData("B3", FILE);
-		Assert.assertEquals(1, coord.getCol());
-		Assert.assertEquals(2, coord.getRow());
-		Assert.assertEquals("B3", coord.getCoordString());
+		Assertions.assertEquals(1, coord.getCol());
+		Assertions.assertEquals(2, coord.getRow());
+		Assertions.assertEquals("B3", coord.getCoordString());
 	}
 
 	@Test
 	void test_A1() {
 		CellData coord = new CellData("A1", FILE);
-		Assert.assertEquals(0, coord.getCol());
-		Assert.assertEquals(0, coord.getRow());
-		Assert.assertEquals("A1", coord.getCoordString());
+		Assertions.assertEquals(0, coord.getCol());
+		Assertions.assertEquals(0, coord.getRow());
+		Assertions.assertEquals("A1", coord.getCoordString());
 	}
 
 	@Test
 	void test_AA45() {
 		CellData coord = new CellData("AA45", FILE);
-		Assert.assertEquals(26, coord.getCol());
-		Assert.assertEquals(44, coord.getRow());
-		Assert.assertEquals("AA45", coord.getCoordString());
+		Assertions.assertEquals(26, coord.getCol());
+		Assertions.assertEquals(44, coord.getRow());
+		Assertions.assertEquals("AA45", coord.getCoordString());
 	}
 
 	@Test
 	void test_RG1552() {
 		CellData coord = new CellData("RG1552", FILE);
-		Assert.assertEquals(474, coord.getCol());
-		Assert.assertEquals(1551, coord.getRow());
-		Assert.assertEquals("RG1552", coord.getCoordString());
+		Assertions.assertEquals(474, coord.getCol());
+		Assertions.assertEquals(1551, coord.getRow());
+		Assertions.assertEquals("RG1552", coord.getCoordString());
 	}
 }

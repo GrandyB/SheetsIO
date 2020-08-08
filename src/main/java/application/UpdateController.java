@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.GsonBuilder;
 
 import application.models.CellData;
-import application.models.json.GoogleSheetsResponse;
+import application.models.GoogleSheetsResponse;
 
 /**
  * Makes the calls to update the sheet. May be used within threads, e.g.

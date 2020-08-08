@@ -1,0 +1,9 @@
+.root {
+	-fx-padding: 10px;
+}
+.config-file-label, .update-method-label {
+	-fx-font-weight: bold;
+}
+.config-name-label {
+	-fx-font-style: italic;
+}

@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import application.models.CellData;
 
@@ -42,13 +42,13 @@ public class SheetCacheTest {
 	public void test_get() {
 		testee.setup(testCells);
 		// Ensure we get hits for the ones we expect
-		Assert.assertEquals("", testee.get(a1));
-		Assert.assertEquals("", testee.get(dataFromCoord(0, 0)));
-		Assert.assertEquals("", testee.get(cz55));
+		Assertions.assertEquals("", testee.get(a1));
+		Assertions.assertEquals("", testee.get(dataFromCoord(0, 0)));
+		Assertions.assertEquals("", testee.get(cz55));
 
 		// Ensure misses for ones we don't want (e.g. A2)
-		Assert.assertNull("Cache hit for unexpected key", testee.get(dataFromRef("A2")));
-		Assert.assertNull("Cache hit for unexpected key", testee.get(dataFromCoord(0, 1)));
+		Assertions.assertNull(testee.get(dataFromRef("A2")), "Cache hit for unexpected key");
+		Assertions.assertNull(testee.get(dataFromCoord(0, 1)), "Cache hit for unexpected key");
 	}
 
 	@Test
@@ -67,23 +67,23 @@ public class SheetCacheTest {
 		rawCellData.put(dataFromRef("CZ55"), cz55Message);
 
 		// Check initial state; cache hits but empty for those we're about to update
-		Assert.assertEquals("", testee.get(a1));
-		Assert.assertEquals("", testee.get(c3));
-		Assert.assertEquals("", testee.get(cz55));
+		Assertions.assertEquals("", testee.get(a1));
+		Assertions.assertEquals("", testee.get(c3));
+		Assertions.assertEquals("", testee.get(cz55));
 
 		testee.update(rawCellData);
 
 		// Ensure raw data doesn't make its way in if wasn't already in
-		Assert.assertNull("Cache should have missed", testee.get(dataFromRef("A2")));
-		Assert.assertNull("Cache should have missed", testee.get(dataFromRef("B3")));
+		Assertions.assertNull(testee.get(dataFromRef("A2")), "Cache should have missed");
+		Assertions.assertNull(testee.get(dataFromRef("B3")), "Cache should have missed");
 
 		// Ensure cache hits have new values, non updated values stay the same
-		Assert.assertEquals(a1Message, testee.get(a1));
-		Assert.assertEquals(c3Message, testee.get(c3));
-		Assert.assertEquals(cz55Message, testee.get(cz55));
-		Assert.assertEquals("", testee.get(b2));
-		Assert.assertEquals("", testee.get(d4));
-		Assert.assertEquals("", testee.get(ab5));
+		Assertions.assertEquals(a1Message, testee.get(a1));
+		Assertions.assertEquals(c3Message, testee.get(c3));
+		Assertions.assertEquals(cz55Message, testee.get(cz55));
+		Assertions.assertEquals("", testee.get(b2));
+		Assertions.assertEquals("", testee.get(d4));
+		Assertions.assertEquals("", testee.get(ab5));
 	}
 
 	private CellData dataFromRef(String ref) {

@@ -16,7 +16,7 @@
  */
 package application.models;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class CellDataTest {
@@ -28,26 +28,26 @@ class CellDataTest {
 		CellData data1 = new CellData(1, 3);
 		CellData data2 = new CellData("B4", "file");
 
-		Assert.assertEquals(1, data2.getCol());
-		Assert.assertEquals(3, data2.getRow());
-		Assert.assertTrue("Expected data1 to equal data2", data1.equals(data2));
+		Assertions.assertEquals(1, data2.getCol());
+		Assertions.assertEquals(3, data2.getRow());
+		Assertions.assertTrue(data1.equals(data2), "Expected data1 to equal data2");
 	}
 
 	@Test
 	public void test_constructor_fromCoord() {
 		CellData data = new CellData("F7", "file");
 
-		Assert.assertEquals("F7", data.getCoordString());
-		Assert.assertEquals(5, data.getCol());
-		Assert.assertEquals(6, data.getRow());
+		Assertions.assertEquals("F7", data.getCoordString());
+		Assertions.assertEquals(5, data.getCol());
+		Assertions.assertEquals(6, data.getRow());
 	}
 
 	@Test
 	public void test_constructor_fromInts() {
 		CellData data = new CellData(5, 6);
 
-		Assert.assertEquals("N/A", data.getCoordString()); // not calculated as not needed
-		Assert.assertEquals(5, data.getCol());
-		Assert.assertEquals(6, data.getRow());
+		Assertions.assertEquals("N/A", data.getCoordString()); // not calculated as not needed
+		Assertions.assertEquals(5, data.getCol());
+		Assertions.assertEquals(6, data.getRow());
 	}
 }

@@ -18,6 +18,7 @@ package application;
 
 import java.io.IOException;
 
+import application.models.IExceptionHandler;
 import lombok.RequiredArgsConstructor;
 
 /**
