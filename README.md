@@ -6,7 +6,7 @@ The aim of the project is to create a simple way to use Google Spreadsheet data 
 
 Microsoft Excel (and other local sheet programs) often have the capability to record macros and save to files, however this requires some technical knowledge to do so, and requires the right type of sheet program  (as each have their own language for writing macros, sometimes making it difficult to share).
 
-There's also a project or two such as [https://github.com/rewindrl/updater](RewindRL)'s updater system, which goes from Google Sheets into browser-based graphics.
+There's also a project or two such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which goes from Google Sheets into browser-based graphics.
 
 SheeTXT is (possibly) the first to go straight to text files.
 
