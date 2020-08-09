@@ -24,12 +24,13 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.models.CellData;
+import application.models.CellWrapper;
+import application.models.json.Cell;
 import lombok.RequiredArgsConstructor;
 
 /**
- * For all file-related operations, taking {@link CellData} and a String value,
- * and physically updating the files on disk.
+ * For all file-related operations, taking {@link CellWrapper} and a String
+ * value, and physically updating the files on disk.
  *
  * @author Mark "Grandy" Bishop
  */
@@ -40,7 +41,7 @@ public class FileUpdater {
 	public static final String FOLDER_PREFIX = "files";
 
 	private final FileIO fileIO;
-	private String folderName;
+	private ConfigHolder configHolder;
 	private File folder;
 
 	/**
@@ -50,28 +51,28 @@ public class FileUpdater {
 	 * @throws IOException
 	 *             if folder cannot be made.
 	 */
-	public void setup(String projectName, ConfigHolder config) throws IOException {
-		assert projectName != null : "projectName cannot be null";
-		assert config != null : "config cannot be null";
+	public void setup(ConfigHolder configHolder) throws IOException {
+		assert configHolder != null : "config cannot be null";
+		assert configHolder.getProjectName() != null : "projectName cannot be null";
+		this.configHolder = configHolder;
 
-		this.folderName = projectName;
 		writeFolders();
-		createInitialFiles(config);
+		createInitialFiles();
 	}
 
 	/** Update all the files from the Map with their new values. */
-	public void updateFiles(Map<CellData, String> updatedCells) throws IOException {
-		for (Entry<CellData, String> entry : updatedCells.entrySet()) {
-			String fileName = entry.getKey().getFileName();
+	public void updateFiles(Map<CellWrapper, String> updatedCells) throws IOException {
+		for (Entry<CellWrapper, String> entry : updatedCells.entrySet()) {
+			CellWrapper cellWrapper = entry.getKey();
 			String newValue = entry.getValue();
 
-			fileIO.writeFile(createFilePath(this.folderName, fileName), newValue);
+			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper.getCell()), newValue);
 		}
 	}
 
 	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
-		String folderPath = createFolderPath(this.folderName);
+		String folderPath = createFolderPath(this.configHolder.getProjectName());
 		this.folder = fileIO.createFolder(folderPath);
 	}
 
@@ -79,9 +80,9 @@ public class FileUpdater {
 	 * Creates empty files for all the cells we're interested in. Must be run after
 	 * {@link #writeFolders()}
 	 */
-	private void createInitialFiles(ConfigHolder config) throws IOException {
-		for (CellData data : config.getCells()) {
-			fileIO.writeFile(createFilePath(this.folderName, data.getFileName()), "");
+	private void createInitialFiles() throws IOException {
+		for (CellWrapper cellWrapper : this.configHolder.getCells()) {
+			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper.getCell()), "");
 		}
 	}
 
@@ -101,12 +102,23 @@ public class FileUpdater {
 		fileIO.deleteFiles(this.folder);
 	}
 
-	/** @return the file path, using prefix and folder name. */
-	protected String createFilePath(String folderName, String fileName) {
-		return FOLDER_PREFIX + File.separator + folderName + File.separator + fileName;
+	/**
+	 * @param folderName
+	 *            the name of the project/folder
+	 * @param cell
+	 *            the {@link Cell}, for its name, to be used in the file name
+	 * @return the file path, using prefix and folder name.
+	 */
+	protected String createFilePath(String folderName, Cell cell) {
+		return FOLDER_PREFIX + File.separator + folderName + File.separator + cell.getName() + "."
+				+ configHolder.getExtension(cell);
 	}
 
-	/** @return the folder path, using prefix and separator. */
+	/**
+	 * @param folderName
+	 *            the name of the project/folder
+	 * @return the folder path, using prefix and separator.
+	 */
 	protected String createFolderPath(String folderName) {
 		return FOLDER_PREFIX + File.separator + folderName;
 	}

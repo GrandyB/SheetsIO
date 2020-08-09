@@ -23,8 +23,7 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-import application.models.CellData;
-import application.models.CellMapping;
+import application.models.CellWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -51,18 +50,41 @@ public final class Config {
 	@NotBlank(message = "Please provide a non-blank \"worksheetName\"")
 	private final String worksheetName;
 
-	@NotEmpty(message = "\"cells\" must be provided have values")
-	private final CellMapping[] cells;
+	@NotEmpty(message = "\"cells\" must be provided and have values")
+	private final Cell[] cells;
+
+	@NotEmpty(message = "\"fileTypes\" must be provided and have values")
+	private final FileType[] fileTypes;
 
 	/**
-	 * @return the {@link CellMapping}[] array muted into an {@link ArrayList} of
-	 *         {@link CellData}, for convenience.
+	 * @return the {@link Cell}[] array muted into an {@link ArrayList} of
+	 *         {@link CellWrapper}, for convenience.
 	 */
-	public List<CellData> getMutatedMappings() {
-		List<CellData> mappings = new ArrayList<>();
+	public List<CellWrapper> getMutatedMappings() {
+		List<CellWrapper> mappings = new ArrayList<>();
 		Arrays.asList(cells).forEach(cell -> {
 			mappings.add(cell.getMutatedData());
 		});
 		return mappings;
+	}
+
+	/**
+	 * @return the {@link FileType}[] array muted into an {@link ArrayList} of
+	 *         {@link FileType}, for convenience.
+	 */
+	public List<FileType> getFileTypes() {
+		List<FileType> types = new ArrayList<>();
+		types.addAll(Arrays.asList(fileTypes));
+		return types;
+	}
+
+	/**
+	 * @return the {@link Cell}[] array muted into an {@link ArrayList} of
+	 *         {@link Cell}, for convenience.
+	 */
+	public List<Cell> getCells() {
+		List<Cell> cells = new ArrayList<>();
+		cells.addAll(Arrays.asList(this.cells));
+		return cells;
 	}
 }

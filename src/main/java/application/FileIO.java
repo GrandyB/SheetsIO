@@ -51,7 +51,8 @@ public class FileIO {
 	}
 
 	/**
-	 * Recursively delete the give File (folder) and everything within it.
+	 * Recursively delete the give File (folder) and everything within it (all the
+	 * way down).
 	 * 
 	 * @throws IOException
 	 *             should deletion fail

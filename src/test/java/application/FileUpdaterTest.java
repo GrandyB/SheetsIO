@@ -18,8 +18,9 @@ package application;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +31,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import application.models.CellData;
+import application.models.CellWrapper;
+import application.models.json.Cell;
 
 public class FileUpdaterTest {
 	private static final String FOLDER_NAME = "exampleFolderName";
@@ -42,12 +44,18 @@ public class FileUpdaterTest {
 	private ConfigHolder configHolder = new ConfigHolder();
 
 	private FileUpdater fileUpdater;
+	private List<CellWrapper> cells = new ArrayList<>();
+	private Cell exampleCell = new Cell(FILE_NAME, "A3", "text");
 
 	@BeforeEach
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
-		Mockito.when(configHolder.getCells()).thenReturn(Arrays.asList(new CellData("A3", FILE_NAME)));
+		Mockito.when(configHolder.getProjectName()).thenReturn(FOLDER_NAME);
+		Mockito.when(configHolder.getExtension(exampleCell)).thenReturn("txt");
+		cells.add(new CellWrapper(exampleCell));
+		Mockito.when(configHolder.getCells()).thenReturn(cells);
+
 		fileUpdater = new FileUpdater(io);
 	}
 
@@ -58,14 +66,14 @@ public class FileUpdaterTest {
 
 	@Test
 	public void test_setup() throws IOException {
-		fileUpdater.setup(FOLDER_NAME, configHolder);
+		fileUpdater.setup(configHolder);
 		verifySetup(FOLDER_NAME);
 	}
 
 	@Test
 	public void test_updateFiles() throws IOException {
 		// Must first setup
-		fileUpdater.setup(FOLDER_NAME, configHolder);
+		fileUpdater.setup(configHolder);
 		verifySetup(FOLDER_NAME);
 
 		/*
@@ -73,13 +81,16 @@ public class FileUpdaterTest {
 		 * cache; which should mean they're only for cells that initially came from the
 		 * config, not random given ones like we have below.
 		 */
-		Map<CellData, String> updatedCells = new HashMap<>();
-		updatedCells.put(new CellData("E3", FILE_NAME + "1"), "newVal1");
-		updatedCells.put(new CellData("B8", FILE_NAME + "2"), "newVal2");
+		Map<CellWrapper, String> updatedCells = new HashMap<>();
+		Cell a8 = new Cell(FILE_NAME + "1", "A8", "text");
+		updatedCells.put(new CellWrapper(a8), "newVal1");
+
+		Cell b8 = new Cell(FILE_NAME + "2", "B8", "text");
+		updatedCells.put(new CellWrapper(b8), "newVal2");
 
 		fileUpdater.updateFiles(updatedCells);
-		Mockito.verify(io).writeFile(fileUpdater.createFilePath(FOLDER_NAME, FILE_NAME + "1"), "newVal1");
-		Mockito.verify(io).writeFile(fileUpdater.createFilePath(FOLDER_NAME, FILE_NAME + "2"), "newVal2");
+		Mockito.verify(io).writeFile(fileUpdater.createFilePath(FOLDER_NAME, a8), "newVal1");
+		Mockito.verify(io).writeFile(fileUpdater.createFilePath(FOLDER_NAME, b8), "newVal2");
 	}
 
 	@Test
@@ -91,7 +102,7 @@ public class FileUpdaterTest {
 	@Test
 	public void test_cleanUp_hasFolder() throws IOException {
 		// Must first setup
-		fileUpdater.setup(FOLDER_NAME, configHolder);
+		fileUpdater.setup(configHolder);
 		verifySetup(FOLDER_NAME);
 
 		fileUpdater.cleanUp();
@@ -105,13 +116,18 @@ public class FileUpdaterTest {
 	}
 
 	@Test
-	public void test_createFilePath() {
-		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME;
-		Assertions.assertEquals(expected, fileUpdater.createFilePath(FOLDER_NAME, FILE_NAME));
+	public void test_createFilePath() throws IOException {
+		// Must first setup
+		fileUpdater.setup(configHolder);
+		verifySetup(FOLDER_NAME);
+
+		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME
+				+ ".txt";
+		Assertions.assertEquals(expected, fileUpdater.createFilePath(FOLDER_NAME, exampleCell));
 	}
 
 	private void verifySetup(String folderName) throws IOException {
 		Mockito.verify(io).createFolder(fileUpdater.createFolderPath(folderName));
-		Mockito.verify(io, Mockito.times(1)).writeFile(fileUpdater.createFilePath(folderName, FILE_NAME), "");
+		Mockito.verify(io, Mockito.times(1)).writeFile(fileUpdater.createFilePath(folderName, exampleCell), "");
 	}
 }

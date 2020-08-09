@@ -19,12 +19,13 @@ package application.models;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class SheetCoordTest {
-	private static final String FILE = "file";
+import application.models.json.Cell;
+
+public class CellWrapperTest {
 
 	@Test
 	void test_B3() {
-		CellData coord = new CellData("B3", FILE);
+		CellWrapper coord = new CellWrapper(createCell("B3"));
 		Assertions.assertEquals(1, coord.getCol());
 		Assertions.assertEquals(2, coord.getRow());
 		Assertions.assertEquals("B3", coord.getCoordString());
@@ -32,7 +33,7 @@ public class SheetCoordTest {
 
 	@Test
 	void test_A1() {
-		CellData coord = new CellData("A1", FILE);
+		CellWrapper coord = new CellWrapper(createCell("A1"));
 		Assertions.assertEquals(0, coord.getCol());
 		Assertions.assertEquals(0, coord.getRow());
 		Assertions.assertEquals("A1", coord.getCoordString());
@@ -40,7 +41,7 @@ public class SheetCoordTest {
 
 	@Test
 	void test_AA45() {
-		CellData coord = new CellData("AA45", FILE);
+		CellWrapper coord = new CellWrapper(createCell("AA45"));
 		Assertions.assertEquals(26, coord.getCol());
 		Assertions.assertEquals(44, coord.getRow());
 		Assertions.assertEquals("AA45", coord.getCoordString());
@@ -48,9 +49,13 @@ public class SheetCoordTest {
 
 	@Test
 	void test_RG1552() {
-		CellData coord = new CellData("RG1552", FILE);
+		CellWrapper coord = new CellWrapper(createCell("RG1552"));
 		Assertions.assertEquals(474, coord.getCol());
 		Assertions.assertEquals(1551, coord.getRow());
 		Assertions.assertEquals("RG1552", coord.getCoordString());
+	}
+
+	private Cell createCell(String ref) {
+		return new Cell(ref, ref, "text");
 	}
 }

@@ -19,14 +19,17 @@ package application.models;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import application.models.json.Cell;
+
 class CellDataTest {
 
 	@Test
 	public void test_equality() {
 		// Especially important as we hit this in {@link SheetCache} with Map keys
 
-		CellData data1 = new CellData(1, 3);
-		CellData data2 = new CellData("B4", "file");
+		CellWrapper data1 = CellWrapper.fromGoogleCoord(1, 3);
+		Cell cell = new Cell("Test", "B4", "text");
+		CellWrapper data2 = new CellWrapper(cell);
 
 		Assertions.assertEquals(1, data2.getCol());
 		Assertions.assertEquals(3, data2.getRow());
@@ -35,7 +38,8 @@ class CellDataTest {
 
 	@Test
 	public void test_constructor_fromCoord() {
-		CellData data = new CellData("F7", "file");
+		Cell cell = new Cell("Test", "F7", "text");
+		CellWrapper data = new CellWrapper(cell);
 
 		Assertions.assertEquals("F7", data.getCoordString());
 		Assertions.assertEquals(5, data.getCol());
@@ -44,7 +48,7 @@ class CellDataTest {
 
 	@Test
 	public void test_constructor_fromInts() {
-		CellData data = new CellData(5, 6);
+		CellWrapper data = CellWrapper.fromGoogleCoord(5, 6);
 
 		Assertions.assertEquals("N/A", data.getCoordString()); // not calculated as not needed
 		Assertions.assertEquals(5, data.getCol());

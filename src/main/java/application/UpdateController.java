@@ -28,8 +28,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.GsonBuilder;
 
-import application.models.CellData;
-import application.models.GoogleSheetsResponse;
+import application.models.CellWrapper;
+import application.models.json.GoogleSheetsResponse;
 
 /**
  * Makes the calls to update the sheet. May be used within threads, e.g.
@@ -60,7 +60,7 @@ public class UpdateController {
 			this.cache.setup(config.getCells());
 			this.fileUpdater.cleanUp();
 			this.url = new URL(this.urlString);
-			this.fileUpdater.setup(config.getProjectName(), config);
+			this.fileUpdater.setup(config);
 		}
 
 	}
@@ -78,7 +78,7 @@ public class UpdateController {
 		}
 		LOGGER.debug("Updating...");
 
-		Map<CellData, String> updatedCells = updateCache(getLatestState());
+		Map<CellWrapper, String> updatedCells = updateCache(getLatestState());
 		if (!updatedCells.isEmpty()) {
 			fileUpdater.updateFiles(updatedCells);
 		}
@@ -99,8 +99,8 @@ public class UpdateController {
 				GoogleSheetsResponse.class);
 	}
 
-	private Map<CellData, String> updateCache(GoogleSheetsResponse data) {
-		Map<CellData, String> fullValueMap = data.getMutatedRowColumnData();
+	private Map<CellWrapper, String> updateCache(GoogleSheetsResponse data) {
+		Map<CellWrapper, String> fullValueMap = data.getMutatedRowColumnData();
 
 		// Update the cache
 		return this.cache.update(fullValueMap);

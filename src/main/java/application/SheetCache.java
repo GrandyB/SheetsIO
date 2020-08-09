@@ -21,29 +21,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import application.models.CellData;
-import application.models.GoogleSheetsResponse;
+import application.models.CellWrapper;
 import application.models.json.Config;
+import application.models.json.GoogleSheetsResponse;
 
 /**
  * Keep track of current values from the google spreadsheet; when an update
- * comes in, track which {@link CellData}s have had their value changed, and
+ * comes in, track which {@link CellWrapper}s have had their value changed, and
  * only update those text files instead of all files.
  *
  * @author Mark "Grandy" Bishop
  */
 public class SheetCache {
-	private Map<CellData, String> values = new HashMap<>();
+	private Map<CellWrapper, String> values = new HashMap<>();
 
 	/**
-	 * Prep the cache with the {@link CellData} of the cells we're interested in
+	 * Prep the cache with the {@link CellWrapper} of the cells we're interested in
 	 * from our {@link Config}. This should be the only place we're changing the
 	 * cache's size.
 	 *
 	 * Should be called each time config is updated, to wipe the cache clean and
 	 * prep it for the next config.
 	 */
-	public void setup(List<CellData> cellsOfInterest) {
+	public void setup(List<CellWrapper> cellsOfInterest) {
 		values.clear();
 		cellsOfInterest.forEach(c -> values.put(c, ""));
 	}
@@ -54,14 +54,14 @@ public class SheetCache {
 	 *
 	 * @param fullValueMap
 	 *            mutated from {@link GoogleSheetsResponse}, the raw data in full
-	 * @return a Map of {@link CellData} to String for the changed cells and their
+	 * @return a Map of {@link CellWrapper} to String for the changed cells and their
 	 *         new values
 	 */
-	public Map<CellData, String> update(Map<CellData, String> fullValueMap) {
-		Map<CellData, String> changedElements = new HashMap<>();
+	public Map<CellWrapper, String> update(Map<CellWrapper, String> fullValueMap) {
+		Map<CellWrapper, String> changedElements = new HashMap<>();
 
 		// Loop through cache keys
-		for (Entry<CellData, String> cacheEntry : this.values.entrySet()) {
+		for (Entry<CellWrapper, String> cacheEntry : this.values.entrySet()) {
 
 			// Look up value in new map, and contrast to stored value
 			String newVal = fullValueMap.get(cacheEntry.getKey());
@@ -81,7 +81,7 @@ public class SheetCache {
 	}
 
 	/** @return String the data from the cell, from the cache. */
-	public String get(CellData cellData) {
+	public String get(CellWrapper cellData) {
 		return values.get(cellData);
 	}
 }

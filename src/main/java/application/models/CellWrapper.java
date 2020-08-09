@@ -16,8 +16,10 @@
  */
 package application.models;
 
+import application.models.json.Cell;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Class for converting and storing an excel cell reference in terms of rows and
@@ -28,7 +30,8 @@ import lombok.Getter;
  * @author Mark "Grandy" Bishop
  */
 @EqualsAndHashCode(of = { "col", "row" })
-public final class CellData {
+@RequiredArgsConstructor
+public final class CellWrapper {
 
 	/** 0-indexed column number. */
 	@Getter
@@ -43,23 +46,28 @@ public final class CellData {
 	private final String coordString;
 
 	@Getter
-	private final String fileName;
+	private final Cell cell;
 
-	public CellData(String coord, String file) {
-		this.coordString = coord;
-		this.col = toColumnNumber(coord);
-		this.row = toRowNumber(coord);
-		this.fileName = file;
+	public CellWrapper(Cell cell) {
+		this.cell = cell;
+		this.coordString = cell.getCell();
+		this.col = toColumnNumber(this.coordString);
+		this.row = toRowNumber(this.coordString);
 	}
 
 	/**
-	 * Constructor, only used when we aren't converting from an excel-style coord.
+	 * Create a CellWrapper just from the Google-provided row/col values; we don't
+	 * need to know an alphabetical reference as the system only cares about row/col
+	 * in the end.
+	 * 
+	 * @param col
+	 *            The column id (zero-indexed)
+	 * @param row
+	 *            The row id (zero-indexed)
+	 * @return a {@link CellWrapper}
 	 */
-	public CellData(int col, int row) {
-		this.col = col;
-		this.row = row;
-		this.coordString = "N/A";
-		this.fileName = "N/A";
+	public static CellWrapper fromGoogleCoord(int col, int row) {
+		return new CellWrapper(col, row, "N/A", null);
 	}
 
 	private static int toRowNumber(String coord) {
@@ -78,7 +86,7 @@ public final class CellData {
 
 	@Override
 	public String toString() {
-		return "CellData [col=" + col + ", row=" + row + ", coordString=" + coordString + ", fileName=" + fileName
-				+ "]";
+		return this.getClass().getSimpleName() + " [col=" + col + ", row=" + row + ", coordString=" + coordString
+				+ ", cell=" + cell + "]";
 	}
 }

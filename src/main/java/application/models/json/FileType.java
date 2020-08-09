@@ -1,5 +1,5 @@
 /**
- * CellMapping.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
+ * FileType.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.models;
+package application.models.json;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
- * Bean equivalent of the [ { "cell": "C4", "file": "file.txt" } ] individual
- * objects.
+ * Model for config json file mapping (id to extension).
  *
  * @author Mark "Grandy" Bishop
  */
-public final class CellMapping {
-	/** Native/mostly useless direct mappings, for validation purposes. */
-	@NotBlank(message = "Mapping \"cell\" must have a value")
-	private String cell;
-	@NotBlank(message = "Mapping \"file\" must have a value")
-	private String file;
+@AllArgsConstructor
+public final class FileType {
+	@Getter
+	@NotBlank(message = "Mapping \"id\" must have a value")
+	private String id;
 
-	/**
-	 * @return {@link CellData}, built from this {@link CellMapping} for
-	 *         convenience.
-	 */
-	public CellData getMutatedData() {
-		return new CellData(cell, file);
-	}
+	@Getter
+	@NotBlank(message = "Mapping \"extension\" must have a value")
+	private String extension;
 }

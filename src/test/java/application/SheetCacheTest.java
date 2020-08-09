@@ -24,31 +24,32 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import application.models.CellData;
+import application.models.CellWrapper;
+import application.models.json.Cell;
 
 public class SheetCacheTest {
 	private SheetCache testee = new SheetCache();
 
-	private CellData a1 = dataFromRef("A1");
-	private CellData b2 = dataFromRef("B2");
-	private CellData c3 = dataFromRef("C3");
-	private CellData d4 = dataFromRef("D4");
-	private CellData ab5 = dataFromRef("AB5");
-	private CellData cz55 = dataFromRef("CZ55");
+	private CellWrapper a1 = dataFromRef("A1");
+	private CellWrapper b2 = dataFromRef("B2");
+	private CellWrapper c3 = dataFromRef("C3");
+	private CellWrapper d4 = dataFromRef("D4");
+	private CellWrapper ab5 = dataFromRef("AB5");
+	private CellWrapper cz55 = dataFromRef("CZ55");
 
-	private List<CellData> testCells = Arrays.asList(a1, b2, c3, d4, ab5, cz55);
+	private List<CellWrapper> testCells = Arrays.asList(a1, b2, c3, d4, ab5, cz55);
 
 	@Test
 	public void test_get() {
 		testee.setup(testCells);
 		// Ensure we get hits for the ones we expect
 		Assertions.assertEquals("", testee.get(a1));
-		Assertions.assertEquals("", testee.get(dataFromCoord(0, 0)));
+		Assertions.assertEquals("", testee.get(CellWrapper.fromGoogleCoord(0, 0)));
 		Assertions.assertEquals("", testee.get(cz55));
 
 		// Ensure misses for ones we don't want (e.g. A2)
 		Assertions.assertNull(testee.get(dataFromRef("A2")), "Cache hit for unexpected key");
-		Assertions.assertNull(testee.get(dataFromCoord(0, 1)), "Cache hit for unexpected key");
+		Assertions.assertNull(testee.get(CellWrapper.fromGoogleCoord(0, 1)), "Cache hit for unexpected key");
 	}
 
 	@Test
@@ -59,8 +60,8 @@ public class SheetCacheTest {
 		String c3Message = "C3 exists in config";
 		String cz55Message = "CZ55 exists in config";
 
-		Map<CellData, String> rawCellData = new HashMap<>();
-		rawCellData.put(dataFromCoord(0, 0), a1Message);
+		Map<CellWrapper, String> rawCellData = new HashMap<>();
+		rawCellData.put(CellWrapper.fromGoogleCoord(0, 0), a1Message);
 		rawCellData.put(dataFromRef("C3"), c3Message);
 		rawCellData.put(dataFromRef("A2"), "A2 doesn't exist in config");
 		rawCellData.put(dataFromRef("B3"), "B3 doesn't exist in config");
@@ -86,11 +87,7 @@ public class SheetCacheTest {
 		Assertions.assertEquals("", testee.get(ab5));
 	}
 
-	private CellData dataFromRef(String ref) {
-		return new CellData(ref, ref + ".txt");
-	}
-
-	private CellData dataFromCoord(int col, int row) {
-		return new CellData(col, row);
+	private CellWrapper dataFromRef(String ref) {
+		return new CellWrapper(new Cell(ref, ref, "text"));
 	}
 }

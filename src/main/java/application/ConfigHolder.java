@@ -19,7 +19,9 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -36,9 +38,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-import application.models.CellData;
+import application.models.CellWrapper;
 import application.models.JsonValidationException;
+import application.models.json.Cell;
 import application.models.json.Config;
+import application.models.json.FileType;
 import lombok.Getter;
 
 /**
@@ -57,6 +61,9 @@ public class ConfigHolder {
 	 * https://developers.google.com/sheets/api/limits
 	 */
 	public static final long UPDATE_INTERVAL = 1000L;
+
+	private Map<Cell, FileType> fileTypePerCell = new HashMap<>();
+	private Map<String, FileType> fileTypeById = new HashMap<>();
 
 	/** Cached version of most recent config {@link File}. */
 	private File lastFile;
@@ -87,9 +94,14 @@ public class ConfigHolder {
 		return config.getWorksheetName();
 	}
 
-	public List<CellData> getCells() {
+	public List<CellWrapper> getCells() {
 		assert config != null : "No config available";
 		return config.getMutatedMappings();
+	}
+
+	public List<FileType> getFileTypes() {
+		assert config != null : "No config available";
+		return config.getFileTypes();
 	}
 
 	public boolean isLoaded() {
@@ -133,16 +145,44 @@ public class ConfigHolder {
 		Validator validator = factory.getValidator();
 		Set<ConstraintViolation<Config>> violations = validator.validate(conf);
 
-		if (violations.isEmpty()) {
-			this.lastFile = file;
-			this.config = conf;
-		} else {
+		if (!violations.isEmpty()) {
 			throw new JsonValidationException(violations);
 		}
+
+		this.lastFile = file;
+		this.config = conf;
+
+		// Populate "fileType" mappings
+		config.getFileTypes().forEach(f -> {
+			fileTypeById.put(f.getId(), f);
+		});
+		// Populate our map of cells -> fileTypes
+		config.getCells().forEach(c -> {
+			fileTypePerCell.put(c, fileTypeById.get(c.getFileType()));
+		});
 	}
 
 	/** @return the update interval for querying the sheet. */
 	public long getUpdateInterval() {
 		return UPDATE_INTERVAL;
+	}
+
+	/**
+	 * @return the String extension from the config for the particular cell & file.
+	 */
+	public String getExtension(Cell cell) {
+		FileType type = this.fileTypePerCell.get(cell);
+		assert type != null : "Could not find the FileType for given cell";
+		return type.getExtension();
+	}
+
+	/**
+	 * @return the {@link FileType} from a given id/name, as defined in "fileTypes"
+	 *         in config.
+	 */
+	public FileType getFileTypeById(String id) {
+		FileType type = this.fileTypeById.get(id);
+		assert type != null : "Could not find the FileType for given id";
+		return type;
 	}
 }

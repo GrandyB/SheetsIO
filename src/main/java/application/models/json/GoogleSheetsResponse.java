@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.models;
+package application.models.json;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import application.models.CellWrapper;
 
 /**
  * Bean represenatation of json object received back from the google
@@ -33,11 +35,11 @@ public class GoogleSheetsResponse {
 	private String[][] values;
 
 	/**
-	 * @return a {@link HashMap} of {@link CellData} (coordinate + file) to
+	 * @return a {@link HashMap} of {@link CellWrapper} (coordinate + file) to
 	 *         {@link String} 'actual' values from the spreadsheet.
 	 */
-	public Map<CellData, String> getMutatedRowColumnData() {
-		Map<CellData, String> vals = new HashMap<>();
+	public Map<CellWrapper, String> getMutatedRowColumnData() {
+		Map<CellWrapper, String> vals = new HashMap<>();
 
 		// Stored as an array of columns, containing an array (row values)
 		// Contains empty arrays where a column has no data in its rows
@@ -47,7 +49,7 @@ public class GoogleSheetsResponse {
 			// Loop through columns, A to ZZ (or however many)
 			for (int row = 0; row < values[col].length; row++) {
 				// Loop through the rows within the column
-				vals.put(new CellData(col, row), values[col][row]);
+				vals.put(CellWrapper.fromGoogleCoord(col, row), values[col][row]);
 			}
 		}
 
