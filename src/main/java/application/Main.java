@@ -222,16 +222,27 @@ public class Main extends Application implements IExceptionHandler {
 		alert.setTitle("SheetsIO error");
 		alert.setHeaderText(e.getLocalizedMessage());
 
-		StackTraceElement[] stack = e.getStackTrace();
 		StringBuilder error = new StringBuilder();
-		// If stack smaller than preset length, use that; otherwise limit to defined max
-		for (int i = 0; i < (stack.length > MAX_EXCEPTION_STACK_LINES ? MAX_EXCEPTION_STACK_LINES
-				: stack.length); i++) {
-			error.append(stack[i].toString());
-			error.append('\n');
+		if (e instanceof JsonValidationException) {
+			error.append("Error while parsing json config file.\n");
+			JsonValidationException jsonEx = (JsonValidationException) e;
+			jsonEx.getViolations().forEach(v -> {
+				error.append(v.getMessage());
+				error.append('\n');
+			});
+		} else {
+			StackTraceElement[] stack = e.getStackTrace();
+			// If stack smaller than preset length, use that; otherwise limit to defined max
+			for (int i = 0; i < (stack.length > MAX_EXCEPTION_STACK_LINES ? MAX_EXCEPTION_STACK_LINES
+					: stack.length); i++) {
+				error.append(stack[i].toString());
+				error.append('\n');
+			}
+			error.append("...\n");
 		}
+
 		error.append(
-				"...\n\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
+				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
 		alert.setContentText(error.toString());
 		alert.showAndWait();
 	}

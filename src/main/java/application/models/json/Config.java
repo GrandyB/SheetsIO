@@ -50,10 +50,10 @@ public final class Config {
 	@NotBlank(message = "Please provide a non-blank \"worksheetName\"")
 	private final String worksheetName;
 
-	@NotEmpty(message = "\"cells\" must be provided and have values")
+	@NotEmpty(message = "\"cells\" array must be provided and have values")
 	private final Cell[] cells;
 
-	@NotEmpty(message = "\"fileTypes\" must be provided and have values")
+	@NotEmpty(message = "\"fileTypes\" array must be provided and have values")
 	private final FileType[] fileTypes;
 
 	/**
@@ -63,7 +63,7 @@ public final class Config {
 	public List<CellWrapper> getMutatedMappings() {
 		List<CellWrapper> mappings = new ArrayList<>();
 		Arrays.asList(cells).forEach(cell -> {
-			mappings.add(cell.getMutatedData());
+			mappings.add(new CellWrapper(cell));
 		});
 		return mappings;
 	}

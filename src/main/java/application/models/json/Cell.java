@@ -18,7 +18,6 @@ package application.models.json;
 
 import javax.validation.constraints.NotBlank;
 
-import application.models.CellWrapper;
 import lombok.Getter;
 
 /**
@@ -29,17 +28,17 @@ import lombok.Getter;
  */
 public final class Cell {
 	@Getter
-	@NotBlank(message = "Mapping \"name\" must have a value")
+	@NotBlank(message = "Cells must have a \"name\" to be identified by")
 	/** Name to give the cell, eventually used in the file name. */
 	private String name;
 
 	@Getter
-	@NotBlank(message = "Mapping \"cell\" must have a value")
+	@NotBlank(message = "Cells must have a \"cell\" reference")
 	/** Cell reference on the Google Sheet, e.g. "A4". */
 	private String cell;
 
 	@Getter
-	@NotBlank(message = "Mapping \"fileType\" must have a value")
+	@NotBlank(message = "Cells must have a \"fileType\" defined")
 	/** Eventually to be converted to a {@link FileType}. */
 	private String fileType;
 
@@ -57,13 +56,6 @@ public final class Cell {
 		this.name = name;
 		this.cell = cell;
 		this.fileType = fileType;
-	}
-
-	/**
-	 * @return {@link CellWrapper}, built from this {@link Cell} for convenience.
-	 */
-	public CellWrapper getMutatedData() {
-		return new CellWrapper(this);
 	}
 
 }
