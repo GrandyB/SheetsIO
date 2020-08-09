@@ -70,7 +70,7 @@ public class Main extends Application implements IExceptionHandler {
 	@Override
 	public void start(Stage stage) {
 		this.primaryStage = stage;
-		primaryStage.setTitle("SheeTXT");
+		primaryStage.setTitle("SheetsIO");
 
 		doInit();
 

@@ -8,7 +8,7 @@
 <JVMSearchPath>jview</JVMSearchPath>
 <arguments></arguments>
 <embeddedJar>true</embeddedJar>
-<executableName>dist\SheeTXT.exe</executableName>
+<executableName>dist\SheetsIO.exe</executableName>
 <iconLocation>src\main\resources\icon.png</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <jarLocation>dist\dist.jar</jarLocation>
