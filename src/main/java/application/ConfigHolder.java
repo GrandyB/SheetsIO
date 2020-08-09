@@ -110,7 +110,6 @@ public class ConfigHolder {
 	public void reload() throws JsonSyntaxException, IOException, JsonValidationException {
 		assert lastFile != null : "There is no existing config file loaded";
 		LOGGER.debug("Reloading.");
-		// File newFile = new File(lastFile.getAbsolutePath());
 		loadFile(lastFile);
 	}
 

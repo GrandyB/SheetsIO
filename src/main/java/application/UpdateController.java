@@ -76,7 +76,6 @@ public class UpdateController {
 			LOGGER.warn("No config provided");
 			return;
 		}
-		LOGGER.debug("Updating...");
 
 		Map<CellWrapper, String> updatedCells = updateCache(getLatestState());
 		if (!updatedCells.isEmpty()) {
