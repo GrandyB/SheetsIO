@@ -1,6 +1,6 @@
 # SheetsIO
 [![license: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![GitHub release](https://img.shields.io/github/release/GrandyB/SheetsIO.svg)](https://github.com/GrandyB/SheeTXT/releases)
+[![GitHub release](https://img.shields.io/github/release/GrandyB/SheetsIO.svg)](https://github.com/GrandyB/SheetsIO/releases)
 
 The aim of the project is to create a simple way to use Google Spreadsheet data as text files within OBS.
 
