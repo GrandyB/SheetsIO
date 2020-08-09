@@ -1,5 +1,5 @@
 /**
- * FileIO.java is part of the "SheeTXT" project (c) by Mark "Grandy" Bishop, 2020.
+ * FileIO.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  */
 package application;
 

@@ -1,5 +1,5 @@
 /**
- * Main.java is part of the "SheeTXT" project (c) by Mark "Grandy" Bishop, 2020.
+ * Main.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import application.models.JsonValidationException;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
@@ -52,6 +54,7 @@ public class Main extends Application implements IExceptionHandler {
 	private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
 	private static final long DISABLE_CONTROL_TIME = 1000L;
+	private static final int MAX_EXCEPTION_STACK_LINES = 10;
 
 	private final FileChooser configChooser = new FileChooser();
 	private final Button chooserButton = new Button("Select config");
@@ -215,6 +218,22 @@ public class Main extends Application implements IExceptionHandler {
 	@Override
 	public void handleException(Exception e) {
 		LOGGER.error(e);
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("SheetsIO error");
+		alert.setHeaderText(e.getLocalizedMessage());
+
+		StackTraceElement[] stack = e.getStackTrace();
+		StringBuilder error = new StringBuilder();
+		// If stack smaller than preset length, use that; otherwise limit to defined max
+		for (int i = 0; i < (stack.length > MAX_EXCEPTION_STACK_LINES ? MAX_EXCEPTION_STACK_LINES
+				: stack.length); i++) {
+			error.append(stack[i].toString());
+			error.append('\n');
+		}
+		error.append(
+				"...\n\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
+		alert.setContentText(error.toString());
+		alert.showAndWait();
 	}
 
 	@Override

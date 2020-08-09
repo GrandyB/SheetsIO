@@ -1,6 +1,6 @@
-# SheeTXT
+# SheetsIO
 [![license: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![GitHub release](https://img.shields.io/github/release/GrandyB/SheeTXT.svg)](https://github.com/GrandyB/SheeTXT/releases)
+[![GitHub release](https://img.shields.io/github/release/GrandyB/SheetsIO.svg)](https://github.com/GrandyB/SheeTXT/releases)
 
 The aim of the project is to create a simple way to use Google Spreadsheet data as text files within OBS.
 
@@ -8,7 +8,7 @@ Microsoft Excel (and other local sheet programs) often have the capability to re
 
 There's also a project or two such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which goes from Google Sheets into browser-based graphics.
 
-SheeTXT is (possibly) the first to go straight to text files.
+SheetsIO is (possibly) the first to go straight to text files.
 
 ## Config
 
@@ -38,7 +38,7 @@ API key is required as of v4 of the Google Sheets API.
 
 1. Go to https://console.developers.google.com/
 1. 'Select a project' in the top bar, 'New Project'
-1. Give it a name (`SheeTXT-integration` ?) and create it
+1. Give it a name (`SheetsIO-integration` ?) and create it
 1. View the project; on the dashboard there should be a 'Go to APIs overview'
 1. Under the 'Credentials' tab, and click 'Create Credentials' at the top -> 'API key'
 

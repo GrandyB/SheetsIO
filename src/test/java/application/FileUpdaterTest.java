@@ -1,5 +1,5 @@
 /**
- * FileUpdaterTest.java is part of the "SheeTXT" project (c) by Mark "Grandy" Bishop, 2020.
+ * FileUpdaterTest.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
