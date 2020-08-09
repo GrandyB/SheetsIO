@@ -12,6 +12,10 @@
 <iconLocation>src\main\resources\icon.png</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <jarLocation>dist\dist.jar</jarLocation>
+<javaProperties>
+<name>log4j.configurationFile</name>
+<value>resources/log4j2.xml</value>
+</javaProperties>
 <mainClassName>application.Main</mainClassName>
 <maximumMemoryHeap>-1</maximumMemoryHeap>
 <maximumVersion></maximumVersion>
@@ -27,7 +31,7 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>SingleProcess</key>
-<value>0</value>
+<value>1</value>
 </skeletonProperties>
 <skeletonProperties>
 <key>SingleInstance</key>

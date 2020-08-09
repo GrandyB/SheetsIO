@@ -59,10 +59,9 @@ public class UpdateController {
 		if (fromScratch) {
 			this.cache.setup(config.getCells());
 			this.fileUpdater.cleanUp();
+			this.url = new URL(this.urlString);
+			this.fileUpdater.setup(config.getProjectName(), config);
 		}
-
-		this.url = new URL(this.urlString);
-		this.fileUpdater.setup(config.getProjectName(), config);
 
 	}
 

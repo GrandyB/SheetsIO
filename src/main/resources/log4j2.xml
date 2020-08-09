@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration scan="true" scanPeriod="10 seconds">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
@@ -9,12 +9,9 @@
         <Policies>
             <TimeBasedTriggeringPolicy />
         </Policies>
-    </RollingFile> 
+    </RollingFile>
   </Appenders>
   <Loggers>
-    <Logger name="com.foo.Bar" level="trace" additivity="false">
-      <AppenderRef ref="Console"/>
-    </Logger>
     <Root level="debug">
       <AppenderRef ref="Console" level="debug"/>
       <AppenderRef ref="MyFile" level="debug"/>
