@@ -53,9 +53,6 @@ public final class Config {
 	@NotEmpty(message = "\"cells\" array must be provided and have values")
 	private final Cell[] cells;
 
-	@NotEmpty(message = "\"fileTypes\" array must be provided and have values")
-	private final FileType[] fileTypes;
-
 	/**
 	 * @return the {@link Cell}[] array muted into an {@link ArrayList} of
 	 *         {@link CellWrapper}, for convenience.
@@ -66,16 +63,6 @@ public final class Config {
 			mappings.add(new CellWrapper(cell));
 		});
 		return mappings;
-	}
-
-	/**
-	 * @return the {@link FileType}[] array muted into an {@link ArrayList} of
-	 *         {@link FileType}, for convenience.
-	 */
-	public List<FileType> getFileTypes() {
-		List<FileType> types = new ArrayList<>();
-		types.addAll(Arrays.asList(fileTypes));
-		return types;
 	}
 
 	/**

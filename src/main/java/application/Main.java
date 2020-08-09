@@ -97,8 +97,8 @@ public class Main extends Application implements IExceptionHandler {
 		configChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
 		chooserButton.setOnAction(ev -> {
 			try {
-				chooseFile();
 				disableThenReenable(chooserButton);
+				chooseFile();
 			} catch (JsonSyntaxException | IOException | JsonValidationException e) {
 				handleException(e);
 			}
@@ -107,8 +107,13 @@ public class Main extends Application implements IExceptionHandler {
 		reloadConfigLink.setOnAction(ev -> {
 			if (config.isLoaded()) {
 				try {
-					config.reload();
+					/*
+					 * Reload backing config file, set it onto the thread, clearing and re-adding
+					 * files into the relevant folder (empty).
+					 */
 					disableThenReenable(reloadConfigLink);
+					config.reload();
+					runnable.updateConfig(config, true);
 				} catch (Exception e) {
 					handleException(e);
 				}
@@ -130,8 +135,8 @@ public class Main extends Application implements IExceptionHandler {
 
 		updateNowButton.setDisable(false);
 		updateNowButton.setOnAction(ev -> {
-			runnable.runOnce();
 			disableThenReenable(updateNowButton);
+			runnable.runOnce();
 		});
 	}
 

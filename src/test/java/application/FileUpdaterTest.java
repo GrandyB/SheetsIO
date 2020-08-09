@@ -37,6 +37,7 @@ import application.models.json.Cell;
 public class FileUpdaterTest {
 	private static final String FOLDER_NAME = "exampleFolderName";
 	private static final String FILE_NAME = "exampleFileName";
+	private static final String TXT_EXTENSION = "txt";
 
 	@Mock
 	private FileIO io;
@@ -45,14 +46,13 @@ public class FileUpdaterTest {
 
 	private FileUpdater fileUpdater;
 	private List<CellWrapper> cells = new ArrayList<>();
-	private Cell exampleCell = new Cell(FILE_NAME, "A3", "text");
+	private Cell exampleCell = new Cell(FILE_NAME, "A3", TXT_EXTENSION);
 
 	@BeforeEach
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
 		Mockito.when(configHolder.getProjectName()).thenReturn(FOLDER_NAME);
-		Mockito.when(configHolder.getExtension(exampleCell)).thenReturn("txt");
 		cells.add(new CellWrapper(exampleCell));
 		Mockito.when(configHolder.getCells()).thenReturn(cells);
 
@@ -82,10 +82,10 @@ public class FileUpdaterTest {
 		 * config, not random given ones like we have below.
 		 */
 		Map<CellWrapper, String> updatedCells = new HashMap<>();
-		Cell a8 = new Cell(FILE_NAME + "1", "A8", "text");
+		Cell a8 = new Cell(FILE_NAME + "1", "A8", TXT_EXTENSION);
 		updatedCells.put(new CellWrapper(a8), "newVal1");
 
-		Cell b8 = new Cell(FILE_NAME + "2", "B8", "text");
+		Cell b8 = new Cell(FILE_NAME + "2", "B8", TXT_EXTENSION);
 		updatedCells.put(new CellWrapper(b8), "newVal2");
 
 		fileUpdater.updateFiles(updatedCells);
@@ -121,8 +121,8 @@ public class FileUpdaterTest {
 		fileUpdater.setup(configHolder);
 		verifySetup(FOLDER_NAME);
 
-		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME
-				+ ".txt";
+		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME + "."
+				+ TXT_EXTENSION;
 		Assertions.assertEquals(expected, fileUpdater.createFilePath(FOLDER_NAME, exampleCell));
 	}
 

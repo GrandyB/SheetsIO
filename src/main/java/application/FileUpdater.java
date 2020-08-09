@@ -111,7 +111,7 @@ public class FileUpdater {
 	 */
 	protected String createFilePath(String folderName, Cell cell) {
 		return FOLDER_PREFIX + File.separator + folderName + File.separator + cell.getName() + "."
-				+ configHolder.getExtension(cell);
+				+ cell.getFileExtension();
 	}
 
 	/**

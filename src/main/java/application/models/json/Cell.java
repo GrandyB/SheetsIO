@@ -27,6 +27,7 @@ import lombok.Getter;
  * @author Mark "Grandy" Bishop
  */
 public final class Cell {
+	private static final String DEFAULT_EXTENSION = "txt";
 	@Getter
 	@NotBlank(message = "Cells must have a \"name\" to be identified by")
 	/** Name to give the cell, eventually used in the file name. */
@@ -37,10 +38,9 @@ public final class Cell {
 	/** Cell reference on the Google Sheet, e.g. "A4". */
 	private String cell;
 
-	@Getter
-	@NotBlank(message = "Cells must have a \"fileType\" defined")
+	@NotBlank(message = "Cells must have a \"fileExtension\" defined")
 	/** Eventually to be converted to a {@link FileType}. */
-	private String fileType;
+	private String fileExtension;
 
 	/**
 	 * Constructor.
@@ -49,13 +49,31 @@ public final class Cell {
 	 *            The identifier of the cell
 	 * @param cell
 	 *            The physical coordinate
-	 * @param fileType
-	 *            The raw version of the fileType
+	 * @param filExtension
+	 *            The extension to save the file with
 	 */
-	public Cell(String name, String cell, String fileType) {
+	public Cell(String name, String cell, String fileExtension) {
 		this.name = name;
 		this.cell = cell;
-		this.fileType = fileType;
+		this.fileExtension = fileExtension;
 	}
 
+	/**
+	 * Constructor, no file extension given, use default.
+	 *
+	 * @param name
+	 *            The identifier of the cell
+	 * @param cell
+	 *            The physical coordinate
+	 */
+	public Cell(String name, String cell) {
+		this.name = name;
+		this.cell = cell;
+		this.fileExtension = DEFAULT_EXTENSION;
+	}
+
+	/** @return the fileExtension, or the DEFAULT (txt) if null. */
+	public String getFileExtension() {
+		return this.fileExtension != null ? this.fileExtension : DEFAULT_EXTENSION;
+	}
 }
