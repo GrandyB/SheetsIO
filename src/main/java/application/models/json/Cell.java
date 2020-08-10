@@ -18,6 +18,7 @@ package application.models.json;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -26,8 +27,8 @@ import lombok.Getter;
  *
  * @author Mark "Grandy" Bishop
  */
-public final class Cell {
-	private static final String DEFAULT_EXTENSION = "txt";
+@AllArgsConstructor
+public final class Cell implements ICell {
 	@Getter
 	@NotBlank(message = "Cells must have a \"name\" to be identified by")
 	/** Name to give the cell, eventually used in the file name. */
@@ -35,45 +36,10 @@ public final class Cell {
 
 	@Getter
 	@NotBlank(message = "Cells must have a \"cell\" reference")
-	/** Cell reference on the Google Sheet, e.g. "A4". */
 	private String cell;
 
+	@Getter
 	@NotBlank(message = "Cells must have a \"fileExtension\" defined")
 	/** Eventually to be converted to a {@link FileType}. */
 	private String fileExtension;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param name
-	 *            The identifier of the cell
-	 * @param cell
-	 *            The physical coordinate
-	 * @param filExtension
-	 *            The extension to save the file with
-	 */
-	public Cell(String name, String cell, String fileExtension) {
-		this.name = name;
-		this.cell = cell;
-		this.fileExtension = fileExtension;
-	}
-
-	/**
-	 * Constructor, no file extension given, use default.
-	 *
-	 * @param name
-	 *            The identifier of the cell
-	 * @param cell
-	 *            The physical coordinate
-	 */
-	public Cell(String name, String cell) {
-		this.name = name;
-		this.cell = cell;
-		this.fileExtension = DEFAULT_EXTENSION;
-	}
-
-	/** @return the fileExtension, or the DEFAULT (txt) if null. */
-	public String getFileExtension() {
-		return this.fileExtension != null ? this.fileExtension : DEFAULT_EXTENSION;
-	}
 }

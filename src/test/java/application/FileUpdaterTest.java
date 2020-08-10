@@ -46,14 +46,14 @@ public class FileUpdaterTest {
 
 	private FileUpdater fileUpdater;
 	private List<CellWrapper> cells = new ArrayList<>();
-	private Cell exampleCell = new Cell(FILE_NAME, "A3", TXT_EXTENSION);
+	private CellWrapper exampleCell = new CellWrapper(new Cell(FILE_NAME, "A3", TXT_EXTENSION));
 
 	@BeforeEach
 	public void setUp() throws IOException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
 		Mockito.when(configHolder.getProjectName()).thenReturn(FOLDER_NAME);
-		cells.add(new CellWrapper(exampleCell));
+		cells.add(exampleCell);
 		Mockito.when(configHolder.getCells()).thenReturn(cells);
 
 		fileUpdater = new FileUpdater(io);
@@ -82,11 +82,11 @@ public class FileUpdaterTest {
 		 * config, not random given ones like we have below.
 		 */
 		Map<CellWrapper, String> updatedCells = new HashMap<>();
-		Cell a8 = new Cell(FILE_NAME + "1", "A8", TXT_EXTENSION);
-		updatedCells.put(new CellWrapper(a8), "newVal1");
+		CellWrapper a8 = new CellWrapper(new Cell(FILE_NAME + "1", "A8", TXT_EXTENSION));
+		updatedCells.put(a8, "newVal1");
 
-		Cell b8 = new Cell(FILE_NAME + "2", "B8", TXT_EXTENSION);
-		updatedCells.put(new CellWrapper(b8), "newVal2");
+		CellWrapper b8 = new CellWrapper(new Cell(FILE_NAME + "2", "B8", TXT_EXTENSION));
+		updatedCells.put(b8, "newVal2");
 
 		fileUpdater.updateFiles(updatedCells);
 		Mockito.verify(io).writeFile(fileUpdater.createFilePath(FOLDER_NAME, a8), "newVal1");

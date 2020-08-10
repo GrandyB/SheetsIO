@@ -17,9 +17,11 @@
 package application.models;
 
 import application.models.json.Cell;
+import application.models.json.ICell;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Class for converting and storing an excel cell reference in terms of rows and
@@ -29,9 +31,11 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Mark "Grandy" Bishop
  */
+@ToString
 @EqualsAndHashCode(of = { "col", "row" })
 @RequiredArgsConstructor
-public final class CellWrapper {
+public final class CellWrapper implements ICell {
+	private static final String DEFAULT_EXTENSION = "txt";
 
 	/** 0-indexed column number. */
 	@Getter
@@ -45,7 +49,6 @@ public final class CellWrapper {
 	@Getter
 	private final String coordString;
 
-	@Getter
 	private final Cell cell;
 
 	public CellWrapper(Cell cell) {
@@ -85,8 +88,21 @@ public final class CellWrapper {
 	}
 
 	@Override
-	public String toString() {
-		return this.getClass().getSimpleName() + " [col=" + col + ", row=" + row + ", coordString=" + coordString
-				+ ", cell=" + cell + "]";
+	/* @see application.models.json.ICell#getName() */
+	public String getName() {
+		return cell.getName();
+	}
+
+	@Override
+	/* @see application.models.json.ICell#getFileExtension() */
+	public String getFileExtension() {
+		String extension = this.cell.getFileExtension();
+		return extension != null ? extension : DEFAULT_EXTENSION;
+	}
+
+	@Override
+	/* @see application.models.json.ICell#getCell() */
+	public String getCell() {
+		return cell.getCell();
 	}
 }

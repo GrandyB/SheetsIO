@@ -66,7 +66,7 @@ public class FileUpdater {
 			CellWrapper cellWrapper = entry.getKey();
 			String newValue = entry.getValue();
 
-			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper.getCell()), newValue);
+			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper), newValue);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles() throws IOException {
 		for (CellWrapper cellWrapper : this.configHolder.getCells()) {
-			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper.getCell()), "");
+			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper), "");
 		}
 	}
 
@@ -109,7 +109,7 @@ public class FileUpdater {
 	 *            the {@link Cell}, for its name, to be used in the file name
 	 * @return the file path, using prefix and folder name.
 	 */
-	protected String createFilePath(String folderName, Cell cell) {
+	protected String createFilePath(String folderName, CellWrapper cell) {
 		return FOLDER_PREFIX + File.separator + folderName + File.separator + cell.getName() + "."
 				+ cell.getFileExtension();
 	}
