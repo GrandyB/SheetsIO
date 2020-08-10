@@ -21,7 +21,7 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.models.IExceptionHandler;
+import application.exceptions.IllegalFileExtensionException;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -61,7 +61,8 @@ public class UpdateRunnable implements Runnable {
 		}
 	}
 
-	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch) throws IOException {
+	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch)
+			throws IOException, IllegalFileExtensionException {
 		this.updateInterval = config.getUpdateInterval();
 		this.autoUpdate = config.isAutoUpdate();
 

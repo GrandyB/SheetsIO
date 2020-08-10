@@ -1,5 +1,5 @@
 /**
- * ICell.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
+ * IExceptionHandler.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.models.json;
+package application;
 
 /**
- * Interface for common data actions for a {@link Cell}.
+ * Marker interface for handling exceptions - so that our main GUI area becomes
+ * the sole place to handle them, and then display nicely to the user. Threads
+ * will make use of this type to send exceptions back to their caller.
  *
  * @author Mark "Grandy" Bishop
  */
-public interface ICell {
+public interface IExceptionHandler {
 	/**
-	 * @return the identifying 'name' of the cell, eventually used as the file name.
+	 * Handle the passed exception; implemented by {@link Main} to give nice error
+	 * messages to the user.
 	 */
-	String getName();
-
-	/** @return Cell reference on the Google Sheet, e.g. "A4". */
-	String getCell();
+	void handleException(Exception e);
 }

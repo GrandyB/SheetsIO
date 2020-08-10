@@ -19,12 +19,13 @@ package application.models;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import application.exceptions.IllegalFileExtensionException;
 import application.models.json.Cell;
 
 public class CellWrapperTest {
 
 	@Test
-	void test_B3() {
+	void test_B3() throws IllegalFileExtensionException {
 		CellWrapper coord = new CellWrapper(createCell("B3"));
 		Assertions.assertEquals(1, coord.getCol());
 		Assertions.assertEquals(2, coord.getRow());
@@ -32,7 +33,7 @@ public class CellWrapperTest {
 	}
 
 	@Test
-	void test_A1() {
+	void test_A1() throws IllegalFileExtensionException {
 		CellWrapper coord = new CellWrapper(createCell("A1"));
 		Assertions.assertEquals(0, coord.getCol());
 		Assertions.assertEquals(0, coord.getRow());
@@ -40,7 +41,7 @@ public class CellWrapperTest {
 	}
 
 	@Test
-	void test_AA45() {
+	void test_AA45() throws IllegalFileExtensionException {
 		CellWrapper coord = new CellWrapper(createCell("AA45"));
 		Assertions.assertEquals(26, coord.getCol());
 		Assertions.assertEquals(44, coord.getRow());
@@ -48,7 +49,7 @@ public class CellWrapperTest {
 	}
 
 	@Test
-	void test_RG1552() {
+	void test_RG1552() throws IllegalFileExtensionException {
 		CellWrapper coord = new CellWrapper(createCell("RG1552"));
 		Assertions.assertEquals(474, coord.getCol());
 		Assertions.assertEquals(1551, coord.getRow());

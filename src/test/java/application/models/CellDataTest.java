@@ -19,12 +19,13 @@ package application.models;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import application.exceptions.IllegalFileExtensionException;
 import application.models.json.Cell;
 
 class CellDataTest {
 
 	@Test
-	public void test_equality() {
+	public void test_equality() throws IllegalFileExtensionException {
 		// Especially important as we hit this in {@link SheetCache} with Map keys
 
 		CellWrapper data1 = CellWrapper.fromGoogleCoord(1, 3);
@@ -37,7 +38,7 @@ class CellDataTest {
 	}
 
 	@Test
-	public void test_constructor_fromCoord() {
+	public void test_constructor_fromCoord() throws IllegalFileExtensionException {
 		Cell cell = new Cell("Test", "F7", "text");
 		CellWrapper data = new CellWrapper(cell);
 

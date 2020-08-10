@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.GsonBuilder;
 
+import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
 import application.models.json.GoogleSheetsResponse;
 
@@ -47,8 +48,13 @@ public class UpdateController {
 	private String urlString;
 	private URL url;
 
-	/** Set a new config, thus needing to reset state and start anew. */
-	public synchronized void setConfig(ConfigHolder config, boolean fromScratch) throws IOException {
+	/**
+	 * Set a new config, thus needing to reset state and start anew.
+	 * 
+	 * @throws IllegalFileExtensionException
+	 */
+	public synchronized void setConfig(ConfigHolder config, boolean fromScratch)
+			throws IOException, IllegalFileExtensionException {
 		this.config = config;
 
 		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
@@ -58,7 +64,6 @@ public class UpdateController {
 
 		if (fromScratch) {
 			this.cache.setup(config.getCells());
-			this.fileUpdater.cleanUp();
 			this.url = new URL(this.urlString);
 			this.fileUpdater.setup(config);
 		}

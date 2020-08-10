@@ -19,6 +19,7 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,8 +37,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import application.exceptions.IllegalFileExtensionException;
+import application.exceptions.JsonValidationException;
 import application.models.CellWrapper;
-import application.models.JsonValidationException;
+import application.models.json.Cell;
 import application.models.json.Config;
 import lombok.Getter;
 
@@ -67,6 +70,12 @@ public class ConfigHolder {
 	/** The latest loaded config. */
 	private Config config;
 
+	/**
+	 * CellWrappers, made from Cells, used by the rest of the app, wiped/repopulated
+	 * on config load.
+	 */
+	private List<CellWrapper> cellWrappers = new ArrayList<>();
+
 	public String getProjectName() {
 		assert config != null : "No config available";
 		return config.getProjectName();
@@ -87,9 +96,9 @@ public class ConfigHolder {
 		return config.getWorksheetName();
 	}
 
-	public List<CellWrapper> getCells() {
-		assert config != null : "No config available";
-		return config.getMutatedMappings();
+	public List<CellWrapper> getCells() throws IllegalFileExtensionException {
+		assert config != null : "No config loaded";
+		return this.cellWrappers;
 	}
 
 	public boolean isLoaded() {
@@ -106,8 +115,10 @@ public class ConfigHolder {
 	 * 
 	 * @throws JsonValidationException
 	 *             if validation of the incoming config goes awry.
+	 * @throws IllegalFileExtensionException
 	 */
-	public void reload() throws JsonSyntaxException, IOException, JsonValidationException {
+	public void reload()
+			throws JsonSyntaxException, IOException, JsonValidationException, IllegalFileExtensionException {
 		assert lastFile != null : "There is no existing config file loaded";
 		LOGGER.debug("Reloading.");
 		loadFile(lastFile);
@@ -119,8 +130,10 @@ public class ConfigHolder {
 	 * 
 	 * @throws JsonValidationException
 	 *             if validation of the incoming config goes awry.
+	 * @throws IllegalFileExtensionException
 	 */
-	public void loadFile(File file) throws IOException, JsonSyntaxException, JsonValidationException {
+	public void loadFile(File file)
+			throws IOException, JsonSyntaxException, JsonValidationException, IllegalFileExtensionException {
 		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
 		LOGGER.debug("Loaded file: {}", root.toString());
@@ -139,6 +152,11 @@ public class ConfigHolder {
 
 		this.lastFile = file;
 		this.config = conf;
+
+		cellWrappers.clear();
+		for (Cell cell : config.getCells()) {
+			cellWrappers.add(new CellWrapper(cell));
+		}
 	}
 
 	/** @return the update interval for querying the sheet. */

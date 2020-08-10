@@ -24,9 +24,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonSyntaxException;
 
-import application.models.IExceptionHandler;
-import application.models.JsonValidationException;
+import application.exceptions.IllegalFileExtensionException;
+import application.exceptions.JsonValidationException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -99,7 +100,7 @@ public class Main extends Application implements IExceptionHandler {
 			try {
 				disableThenReenable(chooserButton);
 				chooseFile();
-			} catch (JsonSyntaxException | IOException | JsonValidationException e) {
+			} catch (JsonSyntaxException | IOException | JsonValidationException | IllegalFileExtensionException e) {
 				handleException(e);
 			}
 		});
@@ -128,7 +129,7 @@ public class Main extends Application implements IExceptionHandler {
 				if (config.isLoaded()) {
 					runnable.updateConfig(config, false);
 				}
-			} catch (IOException e) {
+			} catch (IOException | IllegalFileExtensionException e) {
 				handleException(e);
 			}
 		});
@@ -189,7 +190,8 @@ public class Main extends Application implements IExceptionHandler {
 		launch(args);
 	}
 
-	private void chooseFile() throws JsonSyntaxException, IOException, JsonValidationException {
+	private void chooseFile()
+			throws JsonSyntaxException, IOException, JsonValidationException, IllegalFileExtensionException {
 		File file = configChooser.showOpenDialog(primaryStage);
 		if (file == null) {
 			return;
@@ -223,9 +225,6 @@ public class Main extends Application implements IExceptionHandler {
 	@Override
 	public void handleException(Exception e) {
 		LOGGER.error(e);
-		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("SheetsIO error");
-		alert.setHeaderText(e.getLocalizedMessage());
 
 		StringBuilder error = new StringBuilder();
 		if (e instanceof JsonValidationException) {
@@ -248,8 +247,20 @@ public class Main extends Application implements IExceptionHandler {
 
 		error.append(
 				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
-		alert.setContentText(error.toString());
-		alert.showAndWait();
+		LOGGER.error(error.toString());
+
+		/*
+		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
+		 * which is separate to the JavaFX application thread; Platform.runLater allows
+		 * the code to be ran on the proper thread.
+		 */
+		Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("SheetsIO error");
+			alert.setHeaderText(e.getLocalizedMessage());
+			alert.setContentText(error.toString());
+			alert.showAndWait();
+		});
 	}
 
 	@Override

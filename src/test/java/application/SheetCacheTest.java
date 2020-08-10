@@ -22,25 +22,37 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
 import application.models.json.Cell;
 
 public class SheetCacheTest {
 	private SheetCache testee = new SheetCache();
 
-	private CellWrapper a1 = dataFromRef("A1");
-	private CellWrapper b2 = dataFromRef("B2");
-	private CellWrapper c3 = dataFromRef("C3");
-	private CellWrapper d4 = dataFromRef("D4");
-	private CellWrapper ab5 = dataFromRef("AB5");
-	private CellWrapper cz55 = dataFromRef("CZ55");
+	private CellWrapper a1;
+	private CellWrapper b2;
+	private CellWrapper c3;
+	private CellWrapper d4;
+	private CellWrapper ab5;
+	private CellWrapper cz55;
 
 	private List<CellWrapper> testCells = Arrays.asList(a1, b2, c3, d4, ab5, cz55);
 
+	@BeforeEach
+	public void setUp() throws IllegalFileExtensionException {
+		a1 = dataFromRef("A1");
+		b2 = dataFromRef("B2");
+		c3 = dataFromRef("C3");
+		d4 = dataFromRef("D4");
+		ab5 = dataFromRef("AB5");
+		cz55 = dataFromRef("CZ55");
+	}
+
 	@Test
-	public void test_get() {
+	public void test_get() throws IllegalFileExtensionException {
 		testee.setup(testCells);
 		// Ensure we get hits for the ones we expect
 		Assertions.assertEquals("", testee.get(a1));
@@ -53,7 +65,7 @@ public class SheetCacheTest {
 	}
 
 	@Test
-	public void test_update() {
+	public void test_update() throws IllegalFileExtensionException {
 		testee.setup(testCells);
 
 		String a1Message = "0,0 (aka. A1) exists in config";
@@ -87,7 +99,7 @@ public class SheetCacheTest {
 		Assertions.assertEquals("", testee.get(ab5));
 	}
 
-	private CellWrapper dataFromRef(String ref) {
+	private CellWrapper dataFromRef(String ref) throws IllegalFileExtensionException {
 		return new CellWrapper(new Cell(ref, ref, "text"));
 	}
 }

@@ -24,8 +24,10 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
-import application.models.json.Cell;
+import application.models.FileExtension;
+import application.models.FileExtension.FileExtensionType;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -50,12 +52,14 @@ public class FileUpdater {
 	 * 
 	 * @throws IOException
 	 *             if folder cannot be made.
+	 * @throws IllegalFileExtensionException
 	 */
-	public void setup(ConfigHolder configHolder) throws IOException {
+	public void setup(ConfigHolder configHolder) throws IOException, IllegalFileExtensionException {
 		assert configHolder != null : "config cannot be null";
 		assert configHolder.getProjectName() != null : "projectName cannot be null";
 		this.configHolder = configHolder;
 
+		cleanExistingFolderIfExists();
 		writeFolders();
 		createInitialFiles();
 	}
@@ -66,7 +70,19 @@ public class FileUpdater {
 			CellWrapper cellWrapper = entry.getKey();
 			String newValue = entry.getValue();
 
-			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper), newValue);
+			String destFilePath = createFilePath(this.configHolder.getProjectName(), cellWrapper);
+			FileExtension ext = cellWrapper.getFileExtension();
+			switch (ext.getType()) {
+			case IMAGE:
+				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
+				break;
+			case TEXT:
+				fileIO.writeTextFile(destFilePath, newValue);
+				break;
+			default:
+				throw new IllegalStateException(
+						"Unable to handle " + FileExtensionType.class.getSimpleName() + ": " + ext.getType());
+			}
 		}
 	}
 
@@ -79,10 +95,22 @@ public class FileUpdater {
 	/**
 	 * Creates empty files for all the cells we're interested in. Must be run after
 	 * {@link #writeFolders()}
+	 * 
+	 * @throws IllegalFileExtensionException
+	 *             if
 	 */
-	private void createInitialFiles() throws IOException {
+	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
 		for (CellWrapper cellWrapper : this.configHolder.getCells()) {
-			fileIO.writeFile(createFilePath(this.configHolder.getProjectName(), cellWrapper), "");
+			fileIO.writeTextFile(createFilePath(this.configHolder.getProjectName(), cellWrapper), "");
+		}
+	}
+
+	private void cleanExistingFolderIfExists() throws IOException {
+		String folderPath = createFolderPath(this.configHolder.getProjectName());
+		File folder = new File(folderPath);
+		if (folder.exists()) {
+			this.folder = folder;
+			this.cleanUp();
 		}
 	}
 
@@ -106,12 +134,12 @@ public class FileUpdater {
 	 * @param folderName
 	 *            the name of the project/folder
 	 * @param cell
-	 *            the {@link Cell}, for its name, to be used in the file name
+	 *            the {@link CellWrapper}, for its name and {@link FileExtension}
 	 * @return the file path, using prefix and folder name.
 	 */
 	protected String createFilePath(String folderName, CellWrapper cell) {
 		return FOLDER_PREFIX + File.separator + folderName + File.separator + cell.getName() + "."
-				+ cell.getFileExtension();
+				+ cell.getFileExtension().getExtension();
 	}
 
 	/**

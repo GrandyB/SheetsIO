@@ -16,6 +16,7 @@
  */
 package application.models;
 
+import application.exceptions.IllegalFileExtensionException;
 import application.models.json.Cell;
 import application.models.json.ICell;
 import lombok.EqualsAndHashCode;
@@ -35,7 +36,6 @@ import lombok.ToString;
 @EqualsAndHashCode(of = { "col", "row" })
 @RequiredArgsConstructor
 public final class CellWrapper implements ICell {
-	private static final String DEFAULT_EXTENSION = "txt";
 
 	/** 0-indexed column number. */
 	@Getter
@@ -45,17 +45,27 @@ public final class CellWrapper implements ICell {
 	@Getter
 	private final int row;
 
-	/** The coord itself. Only used for debug purposes. */
+	/** The coord reference itself, e.g. 'A4'. Only used for debug purposes. */
 	@Getter
 	private final String coordString;
 
+	@Getter
+	private FileExtension fileExtension;
+
 	private final Cell cell;
 
-	public CellWrapper(Cell cell) {
+	public CellWrapper(Cell cell) throws IllegalFileExtensionException {
 		this.cell = cell;
 		this.coordString = cell.getCell();
 		this.col = toColumnNumber(this.coordString);
 		this.row = toRowNumber(this.coordString);
+
+		// If an extension is not provided, use default
+		if (cell.getFileExtension() == null) {
+			fileExtension = FileExtension.defaultType();
+		} else {
+			fileExtension = new FileExtension(cell.getFileExtension());
+		}
 	}
 
 	/**
@@ -91,13 +101,6 @@ public final class CellWrapper implements ICell {
 	/* @see application.models.json.ICell#getName() */
 	public String getName() {
 		return cell.getName();
-	}
-
-	@Override
-	/* @see application.models.json.ICell#getFileExtension() */
-	public String getFileExtension() {
-		String extension = this.cell.getFileExtension();
-		return extension != null ? extension : DEFAULT_EXTENSION;
 	}
 
 	@Override

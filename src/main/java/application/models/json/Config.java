@@ -23,7 +23,6 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-import application.models.CellWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -52,18 +51,6 @@ public final class Config {
 
 	@NotEmpty(message = "\"cells\" array must be provided and have values")
 	private final Cell[] cells;
-
-	/**
-	 * @return the {@link Cell}[] array muted into an {@link ArrayList} of
-	 *         {@link CellWrapper}, for convenience.
-	 */
-	public List<CellWrapper> getMutatedMappings() {
-		List<CellWrapper> mappings = new ArrayList<>();
-		Arrays.asList(cells).forEach(cell -> {
-			mappings.add(new CellWrapper(cell));
-		});
-		return mappings;
-	}
 
 	/**
 	 * @return the {@link Cell}[] array muted into an {@link ArrayList} of
