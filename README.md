@@ -26,7 +26,8 @@ Configs can be placed anywhere, selected through the file chooser in the UI.
 		{ "cell": "B2", "name": "team1Name" },
 		{ "cell": "B3", "name": "team1Logo", "fileExtension": "png" },
 		{ "cell": "B4", "name": "team2Name" },
-		{ "cell": "B5", "name": "team2Logo", "fileExtension": "png" }
+		{ "cell": "B5", "name": "team2Logo", "fileExtension": "png" },
+		{ "cell": "B6", "name": "marqueeText", "pad": "15" }
 	]
 }
 ```
@@ -60,8 +61,10 @@ Each cell is formed of:
 
 - `"cell"` - the alphanumeric excel-style cell reference, e.g. `"A4"`
 - `"name"` - what this cell represents - also used as the first part of the file name, e.g. `"team1Name"`
-- `"fileExtension"` _[optional]_ - the file extension, which in turn becomes the file type. System assumes the cell is `"txt"` if not optionally given.
+- `"fileExtension"` _[optional]_ - the file extension, which in turn becomes the file type. System assumes the cell is `"txt"` if not optionally given
+- `"pad"` _[optional]_ - if using a 'Text' type, you can set this value to append this number of spaces to the end of your text. e.g. `"5"` will convert `"hello"` -> `"hello     "` - useful for marquee-type text you wish to use in conjunction with the 'scroll' filter in OBS
 
 Valid `fileExtension` values:
 - Images: "png", "jpg", "jpeg", "gif", "bmp"
-- Text: "txt", "json", "html"
+- Text: "txt"
+- Video: "webm"

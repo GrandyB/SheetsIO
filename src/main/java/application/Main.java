@@ -225,16 +225,19 @@ public class Main extends Application implements IExceptionHandler {
 
 	@Override
 	public void handleException(Exception e) {
-		LOGGER.error(e);
-
 		StringBuilder error = new StringBuilder();
 		if (e instanceof JsonValidationException) {
-			error.append("Error while parsing json config file.\n");
+			error.append("Error while attempting to load config values into the application.\n");
 			JsonValidationException jsonEx = (JsonValidationException) e;
 			jsonEx.getViolations().forEach(v -> {
 				error.append(v.getMessage());
 				error.append('\n');
 			});
+		} else if (e instanceof JsonSyntaxException) {
+			error.append("Your json is malformed and needs correcting!\n");
+			error.append(e.getMessage());
+			error.append(
+					"\n\nCheck the line/column numbers in the error above for hints on where your json is failing.\nIf that doesn't help, consider running your config through a validation service such as https://jsonlint.com/ - removing your apiKey first of course!\n");
 		} else {
 			StackTraceElement[] stack = e.getStackTrace();
 			// If stack smaller than preset length, use that; otherwise limit to defined max
@@ -248,7 +251,12 @@ public class Main extends Application implements IExceptionHandler {
 
 		error.append(
 				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
-		LOGGER.error(error.toString());
+
+		// Remove all instances of the user's API key
+		String sanitisedMessage = ConfigHolder.sanitiseApiKey(config, e.getLocalizedMessage());
+		LOGGER.error(sanitisedMessage);
+		String errorMessage = ConfigHolder.sanitiseApiKey(config, error.toString());
+		LOGGER.error(errorMessage);
 
 		/*
 		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
@@ -258,8 +266,8 @@ public class Main extends Application implements IExceptionHandler {
 		Platform.runLater(() -> {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("SheetsIO error");
-			alert.setHeaderText(e.getLocalizedMessage());
-			alert.setContentText(error.toString());
+			alert.setHeaderText(sanitisedMessage);
+			alert.setContentText(errorMessage);
 			alert.showAndWait();
 		});
 	}

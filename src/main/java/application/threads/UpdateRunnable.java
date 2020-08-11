@@ -37,30 +37,26 @@ import application.exceptions.IllegalFileExtensionException;
 public class UpdateRunnable extends Loop {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
 
-	/** Set a default of 1s update, until we have loaded a config. */
-	private long updateInterval = ConfigHolder.UPDATE_INTERVAL;
 	private boolean autoUpdate = true;
 
 	private UpdateController updater;
 	private boolean runOnce = false;
 
 	public UpdateRunnable(IExceptionHandler handler) {
-		super(handler);
+		super(handler, ConfigHolder.UPDATE_INTERVAL);
 	}
 
 	@Override
 	public void perform() throws Exception {
 		if (this.updater != null && (this.autoUpdate || this.runOnce)) {
-			updater.update();
 			this.runOnce = false;
+			updater.update();
 		}
-
-		Thread.sleep(updateInterval);
 	}
 
 	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch)
 			throws IOException, IllegalFileExtensionException {
-		this.updateInterval = config.getUpdateInterval();
+		this.resetState();
 		this.autoUpdate = config.isAutoUpdate();
 
 		if (this.updater == null) {
@@ -71,6 +67,7 @@ public class UpdateRunnable extends Loop {
 
 	/** Perform a single update, on next update iteration. */
 	public synchronized void runOnce() {
+		this.resetState();
 		LOGGER.debug("Updating on next tick...");
 		this.runOnce = true;
 	}

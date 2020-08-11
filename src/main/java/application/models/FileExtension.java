@@ -30,7 +30,7 @@ import lombok.Getter;
  */
 public class FileExtension {
 	public static final List<String> IMAGE_EXTENSIONS = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
-	public static final List<String> TEXT_EXTENSIONS = Arrays.asList("txt", "json", "html");
+	public static final List<String> TEXT_EXTENSIONS = Arrays.asList("txt");
 	public static final List<String> FILE_EXTENSIONS = Arrays.asList("webm");
 
 	@Getter

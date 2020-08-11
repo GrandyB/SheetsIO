@@ -8,3 +8,4 @@ build.fxbuild
 .project
 /dist/
 /logs/
+/sampleConfig.json

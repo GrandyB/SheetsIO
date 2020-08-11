@@ -86,6 +86,14 @@ public class ConfigHolder {
 		return config.getApiKey();
 	}
 
+	/** @return the string but stripped of the apiKey, for safety. */
+	public static String sanitiseApiKey(ConfigHolder config, String str) {
+		if (config.isLoaded()) {
+			return str.replace(config.getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
+		}
+		return str;
+	}
+
 	public String getSpreadsheetId() {
 		assert config != null : "No config available";
 		return config.getSpreadsheetId();
@@ -136,7 +144,8 @@ public class ConfigHolder {
 			throws IOException, JsonSyntaxException, JsonValidationException, IllegalFileExtensionException {
 		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
-		LOGGER.debug("Loaded file: {}", root.toString());
+		LOGGER.debug("Config file has been loaded.");
+		LOGGER.trace(root.toString());
 
 		// Load json into java beans
 		Config conf = new GsonBuilder().create().fromJson(jsonStr, Config.class);
@@ -157,10 +166,5 @@ public class ConfigHolder {
 		for (Cell cell : config.getCells()) {
 			cellWrappers.add(new CellWrapper(cell));
 		}
-	}
-
-	/** @return the update interval for querying the sheet. */
-	public long getUpdateInterval() {
-		return UPDATE_INTERVAL;
 	}
 }

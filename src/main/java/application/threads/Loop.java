@@ -17,7 +17,9 @@
 package application.threads;
 
 import application.IExceptionHandler;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  * 
@@ -29,19 +31,31 @@ public abstract class Loop implements Runnable {
 	private boolean doStop = false;
 
 	private final IExceptionHandler exceptionHandler;
+	private final long interval;
+
+	@Setter(AccessLevel.PROTECTED)
+	private boolean paused;
 
 	@Override
 	public void run() {
 		while (keepRunning()) {
 			try {
-				perform();
+				if (!paused) {
+					perform();
+				}
+				Thread.sleep(interval);
 			} catch (Exception e) {
 				exceptionHandler.handleException(e);
+				paused = true;
 			}
 		}
 	}
 
 	protected abstract void perform() throws Exception;
+
+	protected void resetState() {
+		this.paused = false;
+	}
 
 	/** Completely halt the thread; should only be used when exiting the app. */
 	public synchronized void doStop() {
