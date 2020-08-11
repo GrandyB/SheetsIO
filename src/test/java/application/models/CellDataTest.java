@@ -29,7 +29,7 @@ class CellDataTest {
 		// Especially important as we hit this in {@link SheetCache} with Map keys
 
 		CellWrapper data1 = CellWrapper.fromGoogleCoord(1, 3);
-		Cell cell = new Cell("Test", "B4", "text");
+		Cell cell = new Cell("Test", "B4", "txt");
 		CellWrapper data2 = new CellWrapper(cell);
 
 		Assertions.assertEquals(1, data2.getCol());
@@ -39,7 +39,7 @@ class CellDataTest {
 
 	@Test
 	public void test_constructor_fromCoord() throws IllegalFileExtensionException {
-		Cell cell = new Cell("Test", "F7", "text");
+		Cell cell = new Cell("Test", "F7", "txt");
 		CellWrapper data = new CellWrapper(cell);
 
 		Assertions.assertEquals("F7", data.getCoordString());

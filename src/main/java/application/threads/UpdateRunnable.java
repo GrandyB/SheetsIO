@@ -14,15 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.threads;
 
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.ConfigHolder;
+import application.IExceptionHandler;
+import application.Main;
+import application.UpdateController;
 import application.exceptions.IllegalFileExtensionException;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Meat of the thread running the update loop. Runs continuously based on the
@@ -31,8 +34,7 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Mark "Grandy" Bishop
  */
-@RequiredArgsConstructor
-public class UpdateRunnable implements Runnable {
+public class UpdateRunnable extends Loop {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
 
 	/** Set a default of 1s update, until we have loaded a config. */
@@ -40,25 +42,20 @@ public class UpdateRunnable implements Runnable {
 	private boolean autoUpdate = true;
 
 	private UpdateController updater;
-	private boolean doStop = false;
 	private boolean runOnce = false;
 
-	private final IExceptionHandler exceptionHandler;
+	public UpdateRunnable(IExceptionHandler handler) {
+		super(handler);
+	}
 
 	@Override
-	public void run() {
-		while (keepRunning()) {
-			try {
-				if (this.updater != null && (this.autoUpdate || this.runOnce)) {
-					updater.update();
-					this.runOnce = false;
-				}
-
-				Thread.sleep(updateInterval);
-			} catch (Exception e) {
-				exceptionHandler.handleException(e);
-			}
+	public void perform() throws Exception {
+		if (this.updater != null && (this.autoUpdate || this.runOnce)) {
+			updater.update();
+			this.runOnce = false;
 		}
+
+		Thread.sleep(updateInterval);
 	}
 
 	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch)
@@ -76,14 +73,5 @@ public class UpdateRunnable implements Runnable {
 	public synchronized void runOnce() {
 		LOGGER.debug("Updating on next tick...");
 		this.runOnce = true;
-	}
-
-	/** Completely halt the thread; should only be used when exiting the app. */
-	public synchronized void doStop() {
-		this.doStop = true;
-	}
-
-	private synchronized boolean keepRunning() {
-		return this.doStop == false;
 	}
 }

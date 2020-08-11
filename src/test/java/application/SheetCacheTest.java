@@ -39,7 +39,7 @@ public class SheetCacheTest {
 	private CellWrapper ab5;
 	private CellWrapper cz55;
 
-	private List<CellWrapper> testCells = Arrays.asList(a1, b2, c3, d4, ab5, cz55);
+	private List<CellWrapper> testCells;
 
 	@BeforeEach
 	public void setUp() throws IllegalFileExtensionException {
@@ -49,6 +49,8 @@ public class SheetCacheTest {
 		d4 = dataFromRef("D4");
 		ab5 = dataFromRef("AB5");
 		cz55 = dataFromRef("CZ55");
+
+		testCells = Arrays.asList(a1, b2, c3, d4, ab5, cz55);
 	}
 
 	@Test
@@ -100,6 +102,6 @@ public class SheetCacheTest {
 	}
 
 	private CellWrapper dataFromRef(String ref) throws IllegalFileExtensionException {
-		return new CellWrapper(new Cell(ref, ref, "text"));
+		return new CellWrapper(new Cell(ref, ref, "txt"));
 	}
 }

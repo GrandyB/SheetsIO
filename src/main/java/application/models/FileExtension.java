@@ -31,6 +31,7 @@ import lombok.Getter;
 public class FileExtension {
 	public static final List<String> IMAGE_EXTENSIONS = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
 	public static final List<String> TEXT_EXTENSIONS = Arrays.asList("txt", "json", "html");
+	public static final List<String> FILE_EXTENSIONS = Arrays.asList("webm");
 
 	@Getter
 	private String extension;
@@ -48,7 +49,7 @@ public class FileExtension {
 
 	@AllArgsConstructor
 	public enum FileExtensionType {
-		TEXT(TEXT_EXTENSIONS), IMAGE(IMAGE_EXTENSIONS);
+		TEXT(TEXT_EXTENSIONS), IMAGE(IMAGE_EXTENSIONS), FILE(FILE_EXTENSIONS);
 
 		@Getter
 		private List<String> extensions;

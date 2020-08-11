@@ -57,6 +57,6 @@ public class CellWrapperTest {
 	}
 
 	private Cell createCell(String ref) {
-		return new Cell(ref, ref, "text");
+		return new Cell(ref, ref, "txt");
 	}
 }

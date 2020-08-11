@@ -77,7 +77,11 @@ public class FileUpdater {
 				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
 				break;
 			case TEXT:
-				fileIO.writeTextFile(destFilePath, newValue);
+				/** Add padding if applicable (@see {@link CellWrapper#getPadding}). */
+				fileIO.writeTextFile(destFilePath, newValue + cellWrapper.getPadding());
+				break;
+			case FILE:
+				fileIO.downloadAndSaveFile(newValue, destFilePath);
 				break;
 			default:
 				throw new IllegalStateException(

@@ -97,6 +97,23 @@ public final class CellWrapper implements ICell {
 		return number - 1;
 	}
 
+	/**
+	 * @return the padding, an optional String of blank spaces to put on the end of
+	 *         a txt entry.
+	 */
+	public String getPadding() {
+		if (this.cell.getPad() == null) {
+			return "";
+		} else {
+			String padding = "";
+			int padNum = Integer.parseInt(this.cell.getPad());
+			for (int i = 0; i < padNum; i++) {
+				padding += " ";
+			}
+			return padding;
+		}
+	}
+
 	@Override
 	/* @see application.models.json.ICell#getName() */
 	public String getName() {

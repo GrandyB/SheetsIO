@@ -26,6 +26,7 @@ import com.google.gson.JsonSyntaxException;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.exceptions.JsonValidationException;
+import application.threads.UpdateRunnable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
