@@ -12,9 +12,18 @@ SheetsIO is possibly (?) the first to go straight to files on your local system.
 
 Want to help make this tool as useful as it could be? Send your bug reports/feature requests in the [issues tab](https://github.com/GrandyB/SheetsIO/issues).
 
+# Getting started
+
+1. Get your [API key](#apikey) from Google
+1. Create your Google Spreadsheet and enable "anyone with the link can view", grab its [spreadsheet ID](#spreadsheetid)
+1. Setup your [config](#config) with your API key cell/file references
+1. Load up the app, choose your config and either hit 'update now' or tick 'autoupdate'
+
+Any issues, refer to the [troubleshooting](#troubleshooting) section.
+
 ## Config
 
-Configs can be placed anywhere, selected through the file chooser in the UI.
+Configs are json files and can be placed anywhere, selected through the file chooser in the UI.
 
 ```json
 {
@@ -33,9 +42,10 @@ Configs can be placed anywhere, selected through the file chooser in the UI.
 ```
 
 - `"projectName"` - becomes the folder name; files are generated within `/files/projectName`
-- `"worksheetName"` - the sheet within the spreadsheet to observe
-- `"apiKey"` - from Google Developer Console, more detail below
-- `"cells"` - the configuration of cells to files
+- `"worksheetName"` - the sheet/tab within the spreadsheet to observe
+- `"apiKey"` - from Google Developer Console - [see below](#apikey)
+- `"spreadsheetId"` - from part of the URL you use to access your spreadsheet - [see below](#spreadsheetid)
+- `"cells"` - the configuration of cells to files - [see below](#cells)
 
 ### apiKey
 API key is required as of v4 of the Google Sheets API.
@@ -68,3 +78,19 @@ Valid `fileExtension` values:
 - Images: "png", "jpg", "jpeg", "gif", "bmp"
 - Text: "txt"
 - Video: "webm"
+
+# Troubleshooting
+Encountering issues? Hopefully the system is providing error message(s) in the UI, if not, check the `/logs` folder!
+
+## JsonSyntaxException / MalformedJsonException 
+e.g. **com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated array at line 14 column 4 path $.cells[7]**
+
+This one is pretty descriptive! Your json file is invalid - even tells you where the issue lies - line number, column number, which array value it's at!
+If you still have issues, remove your apiKey from the file (replace with "") and run it through a service like [JSONLint](https://jsonlint.com/).
+
+# java.io.IOException: Server returned HTTP response code: 403
+HTTP 403 is a HTTP status code meaning access to the requested resource is forbidden. There's a ticket open for improving this error message to users.
+The main cause of 403's is that your Google Spreadsheet is somehow unaccessible or you've used the incorrect [spreadsheetId](#spreadsheetId) - ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
+
+# Something else?
+Report any recurring bugs (with log files) in the [issues tab](https://github.com/GrandyB/SheetsIO/issues), or contact me on Discord (Grandy#0243) or [Twitter](https://twitter.com/GrandyB93).
