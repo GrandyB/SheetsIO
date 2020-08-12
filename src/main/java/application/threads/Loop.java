@@ -17,7 +17,6 @@
 package application.threads;
 
 import application.IExceptionHandler;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -33,7 +32,7 @@ public abstract class Loop implements Runnable {
 	private final IExceptionHandler exceptionHandler;
 	private final long interval;
 
-	@Setter(AccessLevel.PROTECTED)
+	@Setter
 	private boolean paused;
 
 	@Override

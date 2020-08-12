@@ -26,6 +26,7 @@ import com.google.gson.JsonSyntaxException;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.exceptions.JsonValidationException;
+import application.threads.TimerRunnable;
 import application.threads.UpdateRunnable;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -66,29 +67,31 @@ public class Main extends Application implements IExceptionHandler {
 	private final Button updateNowButton = new Button("Update now");
 
 	private final ConfigHolder config = new ConfigHolder();
-	private final UpdateRunnable runnable = new UpdateRunnable(this);
+	private final UpdateRunnable updateRunnable = new UpdateRunnable(this);
+	private final TimerRunnable timerRunnable = new TimerRunnable(this);
+	private final Timer timer = new Timer();
 	private Stage primaryStage;
 
 	@Override
-	public void start(Stage stage) {
+	public void start(Stage stage) throws IOException {
 		this.primaryStage = stage;
 		primaryStage.setTitle("SheetsIO");
 
 		doInit();
 
 		Pane root = doLayout();
-		Scene scene = new Scene(root, 300, 120);
+		Scene scene = new Scene(root, 300, 200);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		// Begin update loop
-		new Thread(runnable).start();
-
+		// Begin update loops
+		new Thread(updateRunnable).start();
+		new Thread(timerRunnable).start();
 	}
 
-	private void doInit() {
+	private void doInit() throws IOException {
 		FileIO fileIO = new FileIO();
 		try {
 			fileIO.createFolder("logs");
@@ -115,7 +118,7 @@ public class Main extends Application implements IExceptionHandler {
 					 */
 					disableThenReenable(reloadConfigLink);
 					config.reload();
-					runnable.updateConfig(config, true);
+					updateRunnable.updateConfig(config, true);
 				} catch (Exception e) {
 					handleException(e);
 				}
@@ -128,7 +131,7 @@ public class Main extends Application implements IExceptionHandler {
 			updateNowButton.setDisable(!updateNowButton.isDisabled());
 			try {
 				if (config.isLoaded()) {
-					runnable.updateConfig(config, false);
+					updateRunnable.updateConfig(config, false);
 				}
 			} catch (IOException | IllegalFileExtensionException e) {
 				handleException(e);
@@ -138,8 +141,10 @@ public class Main extends Application implements IExceptionHandler {
 		updateNowButton.setDisable(false);
 		updateNowButton.setOnAction(ev -> {
 			disableThenReenable(updateNowButton);
-			runnable.runOnce();
+			updateRunnable.runOnce();
 		});
+
+		timer.setup(timerRunnable, this);
 	}
 
 	private Pane doLayout() {
@@ -174,6 +179,8 @@ public class Main extends Application implements IExceptionHandler {
 		autoUpdateCheck.getStyleClass().add("auto-update-checkbox");
 		root.getChildren().add(updateBox);
 
+		root.getChildren().add(timer);
+
 		return root;
 	}
 
@@ -203,7 +210,7 @@ public class Main extends Application implements IExceptionHandler {
 
 		// Update config
 		config.loadFile(file);
-		runnable.updateConfig(config, true);
+		updateRunnable.updateConfig(config, true);
 
 		chosenConfigName.setText(file.getName());
 		reloadConfigLink.setVisible(true);
@@ -275,7 +282,8 @@ public class Main extends Application implements IExceptionHandler {
 	@Override
 	public void stop() {
 		LOGGER.info("Stage is closing");
-		// Shut down the thread
-		runnable.doStop();
+		// Shut down the threads
+		updateRunnable.doStop();
+		timerRunnable.doStop();
 	}
 }
