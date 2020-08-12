@@ -90,7 +90,7 @@ If you still have issues, remove your apiKey from the file (replace with "") and
 
 ## java.io.IOException: Server returned HTTP response code: 403
 HTTP 403 is a HTTP status code meaning access to the requested resource is forbidden. There's a ticket open for improving this error message to users.
-The main cause of 403's is that your Google Spreadsheet is somehow unaccessible or you've used the incorrect [spreadsheetId](#spreadsheetId) - ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
+The main cause of 403's is that your Google Spreadsheet is somehow unaccessible or you've used the incorrect [spreadsheetId](#spreadsheetid) - ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
 
 ## Something else?
 Report any recurring bugs (with log files) in the [issues tab](https://github.com/GrandyB/SheetsIO/issues), or contact me on Discord (Grandy#0243) or [Twitter](https://twitter.com/GrandyB93).
