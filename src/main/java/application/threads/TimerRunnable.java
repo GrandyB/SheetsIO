@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import application.FileIO;
 import application.FileUpdater;
 import application.IExceptionHandler;
-import application.Timer;
+import application.panels.TimerPanel;
 import lombok.Setter;
 
 /**
@@ -38,7 +38,7 @@ public class TimerRunnable extends Loop {
 
 	private FileIO fileIO = new FileIO();
 	@Setter
-	private Timer timer;
+	private TimerPanel timer;
 
 	public TimerRunnable(IExceptionHandler exceptionHandler) {
 		super(exceptionHandler, 1000L);

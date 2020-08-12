@@ -45,7 +45,6 @@ public class UpdateController {
 	private final SheetCache cache = new SheetCache();
 	private final FileUpdater fileUpdater = new FileUpdater(new FileIO());
 
-	private ConfigHolder config;
 	private String urlString;
 	private URL url;
 
@@ -54,19 +53,17 @@ public class UpdateController {
 	 * 
 	 * @throws IllegalFileExtensionException
 	 */
-	public synchronized void setConfig(ConfigHolder config, boolean fromScratch)
-			throws IOException, IllegalFileExtensionException {
-		this.config = config;
+	public synchronized void setConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
 
-		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
-				+ config.getWorksheetName() + /* "!rangeHere" + */ "?key=" + config.getApiKey()
+		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + ConfigHolder.getSpreadsheetId() + "/values/"
+				+ ConfigHolder.getWorksheetName() + /* "!rangeHere" + */ "?key=" + ConfigHolder.getApiKey()
 				+ "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-		LOGGER.debug("URL: {}", ConfigHolder.sanitiseApiKey(config, this.urlString));
+		LOGGER.debug("URL: {}", ConfigHolder.sanitiseApiKey(this.urlString));
 
 		if (fromScratch) {
-			this.cache.setup(config.getCells());
+			this.cache.setup(ConfigHolder.getCells());
 			this.url = new URL(this.urlString);
-			this.fileUpdater.setup(config);
+			this.fileUpdater.setup();
 		}
 
 	}
@@ -78,7 +75,7 @@ public class UpdateController {
 	 *             should the {@link FileUpdater} fail
 	 */
 	public void update() throws IOException {
-		if (config == null) {
+		if (!ConfigHolder.isLoaded()) {
 			LOGGER.warn("No config provided");
 			return;
 		}

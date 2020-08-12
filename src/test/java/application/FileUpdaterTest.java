@@ -42,8 +42,6 @@ public class FileUpdaterTest {
 
 	@Mock
 	private FileIO io;
-	@Mock
-	private ConfigHolder configHolder = new ConfigHolder();
 
 	private FileUpdater fileUpdater;
 	private List<CellWrapper> cells = new ArrayList<>();
@@ -53,10 +51,10 @@ public class FileUpdaterTest {
 	public void setUp() throws IOException, IllegalFileExtensionException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
-		Mockito.when(configHolder.getProjectName()).thenReturn(FOLDER_NAME);
+		Mockito.when(ConfigHolder.getProjectName()).thenReturn(FOLDER_NAME);
 		exampleCell = new CellWrapper(new Cell(FILE_NAME, "A3", TXT_EXTENSION));
 		cells.add(exampleCell);
-		Mockito.when(configHolder.getCells()).thenReturn(cells);
+		Mockito.when(ConfigHolder.getCells()).thenReturn(cells);
 
 		fileUpdater = new FileUpdater(io);
 	}
@@ -68,14 +66,14 @@ public class FileUpdaterTest {
 
 	@Test
 	public void test_setup() throws IOException, IllegalFileExtensionException {
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 	}
 
 	@Test
 	public void test_updateFiles() throws IOException, IllegalFileExtensionException {
 		// Must first setup
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 
 		/*
@@ -104,7 +102,7 @@ public class FileUpdaterTest {
 	@Test
 	public void test_cleanUp_hasFolder() throws IOException, IllegalFileExtensionException {
 		// Must first setup
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 
 		fileUpdater.cleanUp();
@@ -120,7 +118,7 @@ public class FileUpdaterTest {
 	@Test
 	public void test_createFilePath() throws IOException, IllegalFileExtensionException {
 		// Must first setup
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 
 		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME + "."

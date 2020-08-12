@@ -37,8 +37,6 @@ import application.exceptions.IllegalFileExtensionException;
 public class UpdateRunnable extends Loop {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
 
-	private boolean autoUpdate = true;
-
 	private UpdateController updater;
 	private boolean runOnce = false;
 
@@ -48,21 +46,19 @@ public class UpdateRunnable extends Loop {
 
 	@Override
 	public void perform() throws Exception {
-		if (this.updater != null && (this.autoUpdate || this.runOnce)) {
+		if (this.updater != null && (ConfigHolder.isAutoUpdate() || this.runOnce)) {
 			this.runOnce = false;
 			updater.update();
 		}
 	}
 
-	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch)
-			throws IOException, IllegalFileExtensionException {
+	public synchronized void updateConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
 		this.resetState();
-		this.autoUpdate = config.isAutoUpdate();
 
 		if (this.updater == null) {
 			this.updater = new UpdateController();
 		}
-		this.updater.setConfig(config, fromScratch);
+		this.updater.setConfig(fromScratch);
 	}
 
 	/** Perform a single update, on next update iteration. */
