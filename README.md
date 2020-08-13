@@ -6,13 +6,11 @@
 
 The aim of the project is to create a simple way to use Google Spreadsheet data as files within OBS.
 
-Microsoft Excel (and other local sheet programs) often have the capability to record macros and save to files, however this requires some technical knowledge to do so, and requires the right type of sheet program  (as each have their own language for writing macros, sometimes making it difficult to share).
+Primary use case is for broadcasting with OBS - a common issue as a producer is having a ton of raw data (caster details, teams, scores etc) and a lack of a quick/easy way to put that information on screen. SheetsIO, with some basic config to map cell references to file names, you can bring text, images and even webms from the web, onto your local file system and thus easily into your OBS productions using default OBS sources, updating it all from the comfort of a Google Sheet!
 
-There's also a project or two such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which goes from Google Sheets into browser-based graphics.
+There's other ways to do this of course - Microsoft Excel (and other local sheet programs) often have the capability to record macros and save to files, however this requires some technical knowledge to do so, and requires the right type of spreadsheet program (as each have their own language for writing macros, sometimes making it difficult to share). There's also project(s) such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which brings Google Sheets data into browser-based graphics. SheetsIO is possibly (?) the first to go straight to files on your local system however.
 
-SheetsIO is possibly (?) the first to go straight to files on your local system.
-
-Want to help make this tool as useful as it could be? Send your bug reports/feature requests in the [issues tab](https://github.com/GrandyB/SheetsIO/issues).
+Want to help make this tool as useful as it could be? Try it out, break it! Send all your bug reports and feature requests in the [issues tab](https://github.com/GrandyB/SheetsIO/issues).
 
 # Getting started
 
