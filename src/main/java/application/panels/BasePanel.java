@@ -52,18 +52,6 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 		void showErrorDialog(String header, String message);
 	}
 
-	public BasePanel() {
-		preInitialise();
-	}
-
-	/**
-	 * Perform any non-Gui related initialisation of the panel and its state. Use
-	 * {@link #initialise()} for any Gui-related initilisation.
-	 */
-	public void preInitialise() {
-		// Do nothing by default
-	}
-
 	/**
 	 * Perform any Gui-related initialisation. Use {@link #preInitialise()} for any
 	 * non-Gui related initialisation.
@@ -102,9 +90,9 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
 
 		// Remove all instances of the user's API key
-		String sanitisedMessage = ConfigHolder.sanitiseApiKey(e.getLocalizedMessage());
+		String sanitisedMessage = ConfigHolder.get().sanitiseApiKey(e.getLocalizedMessage());
 		LOGGER.error(sanitisedMessage);
-		String errorMessage = ConfigHolder.sanitiseApiKey(error.toString());
+		String errorMessage = ConfigHolder.get().sanitiseApiKey(error.toString());
 		LOGGER.error(errorMessage);
 		getGui().showErrorDialog(sanitisedMessage, errorMessage);
 	}

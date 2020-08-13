@@ -32,8 +32,9 @@ public class TimerDuration {
 	private static final Logger LOGGER = LogManager.getLogger(TimerDuration.class);
 
 	private boolean hasHours;
-	private int totalSeconds;
 
+	@Getter
+	private int totalSeconds;
 	@Getter
 	private int hours;
 	@Getter

@@ -61,7 +61,7 @@ public class FileUpdaterTest {
 		cells.add(exampleCell);
 
 		Mockito.when(config.getProjectName()).thenReturn(FOLDER_NAME);
-		ConfigHolder.setupConfigForTest(config, cells);
+		ConfigHolder.get().setupConfigForTest(config, cells);
 
 		fileUpdater = new FileUpdater(io);
 	}

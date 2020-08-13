@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import application.threads.IntervalRunnable;
+import lombok.Getter;
 
 /**
  * Central place to keep track of all threads running in the app; to be shut
@@ -29,6 +30,7 @@ import application.threads.IntervalRunnable;
  */
 public final class ThreadCollector {
 
+	@Getter
 	private static List<IntervalRunnable> threads = new ArrayList<>();
 
 	public static void stopAllThreads() {

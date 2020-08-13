@@ -31,8 +31,30 @@ import application.threads.UpdateRunnable;
  * @author Mark "Grandy" Bishop
  */
 public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
+	public static final String LOGS_FOLDER = "logs";
 
 	private UpdateRunnable updateRunnable;
+	private ConfigHolder configHolder;
+	private FileIO fileIO;
+
+	public ConfigPanel() {
+		this.configHolder = ConfigHolder.get();
+		this.fileIO = new FileIO();
+
+		// Create/begin the update thread
+		if (updateRunnable == null) {
+			// Ensure only ever have one
+			updateRunnable = ThreadCollector.registerThread(new UpdateRunnable(this));
+		}
+		new Thread(this.updateRunnable).start();
+	}
+
+	/** Dependency injection, for use in tests. */
+	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable) {
+		this.configHolder = configHolder;
+		this.fileIO = fileIO;
+		this.updateRunnable = updateRunnable;
+	}
 
 	public interface Gui extends BasePanel.Gui {
 		/** Update the directory shown to the user on opening the file chooser. */
@@ -52,21 +74,15 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	}
 
 	@Override
-	public void preInitialise() {
+	public void initialise() {
+		super.initialise();
+
 		// Create /logs folder
-		FileIO fileIO = new FileIO();
 		try {
-			fileIO.createFolder("logs");
+			fileIO.createFolder(LOGS_FOLDER);
 		} catch (IOException e) {
 			handleException(e);
 		}
-
-		// Create/begin the update thread
-		if (updateRunnable == null) {
-			// Ensure only ever have one
-			updateRunnable = ThreadCollector.registerThread(new UpdateRunnable(this));
-		}
-		new Thread(updateRunnable).start();
 	}
 
 	/** Handle the selection of a config file from the chooser. */
@@ -74,30 +90,31 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		if (file == null) {
 			return;
 		}
-		getGui().setConfigChooserDirectory(file.getParentFile());
 
 		try {
-			ConfigHolder.loadFile(file);
-			updateRunnable.updateConfig(true);
+			this.configHolder.loadFile(file);
+			this.updateRunnable.updateConfig(true);
 		} catch (Exception e) {
 			handleException(e);
+			return;
 		}
 
+		getGui().setConfigChooserDirectory(file.getParentFile());
 		getGui().setConfigLabel(file.getName());
 		getGui().setReloadConfigLinkVisible(true);
-		getGui().setAutoUpdateCheckState(ConfigHolder.isAutoUpdate());
+		getGui().setAutoUpdateCheckState(this.configHolder.isAutoUpdate());
 	}
 
 	/** Handle a click of the 'reload' config button in the UI. */
 	public void handleReloadLinkClick() {
-		if (ConfigHolder.isLoaded()) {
+		if (this.configHolder.isLoaded()) {
 			try {
 				/*
 				 * Reload backing config file, set it onto the thread, clearing and re-adding
 				 * files into the relevant folder (empty).
 				 */
-				ConfigHolder.reload();
-				updateRunnable.updateConfig(true);
+				this.configHolder.reload();
+				this.updateRunnable.updateConfig(true);
 			} catch (Exception e) {
 				handleException(e);
 			}
@@ -106,11 +123,11 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 
 	/** Handle a toggle in the auto update checkbox. */
 	public void handleAutoUpdateCheck(boolean selected) {
-		ConfigHolder.setAutoUpdate(selected);
+		this.configHolder.setAutoUpdate(selected);
 		getGui().setUpdateNowButtonEnabled(!selected);
 		try {
-			if (ConfigHolder.isLoaded()) {
-				updateRunnable.updateConfig(false);
+			if (this.configHolder.isLoaded()) {
+				this.updateRunnable.updateConfig(false);
 			}
 		} catch (IOException | IllegalFileExtensionException e) {
 			handleException(e);
@@ -119,6 +136,6 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 
 	/** Handle a press of the 'Update Now' button. */
 	public void handleUpdateNowPress() {
-		updateRunnable.runOnce();
+		this.updateRunnable.runOnce();
 	}
 }

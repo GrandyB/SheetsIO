@@ -46,9 +46,9 @@ public class UpdateRunnable extends IntervalRunnable {
 
 	@Override
 	public void perform() throws Exception {
-		LOGGER.trace("Updater: {}\n" + "Auto update: {}\n" + "RunOnce: {}", this.updater, ConfigHolder.isAutoUpdate(),
-				this.runOnce);
-		if (this.updater != null && (ConfigHolder.isAutoUpdate() || this.runOnce)) {
+		LOGGER.trace("Updater: {}\n" + "Auto update: {}\n" + "RunOnce: {}", this.updater,
+				ConfigHolder.get().isAutoUpdate(), this.runOnce);
+		if (this.updater != null && (ConfigHolder.get().isAutoUpdate() || this.runOnce)) {
 			this.runOnce = false;
 			updater.update();
 		}

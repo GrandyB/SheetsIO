@@ -33,7 +33,7 @@ import application.threads.TimerRunnable;
 public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	private static final Logger LOGGER = LogManager.getLogger(TimerPanel.class);
 
-	private TimerRunnable thread;
+	private TimerRunnable timerRunnable;
 	private TimerDuration time;
 
 	private boolean initialState = true;
@@ -48,23 +48,28 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 		void setPlayPauseButtonText(String text);
 	}
 
-	@Override
-	public void preInitialise() {
+	public TimerPanel() {
+		super();
 		this.time = new TimerDuration();
+	}
 
-		if (this.thread == null) {
-			// Ensure there is only ever one
-			this.thread = ThreadCollector.registerThread(new TimerRunnable(this));
-		}
-		this.thread.setTimer(this);
-
-		new Thread(thread).start();
+	/** Dependency injection, for use in tests. */
+	public TimerPanel(TimerDuration time, TimerRunnable timerRunnable) {
+		this.time = time;
+		this.timerRunnable = timerRunnable;
 	}
 
 	@Override
 	public void initialise() {
 		super.initialise();
 		getGui().updatePreview(getDisplay());
+
+		if (this.timerRunnable == null) {
+			// Ensure there is only ever one
+			this.timerRunnable = ThreadCollector.registerThread(new TimerRunnable(this));
+		}
+		this.timerRunnable.setTimer(this);
+		new Thread(timerRunnable).start();
 	}
 
 	/**
@@ -86,15 +91,18 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	/** Reset the timer. */
 	public void reset() {
 		LOGGER.debug("Resetting timer");
+		int currentTime = time.getTotalSeconds();
 		time.update(0);
 		try {
-			this.thread.updateFile(true);
+			this.timerRunnable.updateFile(true);
+
+			this.initialState = true;
+			this.isCurrentlyRunning = false;
+			getGui().setPlayPauseButtonText("Start");
 		} catch (IOException e) {
 			handleException(e);
+			time.update(currentTime);
 		}
-		this.initialState = true;
-		this.isCurrentlyRunning = false;
-		getGui().setPlayPauseButtonText("Start");
 
 		getGui().updatePreview(time.getDisplay());
 	}
@@ -107,13 +115,17 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	public void handleUpdateButtonClick(int hours, int minutes, int seconds) {
 		time.setTimeAndFormat(hours, minutes, seconds);
 		try {
-			this.thread.updateFile(false);
+			this.timerRunnable.updateFile(false);
 		} catch (IOException e) {
 			handleException(e);
 		}
 		getGui().updatePreview(time.getDisplay());
 	}
 
+	/**
+	 * Handle a play/pause button press; using the current values of the 3 input
+	 * fields.
+	 */
 	public void handlePlayPauseButtonPress(int hours, int minutes, int seconds) {
 		if (initialState) {
 			// First time click, setup the time
@@ -123,12 +135,12 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 		}
 		if (isCurrentlyRunning) {
 			// We're currently running, so pause
-			thread.pause();
+			timerRunnable.pause();
 			this.isCurrentlyRunning = false;
 			getGui().setPlayPauseButtonText("Resume");
 		} else {
 			// We're not currently running/initial, so start it
-			thread.unpause();
+			timerRunnable.unpause();
 			this.isCurrentlyRunning = true;
 			getGui().setPlayPauseButtonText("Pause");
 		}

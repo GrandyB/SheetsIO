@@ -55,7 +55,7 @@ public class FileUpdater {
 	 * @throws IllegalFileExtensionException
 	 */
 	public void setup() throws IOException, IllegalFileExtensionException {
-		assert ConfigHolder.getProjectName() != null : "projectName cannot be null";
+		assert ConfigHolder.get().getProjectName() != null : "projectName cannot be null";
 
 		cleanExistingFolderIfExists();
 		writeFolders();
@@ -68,7 +68,7 @@ public class FileUpdater {
 			CellWrapper cellWrapper = entry.getKey();
 			String newValue = entry.getValue();
 
-			String destFilePath = createFilePath(ConfigHolder.getProjectName(), cellWrapper);
+			String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
 			FileExtension ext = cellWrapper.getFileExtension();
 			switch (ext.getType()) {
 			case IMAGE:
@@ -90,7 +90,7 @@ public class FileUpdater {
 
 	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
-		String folderPath = createFolderPath(ConfigHolder.getProjectName());
+		String folderPath = createFolderPath(ConfigHolder.get().getProjectName());
 		this.folder = fileIO.createFolder(folderPath);
 	}
 
@@ -102,13 +102,13 @@ public class FileUpdater {
 	 *             if
 	 */
 	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
-		for (CellWrapper cellWrapper : ConfigHolder.getCells()) {
-			fileIO.writeTextFile(createFilePath(ConfigHolder.getProjectName(), cellWrapper), "");
+		for (CellWrapper cellWrapper : ConfigHolder.get().getCells()) {
+			fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
 		}
 	}
 
 	private void cleanExistingFolderIfExists() throws IOException {
-		String folderPath = createFolderPath(ConfigHolder.getProjectName());
+		String folderPath = createFolderPath(ConfigHolder.get().getProjectName());
 		File folder = new File(folderPath);
 		if (folder.exists()) {
 			this.folder = folder;

@@ -48,7 +48,7 @@ import lombok.Getter;
  *
  * @author Mark "Grandy" Bishop
  */
-public final class ConfigHolder {
+public class ConfigHolder {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigHolder.class);
 
 	/**
@@ -61,63 +61,65 @@ public final class ConfigHolder {
 	public static final long UPDATE_INTERVAL = 1000L;
 
 	/** Cached version of most recent config {@link File}. */
-	private static File lastFile;
+	private File lastFile;
 
 	@Getter
-	private static boolean autoUpdate = false;
+	private boolean autoUpdate = false;
 
 	/** The latest loaded config. */
-	private static Config config;
+	private Config config;
+
+	private static ConfigHolder INSTANCE = new ConfigHolder();
 
 	/**
 	 * CellWrappers, made from Cells, used by the rest of the app, wiped/repopulated
 	 * on config load.
 	 */
-	private static List<CellWrapper> cellWrappers = new ArrayList<>();
+	private List<CellWrapper> cellWrappers = new ArrayList<>();
 
-	public synchronized static String getProjectName() {
+	public synchronized String getProjectName() {
 		assert config != null : "No config available";
 		return config.getProjectName();
 	}
 
-	public synchronized static String getApiKey() {
+	public synchronized String getApiKey() {
 		assert config != null : "No config available";
 		return config.getApiKey();
 	}
 
 	/** @return the string but stripped of the apiKey, for safety. */
-	public synchronized static String sanitiseApiKey(String str) {
+	public synchronized String sanitiseApiKey(String str) {
 		if (str == null) {
 			return "";
 		}
-		if (ConfigHolder.isLoaded()) {
-			return str.replace(ConfigHolder.getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
+		if (isLoaded()) {
+			return str.replace(getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
 		}
 		return str;
 	}
 
-	public synchronized static String getSpreadsheetId() {
+	public synchronized String getSpreadsheetId() {
 		assert config != null : "No config available";
 		return config.getSpreadsheetId();
 	}
 
-	public synchronized static String getWorksheetName() {
+	public synchronized String getWorksheetName() {
 		assert config != null : "No config available";
 		return config.getWorksheetName();
 	}
 
-	public synchronized static List<CellWrapper> getCells() throws IllegalFileExtensionException {
+	public synchronized List<CellWrapper> getCells() throws IllegalFileExtensionException {
 		assert config != null : "No config loaded";
-		return ConfigHolder.cellWrappers;
+		return cellWrappers;
 	}
 
-	public synchronized static boolean isLoaded() {
+	public synchronized boolean isLoaded() {
 		return lastFile != null;
 	}
 
-	public synchronized static void setAutoUpdate(boolean update) {
+	public synchronized void setAutoUpdate(boolean update) {
 		LOGGER.debug("Autoupdate set to {}", update);
-		ConfigHolder.autoUpdate = update;
+		this.autoUpdate = update;
 	}
 
 	/**
@@ -128,7 +130,7 @@ public final class ConfigHolder {
 	 * @throws IllegalFileExtensionException
 	 *             if
 	 */
-	public synchronized static void reload()
+	public synchronized void reload()
 			throws JsonSyntaxException, IOException, JsonValidationException, IllegalFileExtensionException {
 		assert lastFile != null : "There is no existing config file loaded";
 		LOGGER.debug("Reloading.");
@@ -143,7 +145,7 @@ public final class ConfigHolder {
 	 *             if validation of the incoming config goes awry.
 	 * @throws IllegalFileExtensionException
 	 */
-	public synchronized static void loadFile(File file)
+	public synchronized void loadFile(File file)
 			throws IOException, JsonSyntaxException, JsonValidationException, IllegalFileExtensionException {
 		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
@@ -162,8 +164,8 @@ public final class ConfigHolder {
 			throw new JsonValidationException(violations);
 		}
 
-		ConfigHolder.lastFile = file;
-		ConfigHolder.config = conf;
+		this.lastFile = file;
+		this.config = conf;
 
 		cellWrappers.clear();
 		for (Cell cell : config.getCells()) {
@@ -171,13 +173,18 @@ public final class ConfigHolder {
 		}
 	}
 
+	/** @return {@link ConfigHolder} single instance. */
+	public static ConfigHolder get() {
+		return INSTANCE;
+	}
+
 	/**
 	 * EW! This stinks; short of altering config or using PowerMock, not much
 	 * alternative. Do NOT use in regular codebase.
 	 */
 	@Deprecated
-	public static void setupConfigForTest(Config config, List<CellWrapper> cells) {
-		ConfigHolder.config = config;
-		ConfigHolder.cellWrappers = cells;
+	public void setupConfigForTest(Config config, List<CellWrapper> cells) {
+		this.config = config;
+		this.cellWrappers = cells;
 	}
 }

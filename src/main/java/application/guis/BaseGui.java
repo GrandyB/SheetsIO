@@ -26,7 +26,6 @@ import application.panels.IPanel;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
@@ -76,8 +75,8 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui> e
 	@Override
 	public void showErrorDialog(String header, String message) {
 		// Remove all instances of the user's API key
-		String sanitisedMessage = ConfigHolder.sanitiseApiKey(header);
-		String errorMessage = ConfigHolder.sanitiseApiKey(message);
+		String sanitisedMessage = ConfigHolder.get().sanitiseApiKey(header);
+		String errorMessage = ConfigHolder.get().sanitiseApiKey(message);
 		/*
 		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
 		 * which is separate to the JavaFX application thread; Platform.runLater allows
