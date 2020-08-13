@@ -8,10 +8,10 @@
 <JVMSearchPath>jview</JVMSearchPath>
 <arguments></arguments>
 <embeddedJar>true</embeddedJar>
-<executableName>dist\SheetsIO.exe</executableName>
-<iconLocation>src\main\resources\icon.png</iconLocation>
+<executableName>..\dist\SheetsIO.exe</executableName>
+<iconLocation>..\src\main\resources\icon.png</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
-<jarLocation>dist\dist.jar</jarLocation>
+<jarLocation>..\dist\dist.jar</jarLocation>
 <javaProperties>
 <name>log4j.configurationFile</name>
 <value>resources/log4j2.xml</value>
