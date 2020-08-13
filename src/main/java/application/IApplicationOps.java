@@ -1,5 +1,5 @@
 /**
- * ThreadCollector.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
+ * IApplicationOps.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +16,18 @@
  */
 package application;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import application.threads.Loop;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
- * Central place to keep track of all threads running in the app; to be shut
- * down and cleansed upon exiting the application.
+ * Handles any/all needed operations from individual panel/guis to the
+ * {@link Main} class, so that panels don't all have a copy of the whole thing.
  *
  * @author Mark "Grandy" Bishop
  */
-public final class ThreadCollector {
+public interface IApplicationOps {
 
-	private static List<Loop> threads = new ArrayList<>();
+	/** @return the primary {@link Stage} of the app. */
+	Window getPrimaryStage();
 
-	public static void stopAllThreads() {
-		threads.forEach(l -> l.doStop());
-	}
-
-	public static <L extends Loop> L registerThread(L loop) {
-		threads.add(loop);
-		return loop;
-	}
 }

@@ -1,7 +1,7 @@
 /**
  * FileIO.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  */
-package application;
+package application.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

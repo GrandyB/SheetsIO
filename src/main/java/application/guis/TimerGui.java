@@ -41,11 +41,33 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements Tim
 	private Button startPauseButton = new Button("Start");
 	private Text preview = new Text();
 
+	private Button resetButton = new Button("Reset");
+	private Button updateButton = new Button("Update");
+
 	public TimerGui(Main app) {
 		super(app, new TimerPanel(), new VBox(3));
+		getPanel().initialise();
+	}
 
-		getPanel().setUp();
+	@Override
+	public void setUp() {
+		startPauseButton.setOnAction(a -> {
+			getPanel().handlePlayPauseButtonPress(hours.getValueFactory().getValue(),
+					minutes.getValueFactory().getValue(), seconds.getValueFactory().getValue());
+		});
 
+		resetButton.setOnAction(ev -> {
+			getPanel().reset();
+		});
+
+		updateButton.setOnAction(ev -> {
+			getPanel().handleUpdateButtonClick(hours.getValueFactory().getValue(), minutes.getValueFactory().getValue(),
+					seconds.getValueFactory().getValue());
+		});
+	}
+
+	@Override
+	public void doLayout() {
 		Text timerText = new Text("Timer");
 		timerText.getStyleClass().add("timer-label");
 		getLayout().add(timerText);
@@ -60,23 +82,6 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements Tim
 		HBox spinners = new HBox();
 		spinners.getChildren().addAll(hours, minutes, seconds);
 		getLayout().add(spinners);
-
-		/* BUTTONS */
-		startPauseButton.setOnAction(a -> {
-			getPanel().handlePlayPauseButtonPress(hours.getValueFactory().getValue(),
-					minutes.getValueFactory().getValue(), seconds.getValueFactory().getValue());
-		});
-
-		Button resetButton = new Button("Reset");
-		resetButton.setOnAction(ev -> {
-			getPanel().reset();
-		});
-
-		Button updateButton = new Button("Update");
-		updateButton.setOnAction(ev -> {
-			getPanel().handleUpdateButtonClick(hours.getValueFactory().getValue(), minutes.getValueFactory().getValue(),
-					seconds.getValueFactory().getValue());
-		});
 
 		HBox buttons = new HBox(startPauseButton, updateButton, resetButton);
 		getLayout().add(buttons);
@@ -94,14 +99,14 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements Tim
 		Spinner<Integer> spinner = new Spinner<>();
 		SpinnerValueFactory<Integer> factory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0);
 		StringConverter<Integer> converter = new StringIntegerConverter();
-		TextFormatter<Integer> formatter = new TextFormatter<>(factory.getConverter(), factory.getValue());
+		TextFormatter<Integer> formatter = new TextFormatter<>(converter, factory.getValue());
 		spinner.getEditor().setTextFormatter(formatter);
 		factory.valueProperty().bindBidirectional(formatter.valueProperty());
 
 		spinner.setValueFactory(factory);
 		spinner.getValueFactory().setConverter(converter);
 		spinner.setEditable(true);
-		spinner.setPrefSize(50, 20);
+		spinner.setPrefSize(60, 50);
 
 		return spinner;
 	}
@@ -119,11 +124,17 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements Tim
 	private class StringIntegerConverter extends StringConverter<Integer> {
 		@Override
 		public String toString(Integer object) {
+			if (object == null) {
+				return "0";
+			}
 			return object.toString();
 		}
 
 		@Override
 		public Integer fromString(String string) {
+			if (string == null) {
+				return 0;
+			}
 			return Integer.parseInt(string.replaceAll("[^\\d]", ""));
 		}
 	}

@@ -22,18 +22,20 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.FileIO;
-import application.FileUpdater;
 import application.IExceptionHandler;
 import application.panels.TimerPanel;
+import application.services.FileIO;
+import application.services.FileUpdater;
 import lombok.Setter;
 
 /**
- * 
+ * A {@link Runnable} for updating the timer file, controlled by
+ * {@link TimerPanel}.
  *
  * @author Mark "Grandy" Bishop
  */
-public class TimerRunnable extends Loop {
+public class TimerRunnable extends IntervalRunnable {
+
 	private static final Logger LOGGER = LogManager.getLogger(TimerRunnable.class);
 
 	private FileIO fileIO = new FileIO();
@@ -42,26 +44,42 @@ public class TimerRunnable extends Loop {
 
 	public TimerRunnable(IExceptionHandler exceptionHandler) {
 		super(exceptionHandler, 1000L);
-		setPaused(true);
+		pause();
 	}
 
 	@Override
 	protected void perform() throws Exception {
-		LOGGER.debug("Perform timer tick");
+		LOGGER.trace("Perform timer tick");
 		timer.decreaseTick();
-		writeFile(timer.getDisplay());
+		updateFile(false);
 	}
 
 	/**
-	 * @throws IOException
+	 * Updates the file. Can function as a reset if pausing the thread.
 	 * 
+	 * @param pause
+	 *            if true, pause the thread
+	 * @throws IOException
+	 *             if writing the current time to file fails
 	 */
-	public void resetTimer() throws IOException {
-		setPaused(true);
+	public void updateFile(boolean pause) throws IOException {
+		if (pause) {
+			pause();
+		}
 		writeFile(timer.getDisplay());
 	}
 
 	private void writeFile(String display) throws IOException {
 		fileIO.writeTextFile(FileUpdater.FOLDER_PREFIX + File.separator + "timer.txt", display);
+	}
+
+	@Override
+	public synchronized void doStop() {
+		try {
+			writeFile("");
+		} catch (IOException e) {
+			LOGGER.error("Exception while wiping the timer values during a thread stop: {}", e);
+		}
+		super.doStop();
 	}
 }

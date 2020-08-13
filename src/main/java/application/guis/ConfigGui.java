@@ -18,7 +18,7 @@ package application.guis;
 
 import java.io.File;
 
-import application.Main;
+import application.IApplicationOps;
 import application.panels.ConfigPanel;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -43,9 +43,13 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui> implements 
 	private final CheckBox autoUpdateCheck = new CheckBox("Auto update");
 	private final Button updateNowButton = new Button("Update now");
 
-	public ConfigGui(Main app) {
+	public ConfigGui(IApplicationOps app) {
 		super(app, new ConfigPanel(), new VBox(3));
+		getPanel().initialise();
+	}
 
+	@Override
+	public void setUp() {
 		// File "suggestion" -> json config files
 		configChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
 
@@ -69,25 +73,26 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui> implements 
 			disableThenReenable(updateNowButton);
 			getPanel().handleUpdateNowPress();
 		});
-
-		doLayout();
 	}
 
-	private void doLayout() {
+	@Override
+	public void doLayout() {
 		Text configText = new Text("Config file");
 		configText.getStyleClass().add("config-file-label");
 		reloadConfigLink.setVisible(false);
 		reloadConfigLink.getStyleClass().add("config-reload-link");
 		HBox configLabelLayout = new HBox(configText, reloadConfigLink);
+		configLabelLayout.setAlignment(Pos.TOP_LEFT);
 		getLayout().add(configLabelLayout);
 
-		HBox configBox = new HBox(chooserButton, chosenConfigName);
-		configBox.setSpacing(5);
-		configBox.setAlignment(Pos.CENTER_LEFT);
-		configBox.getStyleClass().add("config-box-layout");
 		chosenConfigName.getStyleClass().add("config-name-label");
+		HBox configNameLayout = new HBox(chosenConfigName);
+		configNameLayout.getStyleClass().add("config-name-layout");
+		configNameLayout.setPrefWidth(180);
+		configNameLayout.setPrefHeight(20);
+		getLayout().add(configNameLayout);
 		chooserButton.getStyleClass().add("choose-config-button");
-		getLayout().add(configBox);
+		getLayout().add(chooserButton);
 
 		Text updateMethodText = new Text("Update method");
 		updateMethodText.getStyleClass().add("update-method-label");

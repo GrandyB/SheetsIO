@@ -21,11 +21,11 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.ConfigHolder;
 import application.IExceptionHandler;
 import application.Main;
-import application.UpdateController;
 import application.exceptions.IllegalFileExtensionException;
+import application.models.ConfigHolder;
+import application.services.UpdateController;
 
 /**
  * Meat of the thread running the update loop. Runs continuously based on the
@@ -34,7 +34,7 @@ import application.exceptions.IllegalFileExtensionException;
  *
  * @author Mark "Grandy" Bishop
  */
-public class UpdateRunnable extends Loop {
+public class UpdateRunnable extends IntervalRunnable {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
 
 	private UpdateController updater;
@@ -46,6 +46,8 @@ public class UpdateRunnable extends Loop {
 
 	@Override
 	public void perform() throws Exception {
+		LOGGER.trace("Updater: {}\n" + "Auto update: {}\n" + "RunOnce: {}", this.updater, ConfigHolder.isAutoUpdate(),
+				this.runOnce);
 		if (this.updater != null && (ConfigHolder.isAutoUpdate() || this.runOnce)) {
 			this.runOnce = false;
 			updater.update();
@@ -53,7 +55,7 @@ public class UpdateRunnable extends Loop {
 	}
 
 	public synchronized void updateConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
-		this.resetState();
+		this.unpause();
 
 		if (this.updater == null) {
 			this.updater = new UpdateController();
@@ -63,7 +65,7 @@ public class UpdateRunnable extends Loop {
 
 	/** Perform a single update, on next update iteration. */
 	public synchronized void runOnce() {
-		this.resetState();
+		this.unpause();
 		LOGGER.debug("Updating on next tick...");
 		this.runOnce = true;
 	}

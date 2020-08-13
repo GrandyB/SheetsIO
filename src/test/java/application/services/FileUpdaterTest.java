@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,9 @@ import org.mockito.MockitoAnnotations;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
+import application.models.ConfigHolder;
 import application.models.json.Cell;
+import application.models.json.Config;
 
 public class FileUpdaterTest {
 	private static final String FOLDER_NAME = "exampleFolderName";
@@ -42,19 +44,24 @@ public class FileUpdaterTest {
 
 	@Mock
 	private FileIO io;
+	@Mock
+	private Config config;
 
 	private FileUpdater fileUpdater;
 	private List<CellWrapper> cells = new ArrayList<>();
 	private CellWrapper exampleCell;
 
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void setUp() throws IOException, IllegalFileExtensionException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
-		Mockito.when(ConfigHolder.getProjectName()).thenReturn(FOLDER_NAME);
+
 		exampleCell = new CellWrapper(new Cell(FILE_NAME, "A3", TXT_EXTENSION));
 		cells.add(exampleCell);
-		Mockito.when(ConfigHolder.getCells()).thenReturn(cells);
+
+		Mockito.when(config.getProjectName()).thenReturn(FOLDER_NAME);
+		ConfigHolder.setupConfigForTest(config, cells);
 
 		fileUpdater = new FileUpdater(io);
 	}

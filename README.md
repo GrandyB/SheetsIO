@@ -79,6 +79,14 @@ Valid `fileExtension` values:
 - Text: "txt"
 - Video: "webm"
 
+## Timer
+
+The timer is a combination of spinners and buttons to control `/files/timer.txt`, which updates each second that the timer is active.
+
+- `Start` button begins the countdown, regardless of values
+- `Update` button forces the countdown to the values in the box; if the timer is running, it'll then continue ticking down but from the new value, if the timer is paused, it'll set this new value but not resume automatically
+- `Reset` button forces the countdown to its starting 00:00 display but does not affect the spinners
+
 # Troubleshooting
 Encountering issues? Hopefully the system is providing error message(s) in the UI, if not, check the `/logs` folder!
 

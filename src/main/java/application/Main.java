@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.guis.ConfigGui;
 import application.guis.TimerGui;
+import application.services.ThreadCollector;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -31,14 +32,11 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 /**
- * Application entry point, creates the single-page GUI, and is an
- * {@link IExceptionHandler} - exceptions should make their way here and then be
- * handled/shown to the user where appropriate; we also use threads, so we use
- * this to allow threads to pass back exception info to be handled nicely.
+ * Application entry point, creates the overall window.
  *
  * @author Mark "Grandy" Bishop
  */
-public class Main extends Application {
+public class Main extends Application implements IApplicationOps {
 	private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
 	@Getter
@@ -50,7 +48,7 @@ public class Main extends Application {
 		primaryStage.setTitle("SheetsIO");
 
 		Pane root = doLayout();
-		Scene scene = new Scene(root, 260, 220);
+		Scene scene = new Scene(root, 190, 270);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);

@@ -19,34 +19,40 @@ package application.panels;
 import java.io.File;
 import java.io.IOException;
 
-import application.ConfigHolder;
-import application.FileIO;
-import application.ThreadCollector;
 import application.exceptions.IllegalFileExtensionException;
+import application.models.ConfigHolder;
+import application.services.FileIO;
+import application.services.ThreadCollector;
 import application.threads.UpdateRunnable;
 
 /**
- * 
+ * Logic base for the config section.
  *
  * @author Mark "Grandy" Bishop
  */
 public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 
-	private final UpdateRunnable updateRunnable = ThreadCollector.registerThread(new UpdateRunnable(this));
+	private UpdateRunnable updateRunnable;
 
 	public interface Gui extends BasePanel.Gui {
+		/** Update the directory shown to the user on opening the file chooser. */
 		void setConfigChooserDirectory(File file);
 
+		/** Set the 'currently loaded config' label. */
 		void setConfigLabel(String label);
 
+		/** Set whether the 'reload' link is visible. */
 		void setReloadConfigLinkVisible(boolean visible);
 
+		/** Select or deselect the 'autoupdate' checkbox. */
 		void setAutoUpdateCheckState(boolean checked);
 
+		/** Set whether the 'update now' button is enabled. */
 		void setUpdateNowButtonEnabled(boolean enabled);
 	}
 
-	public void initialise() {
+	@Override
+	public void preInitialise() {
 		// Create /logs folder
 		FileIO fileIO = new FileIO();
 		try {
@@ -55,7 +61,11 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 			handleException(e);
 		}
 
-		// Begin the update thread
+		// Create/begin the update thread
+		if (updateRunnable == null) {
+			// Ensure only ever have one
+			updateRunnable = ThreadCollector.registerThread(new UpdateRunnable(this));
+		}
 		new Thread(updateRunnable).start();
 	}
 
@@ -68,6 +78,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 
 		try {
 			ConfigHolder.loadFile(file);
+			updateRunnable.updateConfig(true);
 		} catch (Exception e) {
 			handleException(e);
 		}

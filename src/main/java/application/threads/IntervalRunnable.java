@@ -16,23 +16,27 @@
  */
 package application.threads;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import application.IExceptionHandler;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
- * 
+ * Base class for interval/tick-based {@link Runnable}s in the application; can
+ * be paused and resumed at will, and handles exceptions off to a provided
+ * {@link IExceptionHandler} - usually the panel it is being controlled from.
  *
  * @author Mark "Grandy" Bishop
  */
 @RequiredArgsConstructor
-public abstract class Loop implements Runnable {
+public abstract class IntervalRunnable implements Runnable {
+	private static final Logger LOGGER = LogManager.getLogger(IntervalRunnable.class);
 	private boolean doStop = false;
 
 	private final IExceptionHandler exceptionHandler;
 	private final long interval;
 
-	@Setter
 	private boolean paused;
 
 	@Override
@@ -52,7 +56,15 @@ public abstract class Loop implements Runnable {
 
 	protected abstract void perform() throws Exception;
 
-	protected void resetState() {
+	/** Pause the thread. */
+	public void pause() {
+		LOGGER.debug("Pausing.");
+		this.paused = true;
+	}
+
+	/* Unpause the thread. */
+	public void unpause() {
+		LOGGER.debug("Resuming.");
 		this.paused = false;
 	}
 

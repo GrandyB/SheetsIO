@@ -21,9 +21,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonSyntaxException;
 
-import application.ConfigHolder;
 import application.IExceptionHandler;
 import application.exceptions.JsonValidationException;
+import application.models.ConfigHolder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,11 +43,33 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	private G gui;
 
 	public interface Gui {
+		/** Perform initialisation of the Gui. */
+		void init();
+
+		/**
+		 * Show an error dialog on screen, with the given header/message, but sanitised.
+		 */
 		void showErrorDialog(String header, String message);
 	}
 
 	public BasePanel() {
+		preInitialise();
+	}
 
+	/**
+	 * Perform any non-Gui related initialisation of the panel and its state. Use
+	 * {@link #initialise()} for any Gui-related initilisation.
+	 */
+	public void preInitialise() {
+		// Do nothing by default
+	}
+
+	/**
+	 * Perform any Gui-related initialisation. Use {@link #preInitialise()} for any
+	 * non-Gui related initialisation.
+	 */
+	public void initialise() {
+		getGui().init();
 	}
 
 	@Override

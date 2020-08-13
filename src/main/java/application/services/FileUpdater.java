@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
+import application.models.ConfigHolder;
 import application.models.FileExtension;
 import application.models.FileExtension.FileExtensionType;
 import lombok.RequiredArgsConstructor;

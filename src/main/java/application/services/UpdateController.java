@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.services;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +30,7 @@ import com.google.gson.GsonBuilder;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
+import application.models.ConfigHolder;
 import application.models.json.GoogleSheetsResponse;
 import application.threads.UpdateRunnable;
 
@@ -79,6 +80,7 @@ public class UpdateController {
 			LOGGER.warn("No config provided");
 			return;
 		}
+		LOGGER.debug("Performing update");
 
 		Map<CellWrapper, String> updatedCells = updateCache(getLatestState());
 		if (!updatedCells.isEmpty()) {

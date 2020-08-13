@@ -19,13 +19,14 @@ package application.guis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.ConfigHolder;
-import application.Main;
+import application.IApplicationOps;
+import application.models.ConfigHolder;
 import application.panels.BasePanel;
 import application.panels.IPanel;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
@@ -46,18 +47,31 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui> e
 	@Getter(AccessLevel.PROTECTED)
 	private P panel;
 	@Getter(AccessLevel.PROTECTED)
-	private Main app;
+	private IApplicationOps app;
 	@Getter(AccessLevel.PROTECTED)
 	private Pane root;
 
 	@SuppressWarnings("unchecked")
-	public BaseGui(Main app, IPanel<G> panel, Pane root) {
+	public BaseGui(IApplicationOps app, IPanel<G> panel, Pane root) {
 		this.app = app;
 		panel.setGui((G) this);
 		this.panel = (P) panel;
 		this.root = root;
 		super.getChildren().add(this.root);
 	}
+
+	/** Sets up the Gui/Panel, to be called at end of child constructor. */
+	@Override
+	public void init() {
+		setUp();
+		doLayout();
+	}
+
+	/** Setup any listeners/actions on components. */
+	protected abstract void setUp();
+
+	/** Populate the layout. */
+	protected abstract void doLayout();
 
 	@Override
 	public void showErrorDialog(String header, String message) {

@@ -21,8 +21,8 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.ThreadCollector;
 import application.models.TimerDuration;
+import application.services.ThreadCollector;
 import application.threads.TimerRunnable;
 
 /**
@@ -33,7 +33,7 @@ import application.threads.TimerRunnable;
 public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	private static final Logger LOGGER = LogManager.getLogger(TimerPanel.class);
 
-	private TimerRunnable thread = ThreadCollector.registerThread(new TimerRunnable(this));
+	private TimerRunnable thread;
 	private TimerDuration time;
 
 	private boolean initialState = true;
@@ -48,12 +48,23 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 		void setPlayPauseButtonText(String text);
 	}
 
-	public void setUp() {
+	@Override
+	public void preInitialise() {
 		this.time = new TimerDuration();
-		thread.setTimer(this);
 
-		getGui().updatePreview(getDisplay());
+		if (this.thread == null) {
+			// Ensure there is only ever one
+			this.thread = ThreadCollector.registerThread(new TimerRunnable(this));
+		}
+		this.thread.setTimer(this);
+
 		new Thread(thread).start();
+	}
+
+	@Override
+	public void initialise() {
+		super.initialise();
+		getGui().updatePreview(getDisplay());
 	}
 
 	/**
@@ -77,7 +88,7 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 		LOGGER.debug("Resetting timer");
 		time.update(0);
 		try {
-			this.thread.resetTimer();
+			this.thread.updateFile(true);
 		} catch (IOException e) {
 			handleException(e);
 		}
@@ -89,10 +100,17 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	}
 
 	/**
-	 * 
+	 * When the update button is clicked, the values from the three spinners is sent
+	 * here; need to update our {@link TimerDuration}, the underlying file and
+	 * preview.
 	 */
 	public void handleUpdateButtonClick(int hours, int minutes, int seconds) {
 		time.setTimeAndFormat(hours, minutes, seconds);
+		try {
+			this.thread.updateFile(false);
+		} catch (IOException e) {
+			handleException(e);
+		}
 		getGui().updatePreview(time.getDisplay());
 	}
 
@@ -101,15 +119,16 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 			// First time click, setup the time
 			time.setTimeAndFormat(hours, minutes, seconds);
 			initialState = false;
+			LOGGER.debug("Initialising timer.\n{}", time);
 		}
 		if (isCurrentlyRunning) {
 			// We're currently running, so pause
-			thread.setPaused(true);
+			thread.pause();
 			this.isCurrentlyRunning = false;
 			getGui().setPlayPauseButtonText("Resume");
 		} else {
 			// We're not currently running/initial, so start it
-			thread.setPaused(false);
+			thread.unpause();
 			this.isCurrentlyRunning = true;
 			getGui().setPlayPauseButtonText("Pause");
 		}

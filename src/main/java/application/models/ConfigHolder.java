@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.models;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,6 @@ import com.google.gson.JsonSyntaxException;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.exceptions.JsonValidationException;
-import application.models.CellWrapper;
 import application.models.json.Cell;
 import application.models.json.Config;
 import lombok.Getter;
@@ -88,6 +87,9 @@ public final class ConfigHolder {
 
 	/** @return the string but stripped of the apiKey, for safety. */
 	public synchronized static String sanitiseApiKey(String str) {
+		if (str == null) {
+			return "";
+		}
 		if (ConfigHolder.isLoaded()) {
 			return str.replace(ConfigHolder.getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
 		}
@@ -167,5 +169,15 @@ public final class ConfigHolder {
 		for (Cell cell : config.getCells()) {
 			cellWrappers.add(new CellWrapper(cell));
 		}
+	}
+
+	/**
+	 * EW! This stinks; short of altering config or using PowerMock, not much
+	 * alternative. Do NOT use in regular codebase.
+	 */
+	@Deprecated
+	public static void setupConfigForTest(Config config, List<CellWrapper> cells) {
+		ConfigHolder.config = config;
+		ConfigHolder.cellWrappers = cells;
 	}
 }
