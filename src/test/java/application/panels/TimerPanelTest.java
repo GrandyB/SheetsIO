@@ -60,13 +60,14 @@ public class TimerPanelTest {
 	}
 
 	@Test
-	public void test_initialise() {
+	public void test_initialise() throws Exception {
 		testee.initialise();
 
 		verify(gui).init();
 		verify(gui).updatePreview(TIME_DISPLAY);
 		verify(time).getDisplay();
 		verify(timerRunnable).setTimer(Mockito.any());
+		Thread.sleep(2000L); // *vomits* should restructure to avoid this >.> <.<
 		verify(timerRunnable).run();
 	}
 

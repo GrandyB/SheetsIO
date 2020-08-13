@@ -33,7 +33,7 @@ public class FileIO {
 	/** Max time (ms) allowed to connect to a site to download its file. */
 	private static final int CONNECTION_TIMEOUT = 2000;
 	/** Max time (ms) allowed to read/download the file. */
-	private static final int READ_TIMEOUT = 10000;
+	private static final int READ_TIMEOUT = 20000;
 
 	/**
 	 * Creates a folder from a path.
