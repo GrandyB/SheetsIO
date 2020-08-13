@@ -4,13 +4,16 @@
 
 ![Image of SheetsIO](https://github.com/GrandyB/SheetsIO/blob/master/.github/ui_screenshot.png)
 
-The aim of the project is to create a simple way to use Google Spreadsheet data as files within OBS.
+**Brief:**
+Use Google Sheets as a central and easily updateable backend for all text/images/files in productions.
 
-Primary use case is for broadcasting with OBS - a common issue as a producer is having a ton of raw data (caster details, teams, scores etc) and a lack of a quick/easy way to put that information on screen. SheetsIO, with some basic config to map cell references to file names, you can bring text, images and even webms from the web, onto your local file system and thus easily into your OBS productions using default OBS sources, updating it all from the comfort of a Google Sheet!
+**More:**
 
-There's other ways to do this of course - Microsoft Excel (and other local sheet programs) often have the capability to record macros and save to files, however this requires some technical knowledge to do so, and requires the right type of spreadsheet program (as each have their own language for writing macros, sometimes making it difficult to share). There's also project(s) such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which brings Google Sheets data into browser-based graphics. SheetsIO is possibly (?) the first to go straight to files on your local system however.
+A common issue as a producer is having an unruly mass of raw data - caster names/socials/photos, team names/logos/scores, player names/stats etc - without any tools it's a nightmare to setup and maintain. SheetsIO, with some basic config to map cell references to file names, allows you to bring down text, images and even webms from the web onto your local file system, and thus easily into your OBS productions using regular ol' OBS sources... all from the comfort of a Google Sheet!
 
-Want to help make this tool as useful as it could be? Try it out, break it! Send all your bug reports and feature requests in the [issues tab](https://github.com/GrandyB/SheetsIO/issues).
+There's other tools/methods out there that attempt to address this problem - Microsoft Excel (and other spreadsheet programs) often have the capability to record macros and save data to files, however this requires some technical knowledge to create, and requires the right type of spreadsheet program to use (as MS/Libre/Openoffice each their own language for writing macros, often making it difficult to share). Then there's project(s) such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which brings Google Sheets data into browser-based graphics, which while powerful, requires a fair bit of coding knowledge to use properly. SheetsIO on the other hand requires zero coding knowledge to implement, uses shareable configs, can bring in an unlimited amount of data of various types, allows for remote editing of data on Google Sheets, and is generally very simple to use.
+
+Want to help make this tool as useful as it could be? Try it out - break it! Write up all your bug reports and feature requests in the [issues tab](https://github.com/GrandyB/SheetsIO/issues).
 
 # Getting started
 
@@ -43,12 +46,12 @@ Configs are json files and can be placed anywhere, selected through the file cho
 
 - `"projectName"` - becomes the folder name; files are generated within `/files/projectName`
 - `"worksheetName"` - the sheet/tab within the spreadsheet to observe
-- `"apiKey"` - from Google Developer Console - [see below](#apikey)
+- `"apiKey"` - from Google Developer Console - [see below](#apikey) - **do not share this key with others**
 - `"spreadsheetId"` - from part of the URL you use to access your spreadsheet - [see below](#spreadsheetid)
 - `"cells"` - the configuration of cells to files - [see below](#cells)
 
 ### apiKey
-API key is required as of v4 of the Google Sheets API.
+API key is required as of v4 of the Google Sheets API. 
 
 1. Go to https://console.developers.google.com/
 1. 'Select a project' in the top bar, 'New Project'
@@ -56,7 +59,7 @@ API key is required as of v4 of the Google Sheets API.
 1. View the project; on the dashboard there should be a 'Go to APIs overview'
 1. Under the 'Credentials' tab, and click 'Create Credentials' at the top -> 'API key'
 
-It should now display an API key for you to then use in your application!
+It should now display an API key for you to then use in your application! It's important to keep this secure, so whenever sharing configs, ensure you remove your apiKey.
 It is advised (although completely optional) to then 'restrict' that key by IP address, or at least specifically to the sheets API - can do that through the key's settings easily at any time.
 
 ### spreadsheetId
