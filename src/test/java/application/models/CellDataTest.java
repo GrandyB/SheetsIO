@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.json.Cell;
 
-class CellDataTest {
+public class CellDataTest {
 
 	@Test
 	public void test_equality() throws IllegalFileExtensionException {

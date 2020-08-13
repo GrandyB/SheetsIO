@@ -32,7 +32,7 @@ import lombok.Getter;
  * @author Mark "Grandy" Bishop
  */
 @AllArgsConstructor
-public final class Config {
+public class Config {
 	@Getter
 	@NotBlank(message = "Please provide a non-blank \"projectName\"")
 	private final String projectName;

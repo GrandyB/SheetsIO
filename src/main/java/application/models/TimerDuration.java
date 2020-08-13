@@ -20,18 +20,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Data holder for timer values.
  *
  * @author Mark "Grandy" Bishop
  */
+@ToString
 public class TimerDuration {
 	private static final Logger LOGGER = LogManager.getLogger(TimerDuration.class);
 
 	private boolean hasHours;
-	private int totalSeconds;
 
+	@Getter
+	private int totalSeconds;
 	@Getter
 	private int hours;
 	@Getter
@@ -54,7 +57,7 @@ public class TimerDuration {
 		this.minutes = (totalSeconds % 3600) / 60;
 		this.seconds = totalSeconds % 60;
 
-		LOGGER.debug("{} set to {}:{}:{} - total {}", TimerDuration.class.getSimpleName(), hours, minutes, seconds,
+		LOGGER.trace("{} set to {}:{}:{} - total {}", TimerDuration.class.getSimpleName(), hours, minutes, seconds,
 				totalSeconds);
 	}
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.models;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,6 @@ import com.google.gson.JsonSyntaxException;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.exceptions.JsonValidationException;
-import application.models.CellWrapper;
 import application.models.json.Cell;
 import application.models.json.Config;
 import lombok.Getter;
@@ -70,50 +69,55 @@ public class ConfigHolder {
 	/** The latest loaded config. */
 	private Config config;
 
+	private static ConfigHolder INSTANCE = new ConfigHolder();
+
 	/**
 	 * CellWrappers, made from Cells, used by the rest of the app, wiped/repopulated
 	 * on config load.
 	 */
 	private List<CellWrapper> cellWrappers = new ArrayList<>();
 
-	public String getProjectName() {
+	public synchronized String getProjectName() {
 		assert config != null : "No config available";
 		return config.getProjectName();
 	}
 
-	public String getApiKey() {
+	public synchronized String getApiKey() {
 		assert config != null : "No config available";
 		return config.getApiKey();
 	}
 
 	/** @return the string but stripped of the apiKey, for safety. */
-	public static String sanitiseApiKey(ConfigHolder config, String str) {
-		if (config.isLoaded()) {
-			return str.replace(config.getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
+	public synchronized String sanitiseApiKey(String str) {
+		if (str == null) {
+			return "";
+		}
+		if (isLoaded()) {
+			return str.replace(getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
 		}
 		return str;
 	}
 
-	public String getSpreadsheetId() {
+	public synchronized String getSpreadsheetId() {
 		assert config != null : "No config available";
 		return config.getSpreadsheetId();
 	}
 
-	public String getWorksheetName() {
+	public synchronized String getWorksheetName() {
 		assert config != null : "No config available";
 		return config.getWorksheetName();
 	}
 
-	public List<CellWrapper> getCells() throws IllegalFileExtensionException {
+	public synchronized List<CellWrapper> getCells() throws IllegalFileExtensionException {
 		assert config != null : "No config loaded";
-		return this.cellWrappers;
+		return cellWrappers;
 	}
 
-	public boolean isLoaded() {
+	public synchronized boolean isLoaded() {
 		return lastFile != null;
 	}
 
-	public void setAutoUpdate(boolean update) {
+	public synchronized void setAutoUpdate(boolean update) {
 		LOGGER.debug("Autoupdate set to {}", update);
 		this.autoUpdate = update;
 	}
@@ -124,8 +128,9 @@ public class ConfigHolder {
 	 * @throws JsonValidationException
 	 *             if validation of the incoming config goes awry.
 	 * @throws IllegalFileExtensionException
+	 *             if
 	 */
-	public void reload()
+	public synchronized void reload()
 			throws JsonSyntaxException, IOException, JsonValidationException, IllegalFileExtensionException {
 		assert lastFile != null : "There is no existing config file loaded";
 		LOGGER.debug("Reloading.");
@@ -140,7 +145,7 @@ public class ConfigHolder {
 	 *             if validation of the incoming config goes awry.
 	 * @throws IllegalFileExtensionException
 	 */
-	public void loadFile(File file)
+	public synchronized void loadFile(File file)
 			throws IOException, JsonSyntaxException, JsonValidationException, IllegalFileExtensionException {
 		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
@@ -166,5 +171,20 @@ public class ConfigHolder {
 		for (Cell cell : config.getCells()) {
 			cellWrappers.add(new CellWrapper(cell));
 		}
+	}
+
+	/** @return {@link ConfigHolder} single instance. */
+	public static ConfigHolder get() {
+		return INSTANCE;
+	}
+
+	/**
+	 * EW! This stinks; short of altering config or using PowerMock, not much
+	 * alternative. Do NOT use in regular codebase.
+	 */
+	@Deprecated
+	public void setupConfigForTest(Config config, List<CellWrapper> cells) {
+		this.config = config;
+		this.cellWrappers = cells;
 	}
 }

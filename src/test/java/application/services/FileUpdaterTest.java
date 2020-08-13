@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,9 @@ import org.mockito.MockitoAnnotations;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
+import application.models.ConfigHolder;
 import application.models.json.Cell;
+import application.models.json.Config;
 
 public class FileUpdaterTest {
 	private static final String FOLDER_NAME = "exampleFolderName";
@@ -43,20 +45,23 @@ public class FileUpdaterTest {
 	@Mock
 	private FileIO io;
 	@Mock
-	private ConfigHolder configHolder = new ConfigHolder();
+	private Config config;
 
 	private FileUpdater fileUpdater;
 	private List<CellWrapper> cells = new ArrayList<>();
 	private CellWrapper exampleCell;
 
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void setUp() throws IOException, IllegalFileExtensionException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
-		Mockito.when(configHolder.getProjectName()).thenReturn(FOLDER_NAME);
+
 		exampleCell = new CellWrapper(new Cell(FILE_NAME, "A3", TXT_EXTENSION));
 		cells.add(exampleCell);
-		Mockito.when(configHolder.getCells()).thenReturn(cells);
+
+		Mockito.when(config.getProjectName()).thenReturn(FOLDER_NAME);
+		ConfigHolder.get().setupConfigForTest(config, cells);
 
 		fileUpdater = new FileUpdater(io);
 	}
@@ -68,14 +73,14 @@ public class FileUpdaterTest {
 
 	@Test
 	public void test_setup() throws IOException, IllegalFileExtensionException {
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 	}
 
 	@Test
 	public void test_updateFiles() throws IOException, IllegalFileExtensionException {
 		// Must first setup
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 
 		/*
@@ -104,7 +109,7 @@ public class FileUpdaterTest {
 	@Test
 	public void test_cleanUp_hasFolder() throws IOException, IllegalFileExtensionException {
 		// Must first setup
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 
 		fileUpdater.cleanUp();
@@ -120,7 +125,7 @@ public class FileUpdaterTest {
 	@Test
 	public void test_createFilePath() throws IOException, IllegalFileExtensionException {
 		// Must first setup
-		fileUpdater.setup(configHolder);
+		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 
 		String expected = FileUpdater.FOLDER_PREFIX + File.separator + FOLDER_NAME + File.separator + FILE_NAME + "."

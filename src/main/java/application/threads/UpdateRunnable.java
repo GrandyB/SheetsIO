@@ -21,11 +21,11 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.ConfigHolder;
 import application.IExceptionHandler;
 import application.Main;
-import application.UpdateController;
 import application.exceptions.IllegalFileExtensionException;
+import application.models.ConfigHolder;
+import application.services.UpdateController;
 
 /**
  * Meat of the thread running the update loop. Runs continuously based on the
@@ -34,10 +34,8 @@ import application.exceptions.IllegalFileExtensionException;
  *
  * @author Mark "Grandy" Bishop
  */
-public class UpdateRunnable extends Loop {
+public class UpdateRunnable extends IntervalRunnable {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
-
-	private boolean autoUpdate = true;
 
 	private UpdateController updater;
 	private boolean runOnce = false;
@@ -48,26 +46,26 @@ public class UpdateRunnable extends Loop {
 
 	@Override
 	public void perform() throws Exception {
-		if (this.updater != null && (this.autoUpdate || this.runOnce)) {
+		LOGGER.trace("Updater: {}\n" + "Auto update: {}\n" + "RunOnce: {}", this.updater,
+				ConfigHolder.get().isAutoUpdate(), this.runOnce);
+		if (this.updater != null && (ConfigHolder.get().isAutoUpdate() || this.runOnce)) {
 			this.runOnce = false;
 			updater.update();
 		}
 	}
 
-	public synchronized void updateConfig(ConfigHolder config, boolean fromScratch)
-			throws IOException, IllegalFileExtensionException {
-		this.resetState();
-		this.autoUpdate = config.isAutoUpdate();
+	public synchronized void updateConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
+		this.unpause();
 
 		if (this.updater == null) {
 			this.updater = new UpdateController();
 		}
-		this.updater.setConfig(config, fromScratch);
+		this.updater.setConfig(fromScratch);
 	}
 
 	/** Perform a single update, on next update iteration. */
 	public synchronized void runOnce() {
-		this.resetState();
+		this.unpause();
 		LOGGER.debug("Updating on next tick...");
 		this.runOnce = true;
 	}

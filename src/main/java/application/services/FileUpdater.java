@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
+import application.models.ConfigHolder;
 import application.models.FileExtension;
 import application.models.FileExtension.FileExtensionType;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,6 @@ public class FileUpdater {
 	public static final String FOLDER_PREFIX = "files";
 
 	private final FileIO fileIO;
-	private ConfigHolder configHolder;
 	private File folder;
 
 	/**
@@ -54,10 +54,8 @@ public class FileUpdater {
 	 *             if folder cannot be made.
 	 * @throws IllegalFileExtensionException
 	 */
-	public void setup(ConfigHolder configHolder) throws IOException, IllegalFileExtensionException {
-		assert configHolder != null : "config cannot be null";
-		assert configHolder.getProjectName() != null : "projectName cannot be null";
-		this.configHolder = configHolder;
+	public void setup() throws IOException, IllegalFileExtensionException {
+		assert ConfigHolder.get().getProjectName() != null : "projectName cannot be null";
 
 		cleanExistingFolderIfExists();
 		writeFolders();
@@ -70,7 +68,7 @@ public class FileUpdater {
 			CellWrapper cellWrapper = entry.getKey();
 			String newValue = entry.getValue();
 
-			String destFilePath = createFilePath(this.configHolder.getProjectName(), cellWrapper);
+			String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
 			FileExtension ext = cellWrapper.getFileExtension();
 			switch (ext.getType()) {
 			case IMAGE:
@@ -92,7 +90,7 @@ public class FileUpdater {
 
 	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
-		String folderPath = createFolderPath(this.configHolder.getProjectName());
+		String folderPath = createFolderPath(ConfigHolder.get().getProjectName());
 		this.folder = fileIO.createFolder(folderPath);
 	}
 
@@ -104,13 +102,13 @@ public class FileUpdater {
 	 *             if
 	 */
 	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
-		for (CellWrapper cellWrapper : this.configHolder.getCells()) {
-			fileIO.writeTextFile(createFilePath(this.configHolder.getProjectName(), cellWrapper), "");
+		for (CellWrapper cellWrapper : ConfigHolder.get().getCells()) {
+			fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
 		}
 	}
 
 	private void cleanExistingFolderIfExists() throws IOException {
-		String folderPath = createFolderPath(this.configHolder.getProjectName());
+		String folderPath = createFolderPath(ConfigHolder.get().getProjectName());
 		File folder = new File(folderPath);
 		if (folder.exists()) {
 			this.folder = folder;

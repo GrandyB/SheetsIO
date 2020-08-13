@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
+package application.services;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +30,7 @@ import com.google.gson.GsonBuilder;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
+import application.models.ConfigHolder;
 import application.models.json.GoogleSheetsResponse;
 import application.threads.UpdateRunnable;
 
@@ -45,7 +46,6 @@ public class UpdateController {
 	private final SheetCache cache = new SheetCache();
 	private final FileUpdater fileUpdater = new FileUpdater(new FileIO());
 
-	private ConfigHolder config;
 	private String urlString;
 	private URL url;
 
@@ -54,19 +54,17 @@ public class UpdateController {
 	 * 
 	 * @throws IllegalFileExtensionException
 	 */
-	public synchronized void setConfig(ConfigHolder config, boolean fromScratch)
-			throws IOException, IllegalFileExtensionException {
-		this.config = config;
+	public synchronized void setConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
 
-		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + config.getSpreadsheetId() + "/values/"
-				+ config.getWorksheetName() + /* "!rangeHere" + */ "?key=" + config.getApiKey()
-				+ "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-		LOGGER.debug("URL: {}", ConfigHolder.sanitiseApiKey(config, this.urlString));
+		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + ConfigHolder.get().getSpreadsheetId()
+				+ "/values/" + ConfigHolder.get().getWorksheetName() + /* "!rangeHere" + */ "?key="
+				+ ConfigHolder.get().getApiKey() + "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
+		LOGGER.debug("URL: {}", ConfigHolder.get().sanitiseApiKey(this.urlString));
 
 		if (fromScratch) {
-			this.cache.setup(config.getCells());
+			this.cache.setup(ConfigHolder.get().getCells());
 			this.url = new URL(this.urlString);
-			this.fileUpdater.setup(config);
+			this.fileUpdater.setup();
 		}
 
 	}
@@ -78,10 +76,11 @@ public class UpdateController {
 	 *             should the {@link FileUpdater} fail
 	 */
 	public void update() throws IOException {
-		if (config == null) {
+		if (!ConfigHolder.get().isLoaded()) {
 			LOGGER.warn("No config provided");
 			return;
 		}
+		LOGGER.trace("Performing update");
 
 		Map<CellWrapper, String> updatedCells = updateCache(getLatestState());
 		if (!updatedCells.isEmpty()) {
