@@ -21,9 +21,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonSyntaxException;
 
+import application.AppUtil;
 import application.IExceptionHandler;
 import application.exceptions.JsonValidationException;
-import application.models.ConfigHolder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -90,9 +90,9 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
 
 		// Remove all instances of the user's API key
-		String sanitisedMessage = ConfigHolder.get().sanitiseApiKey(e.getLocalizedMessage());
+		String sanitisedMessage = AppUtil.sanitiseApiKey(e.getLocalizedMessage());
 		LOGGER.error(sanitisedMessage);
-		String errorMessage = ConfigHolder.get().sanitiseApiKey(error.toString());
+		String errorMessage = AppUtil.sanitiseApiKey(error.toString());
 		LOGGER.error(errorMessage);
 		getGui().showErrorDialog(sanitisedMessage, errorMessage);
 	}

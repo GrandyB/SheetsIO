@@ -1,7 +1,7 @@
 .root {
 	-fx-padding: 10px;
 }
-.config-file-label, .update-method-label, .timer-label {
+.bold-text {
 	-fx-font-weight: bold;
 }
 .config-name-label {

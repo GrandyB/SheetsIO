@@ -82,22 +82,6 @@ public class ConfigHolder {
 		return config.getProjectName();
 	}
 
-	public synchronized String getApiKey() {
-		assert config != null : "No config available";
-		return config.getApiKey();
-	}
-
-	/** @return the string but stripped of the apiKey, for safety. */
-	public synchronized String sanitiseApiKey(String str) {
-		if (str == null) {
-			return "";
-		}
-		if (isLoaded()) {
-			return str.replace(getApiKey(), "YOUR_UNSANITISED_API_KEY_HERE");
-		}
-		return str;
-	}
-
 	public synchronized String getSpreadsheetId() {
 		assert config != null : "No config available";
 		return config.getSpreadsheetId();

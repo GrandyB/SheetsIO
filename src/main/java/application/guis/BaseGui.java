@@ -19,8 +19,8 @@ package application.guis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.AppUtil;
 import application.IApplicationOps;
-import application.models.ConfigHolder;
 import application.panels.BasePanel;
 import application.panels.IPanel;
 import javafx.application.Platform;
@@ -38,7 +38,8 @@ import lombok.Getter;
  *
  * @author Mark "Grandy" Bishop
  */
-public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui> extends Pane implements BasePanel.Gui {
+public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L extends Pane> extends Pane
+		implements BasePanel.Gui {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger(BaseGui.class);
 	private static final long DISABLE_CONTROL_TIME = 1000L;
@@ -48,10 +49,10 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui> e
 	@Getter(AccessLevel.PROTECTED)
 	private IApplicationOps app;
 	@Getter(AccessLevel.PROTECTED)
-	private Pane root;
+	private L root;
 
 	@SuppressWarnings("unchecked")
-	public BaseGui(IApplicationOps app, IPanel<G> panel, Pane root) {
+	public BaseGui(IApplicationOps app, IPanel<G> panel, L root) {
 		this.app = app;
 		panel.setGui((G) this);
 		this.panel = (P) panel;
@@ -67,7 +68,9 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui> e
 	}
 
 	/** Setup any listeners/actions on components. */
-	protected abstract void setUp();
+	protected void setUp() {
+		// Do nothing by default
+	}
 
 	/** Populate the layout. */
 	protected abstract void doLayout();
@@ -75,8 +78,8 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui> e
 	@Override
 	public void showErrorDialog(String header, String message) {
 		// Remove all instances of the user's API key
-		String sanitisedMessage = ConfigHolder.get().sanitiseApiKey(header);
-		String errorMessage = ConfigHolder.get().sanitiseApiKey(message);
+		String sanitisedMessage = AppUtil.sanitiseApiKey(header);
+		String errorMessage = AppUtil.sanitiseApiKey(message);
 		/*
 		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
 		 * which is separate to the JavaFX application thread; Platform.runLater allows

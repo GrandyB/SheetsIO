@@ -16,7 +16,7 @@
  */
 package application.guis;
 
-import application.Main;
+import application.IApplicationOps;
 import application.panels.TimerPanel;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
@@ -32,7 +32,7 @@ import javafx.util.StringConverter;
  *
  * @author Mark "Grandy" Bishop
  */
-public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements TimerPanel.Gui {
+public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implements TimerPanel.Gui {
 
 	private Spinner<Integer> hours;
 	private Spinner<Integer> minutes;
@@ -44,7 +44,7 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements Tim
 	private Button resetButton = new Button("Reset");
 	private Button updateButton = new Button("Update");
 
-	public TimerGui(Main app) {
+	public TimerGui(IApplicationOps app) {
 		super(app, new TimerPanel(), new VBox(3));
 		getPanel().initialise();
 	}
@@ -69,7 +69,7 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui> implements Tim
 	@Override
 	public void doLayout() {
 		Text timerText = new Text("Timer");
-		timerText.getStyleClass().add("timer-label");
+		timerText.getStyleClass().add("bold-text");
 		getLayout().add(timerText);
 
 		getLayout().add(preview);

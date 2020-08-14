@@ -38,10 +38,6 @@ public class Config {
 	private final String projectName;
 
 	@Getter
-	@NotBlank(message = "Please provide a non-blank \"apiKey\"")
-	private final String apiKey;
-
-	@Getter
 	@NotBlank(message = "Please provide a non-blank \"spreadsheetId\"")
 	private final String spreadsheetId;
 

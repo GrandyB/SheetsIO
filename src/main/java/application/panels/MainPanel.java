@@ -1,5 +1,5 @@
 /**
- * IApplicationOps.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
+ * MainPanel.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
-
-import javafx.stage.Stage;
+package application.panels;
 
 /**
- * Handles any/all needed operations from individual panel/guis to the
- * {@link Main} class, so that panels don't all have a copy of the whole thing.
+ * Panel backing the main ui of the app. No particular logic required to
+ * instantiate and show.
  *
  * @author Mark "Grandy" Bishop
  */
-public interface IApplicationOps {
+public class MainPanel extends BasePanel<MainPanel.Gui> {
 
-	/** @return the primary {@link Stage} of the app. */
-	Stage getPrimaryStage();
+	public interface Gui extends BasePanel.Gui {
+
+	}
 }

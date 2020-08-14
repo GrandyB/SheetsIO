@@ -21,13 +21,10 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.guis.ConfigGui;
-import application.guis.TimerGui;
+import application.guis.MainGui;
 import application.services.ThreadCollector;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 
@@ -42,30 +39,20 @@ public class Main extends Application implements IApplicationOps {
 	@Getter
 	private Stage primaryStage;
 
+	private MainGui mainGui;
+
 	@Override
 	public void start(Stage stage) throws IOException {
 		this.primaryStage = stage;
 		primaryStage.setTitle("SheetsIO");
 
-		Pane root = doLayout();
-		Scene scene = new Scene(root, 190, 270);
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		this.mainGui = new MainGui(this);
+
+		Scene mainScene = new Scene(this.mainGui, 190, 270);
+		mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setResizable(false);
-		primaryStage.setScene(scene);
+		primaryStage.setScene(mainScene);
 		primaryStage.show();
-	}
-
-	private Pane doLayout() {
-		VBox root = new VBox(3);
-		root.getStyleClass().add("root");
-		root.setSpacing(10);
-
-		ConfigGui configGui = new ConfigGui(this);
-		root.getChildren().add(configGui);
-
-		TimerGui timer = new TimerGui(this);
-		root.getChildren().add(timer);
-		return root;
 	}
 
 	public static void main(String[] args) {

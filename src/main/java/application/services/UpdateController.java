@@ -28,9 +28,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.GsonBuilder;
 
+import application.AppUtil;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
+import application.models.PropertiesHolder;
 import application.models.json.GoogleSheetsResponse;
 import application.threads.UpdateRunnable;
 
@@ -56,10 +58,10 @@ public class UpdateController {
 	 */
 	public synchronized void setConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
 
-		this.urlString = "https://sheets.googleapis.com/v4/spreadsheets/" + ConfigHolder.get().getSpreadsheetId()
-				+ "/values/" + ConfigHolder.get().getWorksheetName() + /* "!rangeHere" + */ "?key="
-				+ ConfigHolder.get().getApiKey() + "&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-		LOGGER.debug("URL: {}", ConfigHolder.get().sanitiseApiKey(this.urlString));
+		this.urlString = String.format(AppUtil.getSpreadsheetUrlFormat(), ConfigHolder.get().getSpreadsheetId(),
+				ConfigHolder.get().getWorksheetName(), PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY));
+
+		LOGGER.debug("URL: {}", AppUtil.sanitiseApiKey(this.urlString));
 
 		if (fromScratch) {
 			this.cache.setup(ConfigHolder.get().getCells());

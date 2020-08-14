@@ -34,11 +34,11 @@ import javafx.stage.FileChooser;
  *
  * @author Mark "Grandy" Bishop
  */
-public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui> implements ConfigPanel.Gui {
+public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> implements ConfigPanel.Gui {
 
 	private final FileChooser configChooser = new FileChooser();
-	private final Button chooserButton = new Button("Select config");
-	private final Hyperlink reloadConfigLink = new Hyperlink("Reload");
+	private final Button chooserButton = new Button("Browse");
+	private final Hyperlink reloadConfigLink = new Hyperlink("Reload config");
 	private final Text chosenConfigName = new Text();
 	private final CheckBox autoUpdateCheck = new CheckBox("Auto update");
 	private final Button updateNowButton = new Button("Update now");
@@ -78,12 +78,8 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui> implements 
 	@Override
 	public void doLayout() {
 		Text configText = new Text("Config file");
-		configText.getStyleClass().add("config-file-label");
-		reloadConfigLink.setVisible(false);
-		reloadConfigLink.getStyleClass().add("config-reload-link");
-		HBox configLabelLayout = new HBox(configText, reloadConfigLink);
-		configLabelLayout.setAlignment(Pos.TOP_LEFT);
-		getLayout().add(configLabelLayout);
+		configText.getStyleClass().add("bold-text");
+		getLayout().add(configText);
 
 		chosenConfigName.getStyleClass().add("config-name-label");
 		HBox configNameLayout = new HBox(chosenConfigName);
@@ -91,11 +87,15 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui> implements 
 		configNameLayout.setPrefWidth(180);
 		configNameLayout.setPrefHeight(20);
 		getLayout().add(configNameLayout);
+
+		HBox configButtons = new HBox(chooserButton, reloadConfigLink);
+		reloadConfigLink.setVisible(false);
+		reloadConfigLink.getStyleClass().add("config-reload-link");
 		chooserButton.getStyleClass().add("choose-config-button");
-		getLayout().add(chooserButton);
+		getLayout().add(configButtons);
 
 		Text updateMethodText = new Text("Update method");
-		updateMethodText.getStyleClass().add("update-method-label");
+		updateMethodText.getStyleClass().add("bold-text");
 		getLayout().add(updateMethodText);
 
 		HBox updateBox = new HBox(updateNowButton, autoUpdateCheck);
