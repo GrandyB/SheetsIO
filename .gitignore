@@ -9,3 +9,4 @@ build.fxbuild
 /dist/
 /logs/
 /sampleConfig.json
+/application.properties
