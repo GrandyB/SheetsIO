@@ -1,5 +1,5 @@
 /**
- * ConfigReloadedEvent.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
+ * ApiKeySetEvent.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,13 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package applicaiton.events;
+package application.events;
+
+import application.models.ApiKeyStatus;
+import application.models.PropertiesHolder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
- * Event for when config gets reloaded. TODO
+ * Event sent when the apiKey is set to {@link PropertiesHolder}.
  *
  * @author Mark "Grandy" Bishop
  */
-public class ConfigReloadedEvent {
-
+@AllArgsConstructor
+public class ApiKeySetEvent {
+	@Getter
+	private final ApiKeyStatus status;
 }

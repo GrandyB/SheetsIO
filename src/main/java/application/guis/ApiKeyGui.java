@@ -91,7 +91,7 @@ public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> imple
 	public void setCircle(ApiKeyStatus status) {
 		textAndIndicatorLayout.getChildren().remove(statusCircle);
 		statusCircle = ApiKeyStatus.getIndicatorCircle(status);
-		textAndIndicatorLayout.getChildren().add(statusCircle);
+		textAndIndicatorLayout.getChildren().add(1, statusCircle);
 	}
 
 	@Override

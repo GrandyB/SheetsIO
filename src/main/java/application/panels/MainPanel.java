@@ -18,7 +18,7 @@ package application.panels;
 
 import org.greenrobot.eventbus.Subscribe;
 
-import applicaiton.events.ApiKeySetEvent;
+import application.events.ApiKeySetEvent;
 import application.models.ApiKeyStatus;
 
 /**

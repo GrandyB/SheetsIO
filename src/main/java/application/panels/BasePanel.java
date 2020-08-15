@@ -23,9 +23,9 @@ import org.greenrobot.eventbus.Subscribe;
 
 import com.google.gson.JsonSyntaxException;
 
-import applicaiton.events.ConfigReloadedEvent;
 import application.AppUtil;
 import application.IExceptionHandler;
+import application.events.ConfigReloadedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.exceptions.JsonValidationException;
 import lombok.AccessLevel;
