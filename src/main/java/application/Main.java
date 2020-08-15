@@ -48,7 +48,7 @@ public class Main extends Application implements IApplicationOps {
 
 		this.mainGui = new MainGui(this);
 
-		Scene mainScene = new Scene(this.mainGui, 190, 270);
+		Scene mainScene = new Scene(this.mainGui, 190, 290);
 		mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setResizable(false);
 		primaryStage.setScene(mainScene);
