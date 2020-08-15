@@ -44,6 +44,9 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 
 		/** Provide a value to the apiKey box. */
 		void setApiKeyField(String value);
+
+		/** Show/hide the help link. */
+		void showHelpLink(boolean show);
 	}
 
 	@Override
@@ -80,5 +83,6 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 		}
 		EventBus.getDefault().post(new ApiKeySetEvent(status));
 		getGui().setCircle(status);
+		getGui().showHelpLink(!ApiKeyStatus.LOADED.equals(status));
 	}
 }

@@ -51,10 +51,10 @@ public class PropertiesHolder {
 	private ApiKeyStatus apiKeyStatus = ApiKeyStatus.MISSING;
 
 	public PropertiesHolder() {
-		reload();
+		load();
 	}
 
-	public void reload() {
+	public void load() {
 		// Private constructor to restrict new instances
 		LOGGER.debug("Reading all properties from the file");
 		try {

@@ -71,7 +71,7 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 		StringBuilder error = new StringBuilder();
 
 		if (e instanceof JsonValidationException) {
-			error.append("Error while attempting to load config values into the application.\n");
+			error.append("Error while attempting to load config values into the application.\n\n");
 			JsonValidationException jsonEx = (JsonValidationException) e;
 			jsonEx.getViolations().forEach(v -> {
 				error.append(v.getMessage());

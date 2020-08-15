@@ -33,4 +33,7 @@ public interface IApplicationOps {
 
 	/** @return {@link EventBus} the application-wide event bus. */
 	EventBus getEventBus();
+
+	/** Open the system default browser with the given url */
+	void openBrowser(String url);
 }

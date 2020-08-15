@@ -22,6 +22,7 @@ import application.models.PropertiesHolder;
 import application.panels.ApiKeyPanel;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -36,10 +37,12 @@ import javafx.scene.text.Text;
  * @author Mark "Grandy" Bishop
  */
 public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> implements ApiKeyPanel.Gui {
+	private static final String HELP_LINK = "https://github.com/GrandyB/SheetsIO#apikey";
 
 	private HBox textAndIndicatorLayout;
 	private Circle statusCircle;
 	private TextField apiKeyInput = new TextField();
+	private Hyperlink helpLink = new Hyperlink("Help");
 
 	public ApiKeyGui(IApplicationOps ops) {
 		super(ops, new ApiKeyPanel(), new VBox(3));
@@ -49,11 +52,12 @@ public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> imple
 	@Override
 	protected void doLayout() {
 		ApiKeyStatus status = PropertiesHolder.get().getStatus();
+		helpLink.setOnAction(a -> getApp().openBrowser(HELP_LINK));
 
 		Text apiKeyText = new Text("API key");
 		apiKeyText.getStyleClass().add("bold-text");
 		statusCircle = ApiKeyStatus.getIndicatorCircle(status);
-		textAndIndicatorLayout = new HBox(apiKeyText, statusCircle);
+		textAndIndicatorLayout = new HBox(apiKeyText, statusCircle, helpLink);
 		textAndIndicatorLayout.setAlignment(Pos.CENTER_LEFT);
 		textAndIndicatorLayout.setSpacing(5);
 		getLayout().add(textAndIndicatorLayout);
@@ -97,6 +101,11 @@ public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> imple
 	@Override
 	public void setApiKeyField(String value) {
 		apiKeyInput.setText(value);
+	}
+
+	@Override
+	public void showHelpLink(boolean show) {
+		helpLink.setVisible(show);
 	}
 
 }
