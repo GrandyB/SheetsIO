@@ -133,5 +133,11 @@
 		    <version>2.2</version>
 		    <scope>test</scope>
 		</dependency>
+		<!-- https://github.com/greenrobot/EventBus -->
+		<dependency>
+		    <groupId>org.greenrobot</groupId>
+		    <artifactId>eventbus</artifactId>
+		    <version>3.2.0</version>
+		</dependency>
 	</dependencies>
 </project>

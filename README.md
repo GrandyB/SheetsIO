@@ -57,6 +57,7 @@ API key is required as of v4 of the Google Sheets API.
 1. 'Select a project' in the top bar, 'New Project'
 1. Give it a name (`SheetsIO-integration` ?) and create it
 1. View the project; on the dashboard there should be a 'Go to APIs overview'
+1. Under the 'Dashboard' tab, click 'Enable API' at the top
 1. Under the 'Credentials' tab, and click 'Create Credentials' at the top -> 'API key'
 
 It should now display an API key for you to then use in your application! It's important to keep this secure, so whenever sharing configs, ensure you remove your apiKey.

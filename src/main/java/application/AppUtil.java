@@ -16,10 +16,20 @@
  */
 package application;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import com.google.gson.GsonBuilder;
+
+import application.exceptions.GoogleSheetsException;
 import application.models.PropertiesHolder;
+import application.models.json.GoogleSheetsResponse;
 
 /**
- * 
+ * Utility methods to perform common actions.
  *
  * @author Mark "Grandy" Bishop
  */
@@ -31,8 +41,12 @@ public class AppUtil {
 			return "";
 		}
 
-		return str.replace(PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY),
-				"YOUR_UNSANITISED_API_KEY_HERE");
+		String currentApiKey = PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY);
+		if (currentApiKey == null || currentApiKey.trim().isEmpty()) {
+			return str;
+		}
+
+		return str.replace(currentApiKey, "YOUR_UNSANITISED_API_KEY_HERE");
 	}
 
 	/**
@@ -43,5 +57,34 @@ public class AppUtil {
 	 */
 	public static String getSpreadsheetUrlFormat() {
 		return "https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?key=%s&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
+	}
+
+	/**
+	 * Create a connection to the Google Sheets v4 API using the given {@link URL}.
+	 * 
+	 * @return a {@link GoogleSheetsResponse} representation of the Google Sheet
+	 *         data.
+	 * @throws IOException
+	 *             if the connection to Google Sheets or converting to
+	 *             {@link GoogleSheetsResponse} fails
+	 * @throws GoogleSheetsException
+	 */
+	public static GoogleSheetsResponse getGoogleSheetsData(URL url) throws IOException, GoogleSheetsException {
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+		InputStreamReader isr;
+		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+			return new GsonBuilder().create().fromJson(new InputStreamReader(conn.getInputStream()),
+					GoogleSheetsResponse.class);
+		} else {
+			isr = new InputStreamReader(conn.getErrorStream());
+			BufferedReader br = new BufferedReader(isr);
+			StringBuilder sb = new StringBuilder();
+			String output;
+			while ((output = br.readLine()) != null) {
+				sb.append(output);
+			}
+			throw GoogleSheetsException.fromJsonString(sb.toString());
+		}
 	}
 }

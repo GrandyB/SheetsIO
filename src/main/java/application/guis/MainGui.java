@@ -17,16 +17,8 @@
 package application.guis;
 
 import application.IApplicationOps;
-import application.models.ApiKeyStatus;
-import application.models.PropertiesHolder;
 import application.panels.MainPanel;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 /**
  * GUI for main bulk of the app, comprised of a {@link ConfigGui} and a
@@ -35,6 +27,8 @@ import javafx.scene.text.Text;
  * @author Mark "Grandy" Bishop
  */
 public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements MainPanel.Gui {
+
+	private VBox mainLayout = new VBox();
 
 	public MainGui(IApplicationOps app) {
 		super(app, new MainPanel(), new VBox(3));
@@ -46,35 +40,18 @@ public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements 
 		getRoot().getStyleClass().add("root");
 		getRoot().setSpacing(10);
 
-		ApiKeyStatus status = PropertiesHolder.get().getStatus();
+		getLayout().add(new ApiKeyGui(this.getApp()));
 
-		Text apiKeyText = new Text("API status");
-		apiKeyText.getStyleClass().add("bold-text");
-		HBox apiKeyTextAndIndicator = new HBox(apiKeyText, ApiKeyStatus.getCircle(status));
-		apiKeyTextAndIndicator.setAlignment(Pos.CENTER_LEFT);
-		apiKeyTextAndIndicator.setSpacing(5);
-		getLayout().add(apiKeyTextAndIndicator);
-
-		Label apiKeyLabel = new Label("Enter API key:");
-		TextField apiKeyInput = new TextField();
-		VBox vb = new VBox(apiKeyLabel, apiKeyInput);
-		vb.setSpacing(5);
-		Button setApiKeyButton = new Button("Set");
-		Button showHideKeyButton = new Button("Show/Hide");
-		HBox buttonLayout = new HBox(setApiKeyButton, showHideKeyButton);
-		getLayout().addAll(vb, buttonLayout);
-
-		createAndAdd();
-	}
-
-	private void createAndAdd() {
-		VBox vb = new VBox();
 		ConfigGui configGui = new ConfigGui(getApp());
-		vb.getChildren().add(configGui);
+		mainLayout.getChildren().add(configGui);
 
 		TimerGui timer = new TimerGui(getApp());
-		vb.getChildren().add(timer);
-		getRoot().getChildren().add(vb);
+		mainLayout.getChildren().add(timer);
+		getLayout().add(mainLayout);
 	}
 
+	@Override
+	public void enableMainLayout(boolean enable) {
+		mainLayout.setDisable(!enable);
+	}
 }

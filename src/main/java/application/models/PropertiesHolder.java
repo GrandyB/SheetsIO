@@ -35,9 +35,17 @@ import org.apache.logging.log4j.Logger;
  */
 public class PropertiesHolder {
 	private static final Logger LOGGER = LogManager.getLogger(PropertiesHolder.class);
-	private static final String COMMENT = " Set apiKey below as the key from https://console.developers.google.com/ - e.g. apikey=123abc;";
+	private static final PropertiesHolder INSTANCE = new PropertiesHolder();
+
+	// Sample
+	private static final String SAMPLE_API_TEST_SPREADSHEET_ID = "1z2BtJTik73zIUvKi0y9RZbImDyWp_RiQikaEeFBF5E8";
+	private static final String SAMPLE_API_TEST_WORKBOOK_ID = "Test";
+
+	public static final String COMMENT = " Set 'apiKey' below as the key from https://console.developers.google.com/ - e.g. apikey=123abc;";
 	public static final String FILE_NAME = "application.properties";
 	public static final String API_KEY = "apiKey";
+	public static final String API_KEY_TEST_SPREADSHEET_ID = "apiKey.test.spreadsheetId";
+	public static final String API_KEY_TEST_WORKBOOK_ID = "apiKey.test.workbookId";
 
 	private final Properties props = new Properties();
 	private ApiKeyStatus apiKeyStatus = ApiKeyStatus.MISSING;
@@ -55,19 +63,21 @@ public class PropertiesHolder {
 			fis.close();
 
 			String apiKey = props.getProperty(API_KEY);
-			LOGGER.debug("{}: {}", API_KEY, apiKey);
+			LOGGER.trace("{}: {}", API_KEY, apiKey);
 			apiKeyStatus = apiKey == null || apiKey.isEmpty() ? ApiKeyStatus.INCOMPLETE : ApiKeyStatus.LOADED;
 			return;
 		} catch (Exception e) {
-			LOGGER.debug(e);
+			LOGGER.debug("Reading input file failed; assuming no file exists", e);
 		}
 
 		LOGGER.debug("Write empty properties");
 		props.setProperty("apiKey", "");
+		props.setProperty(API_KEY_TEST_SPREADSHEET_ID, SAMPLE_API_TEST_SPREADSHEET_ID);
+		props.setProperty(API_KEY_TEST_WORKBOOK_ID, SAMPLE_API_TEST_WORKBOOK_ID);
 		try {
 			flush();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.debug("Saving properties file failed", e);
 		}
 		apiKeyStatus = ApiKeyStatus.INCOMPLETE;
 	}
@@ -103,12 +113,7 @@ public class PropertiesHolder {
 		}
 	}
 
-	// Bill Pugh Solution for singleton pattern
-	private static class LazyHolder {
-		private static final PropertiesHolder INSTANCE = new PropertiesHolder();
-	}
-
 	public static PropertiesHolder get() {
-		return LazyHolder.INSTANCE;
+		return PropertiesHolder.INSTANCE;
 	}
 }

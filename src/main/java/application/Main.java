@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.greenrobot.eventbus.EventBus;
 
 import application.guis.MainGui;
 import application.services.ThreadCollector;
@@ -39,16 +40,17 @@ public class Main extends Application implements IApplicationOps {
 	@Getter
 	private Stage primaryStage;
 
-	private MainGui mainGui;
+	@Getter
+	private EventBus eventBus = new EventBus();
 
 	@Override
 	public void start(Stage stage) throws IOException {
 		this.primaryStage = stage;
 		primaryStage.setTitle("SheetsIO");
 
-		this.mainGui = new MainGui(this);
+		MainGui mainGui = new MainGui(this);
 
-		Scene mainScene = new Scene(this.mainGui, 190, 290);
+		Scene mainScene = new Scene(mainGui, 220, 335);
 		mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setResizable(false);
 		primaryStage.setScene(mainScene);

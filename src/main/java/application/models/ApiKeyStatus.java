@@ -23,23 +23,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 
+ * Enum for state of the apiKey; LOADED/INCOMPLETE/MISSING.
  *
  * @author Mark "Grandy" Bishop
  */
 @AllArgsConstructor
 public enum ApiKeyStatus {
-	LOADED("Loaded successfully", true),
-	MISSING("config.properties file is missing", false),
-	INCOMPLETE("apiKey entry not found in " + PropertiesHolder.FILE_NAME, false);
+	LOADED("Loaded successfully"),
+	MISSING(PropertiesHolder.FILE_NAME + " file is missing"),
+	INCOMPLETE("apiKey entry not found in " + PropertiesHolder.FILE_NAME),
+	ERROR("apiKey is invalid");
 
 	@Getter
 	String message;
-	@Getter
-	boolean loaded;
 
 	/** @return a {@link Circle} that gives indication of success. */
-	public static Circle getCircle(ApiKeyStatus status) {
+	public static Circle getIndicatorCircle(ApiKeyStatus status) {
 		Circle circle = new Circle(0, 0, 5);
 		Tooltip t = new Tooltip(status.getMessage());
 		Tooltip.install(circle, t);
@@ -52,6 +51,7 @@ public enum ApiKeyStatus {
 			circle.setFill(Color.ORANGE);
 			break;
 		case MISSING:
+		case ERROR:
 			circle.setFill(Color.RED);
 			break;
 		default:

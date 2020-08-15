@@ -16,6 +16,11 @@
  */
 package application.panels;
 
+import org.greenrobot.eventbus.Subscribe;
+
+import applicaiton.events.ApiKeySetEvent;
+import application.models.ApiKeyStatus;
+
 /**
  * Panel backing the main ui of the app. No particular logic required to
  * instantiate and show.
@@ -25,6 +30,23 @@ package application.panels;
 public class MainPanel extends BasePanel<MainPanel.Gui> {
 
 	public interface Gui extends BasePanel.Gui {
+		void enableMainLayout(boolean enable);
+	}
 
+	@Subscribe
+	public void handleApiKeySetEvent(ApiKeySetEvent event) {
+		switch (event.getStatus()) {
+		case LOADED:
+			getGui().enableMainLayout(true);
+			break;
+		case MISSING:
+		case INCOMPLETE:
+		case ERROR:
+			getGui().enableMainLayout(false);
+			break;
+		default:
+			throw new IllegalArgumentException(
+					String.format("Unexpected {}: {}", ApiKeyStatus.class.getSimpleName(), event.getStatus()));
+		}
 	}
 }

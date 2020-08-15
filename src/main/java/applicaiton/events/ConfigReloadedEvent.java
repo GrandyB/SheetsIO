@@ -1,5 +1,5 @@
 /**
- * IApplicationOps.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
+ * ConfigReloadedEvent.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,23 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application;
-
-import org.greenrobot.eventbus.EventBus;
-
-import javafx.stage.Stage;
+package applicaiton.events;
 
 /**
- * Handles any/all needed operations from individual panel/guis to the
- * {@link Main} class, so that panels don't all have a copy of the whole thing.
+ * Event for when config gets reloaded. TODO
  *
  * @author Mark "Grandy" Bishop
  */
-public interface IApplicationOps {
+public class ConfigReloadedEvent {
 
-	/** @return the primary {@link Stage} of the app. */
-	Stage getPrimaryStage();
-
-	/** @return {@link EventBus} the application-wide event bus. */
-	EventBus getEventBus();
 }
