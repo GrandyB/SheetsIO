@@ -21,6 +21,7 @@ import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
 import application.panels.MainPanel;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -54,32 +55,26 @@ public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements 
 		apiKeyTextAndIndicator.setSpacing(5);
 		getLayout().add(apiKeyTextAndIndicator);
 
-		switch (status) {
-		case LOADED:
-			createAndAdd();
-			break;
-		case INCOMPLETE:
-		case MISSING:
-			Label apiKeyLabel = new Label("Enter API key:");
-			TextField apiKeyInput = new TextField();
-			VBox vb = new VBox(apiKeyLabel, apiKeyInput);
-			vb.setSpacing(5);
-			HBox buttonLayout = new HBox();
-			getLayout().add(vb);
-			break;
-		default:
-			throw new IllegalArgumentException(
-					String.format("Unable to handle %s '%s'", ApiKeyStatus.class.getSimpleName(), status));
+		Label apiKeyLabel = new Label("Enter API key:");
+		TextField apiKeyInput = new TextField();
+		VBox vb = new VBox(apiKeyLabel, apiKeyInput);
+		vb.setSpacing(5);
+		Button setApiKeyButton = new Button("Set");
+		Button showHideKeyButton = new Button("Show/Hide");
+		HBox buttonLayout = new HBox(setApiKeyButton, showHideKeyButton);
+		getLayout().addAll(vb, buttonLayout);
 
-		}
+		createAndAdd();
 	}
 
 	private void createAndAdd() {
+		VBox vb = new VBox();
 		ConfigGui configGui = new ConfigGui(getApp());
-		getRoot().getChildren().add(configGui);
+		vb.getChildren().add(configGui);
 
 		TimerGui timer = new TimerGui(getApp());
-		getRoot().getChildren().add(timer);
+		vb.getChildren().add(timer);
+		getRoot().getChildren().add(vb);
 	}
 
 }
