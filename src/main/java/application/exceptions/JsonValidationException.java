@@ -16,6 +16,10 @@
  */
 package application.exceptions;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -35,4 +39,34 @@ public class JsonValidationException extends Exception {
 
 	@Getter
 	private final Set<ConstraintViolation<Config>> violations;
+
+	/**
+	 * @return a nicely formatted summary of violations.
+	 */
+	public String getSummary() {
+		Map<String, List<ConstraintViolation<Config>>> perItemErrors = new LinkedHashMap<>();
+
+		violations.forEach(v -> {
+			// Property path for the violation, e.g. cells[13].name
+			String key = v.getPropertyPath().toString().split("\\.")[0];
+			perItemErrors.computeIfAbsent(key, k -> new ArrayList<>()).add(v);
+		});
+
+		StringBuilder builder = new StringBuilder("Found the following issue(s) during json validation:\n\n");
+		for (Map.Entry<String, List<ConstraintViolation<Config>>> entry : perItemErrors.entrySet()) {
+			String prop = entry.getKey();
+			builder.append(prop);
+			builder.append(" has the following errors:\n");
+
+			entry.getValue().forEach(cv -> {
+				builder.append("\t");
+				builder.append(cv.getMessage());
+				builder.append(" - value: [");
+				builder.append(cv.getInvalidValue());
+				builder.append("]\n");
+			});
+			builder.append("\n");
+		}
+		return builder.toString();
+	}
 }

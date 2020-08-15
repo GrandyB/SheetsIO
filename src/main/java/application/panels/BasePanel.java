@@ -64,12 +64,9 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	public void handleException(Exception e) {
 		StringBuilder error = new StringBuilder();
 		if (e instanceof JsonValidationException) {
-			error.append("Error while attempting to load config values into the application.\n");
 			JsonValidationException jsonEx = (JsonValidationException) e;
-			jsonEx.getViolations().forEach(v -> {
-				error.append(v.getMessage());
-				error.append('\n');
-			});
+			error.append(jsonEx.getSummary());
+			error.append('\n');
 		} else if (e instanceof JsonSyntaxException) {
 			error.append("Your json is malformed and needs correcting!\n");
 			error.append(e.getMessage());
@@ -90,7 +87,8 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
 
 		// Remove all instances of the user's API key
-		String sanitisedMessage = ConfigHolder.get().sanitiseApiKey(e.getLocalizedMessage());
+		String sanitisedMessage = ConfigHolder.get()
+				.sanitiseApiKey(e.getMessage() == null ? e.getClass().toString() : e.getMessage());
 		LOGGER.error(sanitisedMessage);
 		String errorMessage = ConfigHolder.get().sanitiseApiKey(error.toString());
 		LOGGER.error(errorMessage);
