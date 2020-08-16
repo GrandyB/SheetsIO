@@ -70,6 +70,8 @@ For a sheet with the following URL:
 The 'id' is that middle section:
 ```12YrqfVJENT6FJZB5NZrv2fHKg36XEy2jTE5X-mwC61g```
 
+Remember that the spreadsheet's sharing settings must be open so that 'anyone with the link can view' in order for the system to connect.
+
 ### cells
 Each cell is formed of:
 

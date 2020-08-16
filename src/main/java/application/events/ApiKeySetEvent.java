@@ -19,6 +19,7 @@ package application.events;
 import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -27,6 +28,7 @@ import lombok.Getter;
  * @author Mark "Grandy" Bishop
  */
 @AllArgsConstructor
+@EqualsAndHashCode
 public class ApiKeySetEvent {
 	@Getter
 	private final ApiKeyStatus status;

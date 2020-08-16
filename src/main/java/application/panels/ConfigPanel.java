@@ -37,7 +37,9 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	private ConfigHolder configHolder;
 	private FileIO fileIO;
 
+	/** Primary constructor. */
 	public ConfigPanel() {
+		super();
 		this.configHolder = ConfigHolder.get();
 		this.fileIO = new FileIO();
 
@@ -51,6 +53,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 
 	/** Dependency injection, for use in tests. */
 	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable) {
+		super();
 		this.configHolder = configHolder;
 		this.fileIO = fileIO;
 		this.updateRunnable = updateRunnable;

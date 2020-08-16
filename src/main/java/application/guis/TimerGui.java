@@ -17,6 +17,7 @@
 package application.guis;
 
 import application.IApplicationOps;
+import application.models.PropertiesHolder;
 import application.panels.TimerPanel;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
@@ -45,7 +46,7 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implemen
 	private Button updateButton = new Button("Update");
 
 	public TimerGui(IApplicationOps app) {
-		super(app, new TimerPanel(), new VBox(3));
+		super(app, new TimerPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
 		getPanel().initialise();
 	}
 

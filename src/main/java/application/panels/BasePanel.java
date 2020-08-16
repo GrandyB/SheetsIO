@@ -24,12 +24,15 @@ import org.greenrobot.eventbus.Subscribe;
 import com.google.gson.JsonSyntaxException;
 
 import application.AppUtil;
+import application.IApplicationOps;
 import application.IExceptionHandler;
 import application.events.ConfigReloadedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.exceptions.JsonValidationException;
+import application.models.PropertiesHolder;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -37,14 +40,31 @@ import lombok.Setter;
  *
  * @author Mark "Grandy" Bishop
  */
+@RequiredArgsConstructor
 public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, IExceptionHandler {
 	private static final Logger LOGGER = LogManager.getLogger(BasePanel.class);
 
 	private static final int MAX_EXCEPTION_STACK_LINES = 10;
 
+	public static final String GENERIC_ERROR_END = "\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues";
+
 	@Getter(AccessLevel.PROTECTED)
 	@Setter
 	private G gui;
+
+	@Getter
+	@Setter
+	private IApplicationOps app;
+
+	@Getter
+	private final AppUtil appUtil;
+	@Getter
+	private final PropertiesHolder props;
+
+	public BasePanel() {
+		appUtil = AppUtil.get();
+		props = PropertiesHolder.get();
+	}
 
 	public interface Gui {
 		/** Perform initialisation of the Gui. */
@@ -101,13 +121,12 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 
 		}
 
-		error.append(
-				"\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues");
+		error.append(GENERIC_ERROR_END);
 
 		// Remove all instances of the user's API key
-		String sanitisedMessage = AppUtil.sanitiseApiKey(headerText);
+		String sanitisedMessage = AppUtil.get().sanitiseApiKey(headerText);
 		LOGGER.error(sanitisedMessage);
-		String errorMessage = AppUtil.sanitiseApiKey(error.toString());
+		String errorMessage = AppUtil.get().sanitiseApiKey(error.toString());
 		LOGGER.error(errorMessage);
 		getGui().showErrorDialog(sanitisedMessage, errorMessage);
 	}
@@ -115,5 +134,10 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	@Subscribe
 	public void handleConfigReloadEvent(ConfigReloadedEvent event) {
 		// Do nothing
+	}
+
+	/** Open a browser window with the given url. */
+	public void openBrowser(String url) {
+		getApp().openBrowser(url);
 	}
 }

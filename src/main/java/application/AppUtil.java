@@ -34,9 +34,18 @@ import application.models.json.GoogleSheetsResponse;
  * @author Mark "Grandy" Bishop
  */
 public class AppUtil {
+	private static final AppUtil INSTANCE = new AppUtil();
+
+	/** the format for the URL, needing spreadsheetId, worksheetName, and apiKey. */
+	public static final String SPREADSHEET_URL_FORMAT = "https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?key=%s&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
+
+	/** @return the singleton instance of AppUtil. */
+	public static AppUtil get() {
+		return INSTANCE;
+	}
 
 	/** @return the string but stripped of the apiKey, for safety. */
-	public static String sanitiseApiKey(String str) {
+	public String sanitiseApiKey(String str) {
 		if (str == null) {
 			return "";
 		}
@@ -50,16 +59,6 @@ public class AppUtil {
 	}
 
 	/**
-	 * The formation of a spreadsheet URL, for use in String.format();
-	 * 
-	 * @return the format for the URL, needing spreadsheetId, worksheetName, and
-	 *         apiKey.
-	 */
-	public static String getSpreadsheetUrlFormat() {
-		return "https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s?key=%s&majorDimension=COLUMNS&valueRenderOption=FORMATTED_VALUE";
-	}
-
-	/**
 	 * Create a connection to the Google Sheets v4 API using the given {@link URL}.
 	 * 
 	 * @return a {@link GoogleSheetsResponse} representation of the Google Sheet
@@ -69,7 +68,7 @@ public class AppUtil {
 	 *             {@link GoogleSheetsResponse} fails
 	 * @throws GoogleSheetsException
 	 */
-	public static GoogleSheetsResponse getGoogleSheetsData(URL url) throws IOException, GoogleSheetsException {
+	public GoogleSheetsResponse getGoogleSheetsData(URL url) throws IOException, GoogleSheetsException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
 		InputStreamReader isr;

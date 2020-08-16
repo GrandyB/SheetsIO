@@ -45,14 +45,14 @@ public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> imple
 	private Hyperlink helpLink = new Hyperlink("Help");
 
 	public ApiKeyGui(IApplicationOps ops) {
-		super(ops, new ApiKeyPanel(), new VBox(3));
+		super(ops, new ApiKeyPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
 		getPanel().initialise();
 	}
 
 	@Override
 	protected void doLayout() {
 		ApiKeyStatus status = PropertiesHolder.get().getStatus();
-		helpLink.setOnAction(a -> getApp().openBrowser(HELP_LINK));
+		helpLink.setOnAction(a -> getPanel().openBrowser(HELP_LINK));
 
 		Text apiKeyText = new Text("API key");
 		apiKeyText.getStyleClass().add("bold-text");
@@ -87,7 +87,7 @@ public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> imple
 		// Bind the textField and passwordField text values bidirectionally.
 		apiKeyInput.textProperty().bindBidirectional(passwordField.textProperty());
 		HBox hbox = new HBox(apiKeyInput, passwordField, checkBox);
-		hbox.setSpacing(3);
+		hbox.setSpacing(PropertiesHolder.INTERNAL_SPACING);
 		getLayout().add(hbox);
 	}
 

@@ -21,19 +21,20 @@ import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.greenrobot.eventbus.EventBus;
 
 import application.AppUtil;
 import application.events.ApiKeySetEvent;
 import application.exceptions.GoogleSheetsException;
 import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
+import lombok.NoArgsConstructor;
 
 /**
  * Logic for the apiKey entry gui.
  *
  * @author Mark "Grandy" Bishop
  */
+@NoArgsConstructor
 public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger(ApiKeyPanel.class);
@@ -49,11 +50,16 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 		void showHelpLink(boolean show);
 	}
 
+	/** Alternative DI constructor, for test use. */
+	public ApiKeyPanel(PropertiesHolder props, AppUtil util) {
+		super(util, props);
+	}
+
 	@Override
 	public void initialise() {
 		super.initialise();
 
-		String key = PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY);
+		String key = getProps().getProperty(PropertiesHolder.API_KEY);
 		getGui().setApiKeyField(key);
 		handleSetApiKeyPress(key);
 	}
@@ -66,22 +72,21 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 			getGui().showErrorDialog("No apiKeyGiven", "Please provide an apiKey");
 
 		} else {
-			PropertiesHolder props = PropertiesHolder.get();
 			// Get the "sample"/test URL and try out a connection
-			String url = String.format(AppUtil.getSpreadsheetUrlFormat(),
-					props.getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID),
-					props.getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID), potentialKey);
+			String url = String.format(AppUtil.SPREADSHEET_URL_FORMAT,
+					getProps().getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID),
+					getProps().getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID), potentialKey);
 
 			try {
-				AppUtil.getGoogleSheetsData(new URL(url));
-				PropertiesHolder.get().setProperty(PropertiesHolder.API_KEY, potentialKey);
-				PropertiesHolder.get().flush();
+				getAppUtil().getGoogleSheetsData(new URL(url));
+				getProps().setProperty(PropertiesHolder.API_KEY, potentialKey);
+				getProps().flush();
 				status = ApiKeyStatus.LOADED;
 			} catch (GoogleSheetsException | IOException e) {
 				handleException(e);
 			}
 		}
-		EventBus.getDefault().post(new ApiKeySetEvent(status));
+		getApp().getEventBus().post(new ApiKeySetEvent(status));
 		getGui().setCircle(status);
 		getGui().showHelpLink(!ApiKeyStatus.LOADED.equals(status));
 	}

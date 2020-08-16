@@ -47,15 +47,13 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 	@Getter(AccessLevel.PROTECTED)
 	private P panel;
 	@Getter(AccessLevel.PROTECTED)
-	private IApplicationOps app;
-	@Getter(AccessLevel.PROTECTED)
 	private L root;
 
 	@SuppressWarnings("unchecked")
 	public BaseGui(IApplicationOps app, IPanel<G> panel, L root) {
-		this.app = app;
 		panel.setGui((G) this);
 		this.panel = (P) panel;
+		this.panel.setApp(app);
 		this.root = root;
 		super.getChildren().add(this.root);
 	}
@@ -78,8 +76,8 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 	@Override
 	public void showErrorDialog(String header, String message) {
 		// Remove all instances of the user's API key
-		String sanitisedMessage = AppUtil.sanitiseApiKey(header);
-		String errorMessage = AppUtil.sanitiseApiKey(message);
+		String sanitisedMessage = AppUtil.get().sanitiseApiKey(header);
+		String errorMessage = AppUtil.get().sanitiseApiKey(message);
 		/*
 		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
 		 * which is separate to the JavaFX application thread; Platform.runLater allows

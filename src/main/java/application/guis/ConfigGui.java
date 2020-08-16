@@ -19,6 +19,7 @@ package application.guis;
 import java.io.File;
 
 import application.IApplicationOps;
+import application.models.PropertiesHolder;
 import application.panels.ConfigPanel;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -44,7 +45,7 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> imple
 	private final Button updateNowButton = new Button("Update now");
 
 	public ConfigGui(IApplicationOps app) {
-		super(app, new ConfigPanel(), new VBox(3));
+		super(app, new ConfigPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
 		getPanel().initialise();
 	}
 
@@ -55,7 +56,7 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> imple
 
 		chooserButton.setOnAction((a) -> {
 			disableThenReenable(chooserButton);
-			getPanel().handleConfigSelection(configChooser.showOpenDialog(this.getApp().getPrimaryStage()));
+			getPanel().handleConfigSelection(configChooser.showOpenDialog(getPanel().getApp().getPrimaryStage()));
 		});
 
 		reloadConfigLink.setOnAction(ev -> {
@@ -77,26 +78,30 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> imple
 
 	@Override
 	public void doLayout() {
+		getRoot().setSpacing(PropertiesHolder.LAYOUT_SPACING);
+
+		// Config + reload link
 		Text configText = new Text("Config file");
 		configText.getStyleClass().add("bold-text");
-		getLayout().add(configText);
 
 		chosenConfigName.getStyleClass().add("config-name-label");
 		HBox configNameLayout = new HBox(chosenConfigName);
 		configNameLayout.getStyleClass().add("config-name-layout");
 		configNameLayout.setPrefWidth(180);
 		configNameLayout.setPrefHeight(20);
-		getLayout().add(configNameLayout);
 
 		HBox configButtons = new HBox(chooserButton, reloadConfigLink);
 		reloadConfigLink.setVisible(false);
 		reloadConfigLink.getStyleClass().add("config-reload-link");
 		chooserButton.getStyleClass().add("choose-config-button");
-		getLayout().add(configButtons);
 
+		VBox configLayout = new VBox(configText, configNameLayout, configButtons);
+		configLayout.setSpacing(PropertiesHolder.INTERNAL_SPACING);
+		getLayout().add(configLayout);
+
+		// Update now + autoupdate checkbox
 		Text updateMethodText = new Text("Update method");
 		updateMethodText.getStyleClass().add("bold-text");
-		getLayout().add(updateMethodText);
 
 		HBox updateBox = new HBox(updateNowButton, autoUpdateCheck);
 		updateBox.setSpacing(5);
@@ -104,7 +109,10 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> imple
 		updateBox.getStyleClass().add("update-box-layout");
 		updateNowButton.getStyleClass().add("update-now-button");
 		autoUpdateCheck.getStyleClass().add("auto-update-checkbox");
-		getLayout().add(updateBox);
+
+		VBox updateLayout = new VBox(updateMethodText, updateBox);
+		updateLayout.setSpacing(PropertiesHolder.INTERNAL_SPACING);
+		getLayout().add(updateLayout);
 	}
 
 	@Override

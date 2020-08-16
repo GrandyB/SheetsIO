@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.EventBus;
 
 import application.guis.MainGui;
+import application.models.PropertiesHolder;
 import application.services.ThreadCollector;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -51,7 +52,7 @@ public class Main extends Application implements IApplicationOps {
 
 		MainGui mainGui = new MainGui(this);
 
-		Scene mainScene = new Scene(mainGui, 210, 340);
+		Scene mainScene = new Scene(mainGui, PropertiesHolder.SCENE_WIDTH, PropertiesHolder.SCENE_HEIGHT);
 		mainScene.getStylesheets().add(getClass().getResource("/application.css").toExternalForm());
 		primaryStage.setResizable(false);
 		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.png")));

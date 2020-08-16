@@ -35,6 +35,7 @@ import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
 import application.models.json.GoogleSheetsResponse;
 import application.threads.UpdateRunnable;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Makes the calls to update the sheet. May be used within threads, e.g.
@@ -42,6 +43,7 @@ import application.threads.UpdateRunnable;
  *
  * @author Mark "Grandy" Bishop
  */
+@RequiredArgsConstructor
 public class UpdateController {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class);
 
@@ -58,10 +60,10 @@ public class UpdateController {
 	 */
 	public synchronized void setConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
 
-		this.urlString = String.format(AppUtil.getSpreadsheetUrlFormat(), ConfigHolder.get().getSpreadsheetId(),
+		this.urlString = String.format(AppUtil.SPREADSHEET_URL_FORMAT, ConfigHolder.get().getSpreadsheetId(),
 				ConfigHolder.get().getWorksheetName(), PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY));
 
-		LOGGER.debug("URL: {}", AppUtil.sanitiseApiKey(this.urlString));
+		LOGGER.debug("URL: {}", AppUtil.get().sanitiseApiKey(this.urlString));
 
 		if (fromScratch) {
 			this.cache.setup(ConfigHolder.get().getCells());

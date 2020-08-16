@@ -17,6 +17,7 @@
 package application.guis;
 
 import application.IApplicationOps;
+import application.models.PropertiesHolder;
 import application.panels.MainPanel;
 import javafx.scene.layout.VBox;
 
@@ -31,21 +32,22 @@ public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements 
 	private VBox mainLayout = new VBox();
 
 	public MainGui(IApplicationOps app) {
-		super(app, new MainPanel(), new VBox(3));
+		super(app, new MainPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
 		getPanel().initialise();
 	}
 
 	@Override
 	protected void doLayout() {
 		getRoot().getStyleClass().add("root");
-		getRoot().setSpacing(10);
+		getRoot().setSpacing(PropertiesHolder.LAYOUT_SPACING);
 
-		getLayout().add(new ApiKeyGui(this.getApp()));
+		getLayout().add(new ApiKeyGui(getPanel().getApp()));
 
-		ConfigGui configGui = new ConfigGui(getApp());
+		mainLayout.setSpacing(PropertiesHolder.LAYOUT_SPACING);
+		ConfigGui configGui = new ConfigGui(getPanel().getApp());
 		mainLayout.getChildren().add(configGui);
 
-		TimerGui timer = new TimerGui(getApp());
+		TimerGui timer = new TimerGui(getPanel().getApp());
 		mainLayout.getChildren().add(timer);
 		getLayout().add(mainLayout);
 	}

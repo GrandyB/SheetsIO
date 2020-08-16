@@ -47,6 +47,12 @@ public class PropertiesHolder {
 	public static final String API_KEY_TEST_SPREADSHEET_ID = "apiKey.test.spreadsheetId";
 	public static final String API_KEY_TEST_WORKBOOK_ID = "apiKey.test.workbookId";
 
+	public static final int SCENE_WIDTH = 210;
+	public static final int SCENE_HEIGHT = 360;
+	public static final int LAYOUT_SPACING = 10;
+	public static final int AVAILABLE_WIDTH = SCENE_WIDTH - (2 * LAYOUT_SPACING);
+	public static final int INTERNAL_SPACING = 4;
+
 	private final Properties props = new Properties();
 	private ApiKeyStatus apiKeyStatus = ApiKeyStatus.MISSING;
 
