@@ -24,8 +24,10 @@ import java.net.URL;
 
 import org.greenrobot.eventbus.EventBus;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -33,6 +35,7 @@ import org.mockito.MockitoAnnotations;
 import application.AppUtil;
 import application.IApplicationOps;
 import application.events.ApiKeySetEvent;
+import application.events.AppInitialisedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
@@ -49,9 +52,9 @@ public class ApiKeyPanelTest {
 	@Mock
 	private AppUtil util;
 	@Mock
-	private EventBus eventBus;
-	@Mock
 	private IApplicationOps ops;
+	@Mock
+	private EventBus eventBus = new EventBus();
 
 	private ApiKeyPanel testee;
 
@@ -70,60 +73,78 @@ public class ApiKeyPanelTest {
 
 	@AfterEach
 	public void tearDown() {
-		Mockito.verifyNoMoreInteractions(gui, props, util, eventBus);
+		Mockito.verifyNoMoreInteractions(gui, props, util);
 	}
 
 	@Test
-	public void test_initialise_success() throws IOException, GoogleSheetsException {
-		testee.initialise();
-		verify(eventBus).register(testee);
+	public void test_handleSetApiKeyPress_success() throws IOException, GoogleSheetsException {
+		testee.handleAppInitialised(new AppInitialisedEvent());
 
-		// initialise
-		verify(gui).init();
 		verify(props).getProperty(PropertiesHolder.API_KEY);
 		verify(gui).setApiKeyField(SAMPLE_KEY);
 
-		// handleSetApiKeyPress is called - build url
-		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID);
-		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID);
+		// handleSetApiKeyPress is called - save entered key
+		verify(props).setProperty(PropertiesHolder.API_KEY, SAMPLE_KEY);
+		verify(props).flush();
 
 		// Try url out
+		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID);
+		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID);
 		verify(util).getGoogleSheetsData(
 				new URL(String.format(AppUtil.SPREADSHEET_URL_FORMAT, SAMPLE_ID, SAMPLE_BOOK, SAMPLE_KEY)));
 
 		// Success
-		verify(props).setProperty(PropertiesHolder.API_KEY, SAMPLE_KEY);
-		verify(props).flush();
-		verify(eventBus).post(new ApiKeySetEvent(ApiKeyStatus.LOADED));
-		verify(gui).setCircle(ApiKeyStatus.LOADED);
-		verify(gui).showHelpLink(false);
+		verifyUpdateUI(ApiKeyStatus.LOADED, false);
 	}
 
 	@Test
 	public void test_initialise_exception() throws IOException, GoogleSheetsException {
 		Mockito.when(util.getGoogleSheetsData(Mockito.any())).thenThrow(new GoogleSheetsException(1, "uh", "oh"));
-		testee.initialise();
-		verify(eventBus).register(testee);
+		testee.handleAppInitialised(new AppInitialisedEvent());
 
-		// initialise
-		verify(gui).init();
 		verify(props).getProperty(PropertiesHolder.API_KEY);
 		verify(gui).setApiKeyField(SAMPLE_KEY);
 
-		// handleSetApiKeyPress is called - build url
-		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID);
-		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID);
+		// handleSetApiKeyPress is called - save entered key
+		verify(props).setProperty(PropertiesHolder.API_KEY, SAMPLE_KEY);
+		verify(props).flush();
 
 		// Try url out
+		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID);
+		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID);
 		verify(util).getGoogleSheetsData(
 				new URL(String.format(AppUtil.SPREADSHEET_URL_FORMAT, SAMPLE_ID, SAMPLE_BOOK, SAMPLE_KEY)));
 
 		// Fail
+		verifyUpdateUI(ApiKeyStatus.ERROR, true);
 		verify(gui).showErrorDialog("1 - oh", "uh\n" + BasePanel.GENERIC_ERROR_END);
-		verify(props).setProperty(PropertiesHolder.API_KEY, SAMPLE_KEY);
+
+	}
+
+	@Test
+	public void test_initialise_emptyKey() throws IOException, GoogleSheetsException {
+		when(props.getProperty(PropertiesHolder.API_KEY)).thenReturn("");
+		testee.handleAppInitialised(new AppInitialisedEvent());
+
+		verify(props).getProperty(PropertiesHolder.API_KEY);
+		verify(gui).setApiKeyField("");
+
+		// handleSetApiKeyPress is called - save entered key
+		verify(props).setProperty(PropertiesHolder.API_KEY, "");
 		verify(props).flush();
-		verify(eventBus).post(new ApiKeySetEvent(ApiKeyStatus.ERROR));
-		verify(gui).setCircle(ApiKeyStatus.ERROR);
-		verify(gui).showHelpLink(true);
+
+		// Fail
+		verifyUpdateUI(ApiKeyStatus.MISSING, true);
+		verify(gui).showErrorDialog("No apiKey given", "Please provide an apiKey");
+
+	}
+
+	private void verifyUpdateUI(ApiKeyStatus status, boolean helpLinkEnabled) {
+		ArgumentCaptor<ApiKeySetEvent> arg = ArgumentCaptor.forClass(ApiKeySetEvent.class);
+		verify(eventBus).post(arg.capture());
+		Assertions.assertEquals(status, arg.getValue().getStatus());
+
+		verify(gui).setCircle(status);
+		verify(gui).showHelpLink(helpLinkEnabled);
 	}
 }

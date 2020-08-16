@@ -21,9 +21,11 @@ import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.greenrobot.eventbus.Subscribe;
 
 import application.AppUtil;
 import application.events.ApiKeySetEvent;
+import application.events.AppInitialisedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
@@ -55,22 +57,20 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 		super(util, props);
 	}
 
-	@Override
-	public void initialise() {
-		super.initialise();
-
-		String key = getProps().getProperty(PropertiesHolder.API_KEY);
-		getGui().setApiKeyField(key);
-		handleSetApiKeyPress(key);
-	}
-
 	/** Handle the press of the 'set' apiKey button. */
 	public void handleSetApiKeyPress(String potentialKey) {
-		ApiKeyStatus status = ApiKeyStatus.ERROR;
+		getProps().setProperty(PropertiesHolder.API_KEY, potentialKey);
+		try {
+			getProps().flush();
+		} catch (Exception e) {
+			updateUI(ApiKeyStatus.ERROR);
+			handleException(e);
+		}
 
 		if (potentialKey == null || potentialKey.trim().isEmpty()) {
-			getGui().showErrorDialog("No apiKeyGiven", "Please provide an apiKey");
-
+			updateUI(ApiKeyStatus.MISSING);
+			getGui().showErrorDialog("No apiKey given", "Please provide an apiKey");
+			return;
 		} else {
 			// Get the "sample"/test URL and try out a connection
 			String url = String.format(AppUtil.SPREADSHEET_URL_FORMAT,
@@ -79,19 +79,24 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 
 			try {
 				getAppUtil().getGoogleSheetsData(new URL(url));
-				status = ApiKeyStatus.LOADED;
+				updateUI(ApiKeyStatus.LOADED);
 			} catch (GoogleSheetsException | IOException e) {
+				updateUI(ApiKeyStatus.ERROR);
 				handleException(e);
 			}
 		}
-		getProps().setProperty(PropertiesHolder.API_KEY, potentialKey);
-		try {
-			getProps().flush();
-		} catch (Exception e) {
-			handleException(e);
-		}
+	}
+
+	private void updateUI(ApiKeyStatus status) {
 		getApp().getEventBus().post(new ApiKeySetEvent(status));
 		getGui().setCircle(status);
 		getGui().showHelpLink(!ApiKeyStatus.LOADED.equals(status));
+	}
+
+	@Subscribe
+	public void handleAppInitialised(AppInitialisedEvent e) {
+		String key = getProps().getProperty(PropertiesHolder.API_KEY);
+		getGui().setApiKeyField(key);
+		handleSetApiKeyPress(key);
 	}
 }

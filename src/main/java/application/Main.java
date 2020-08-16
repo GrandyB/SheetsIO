@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.EventBus;
 
+import application.events.AppInitialisedEvent;
 import application.guis.MainGui;
 import application.models.PropertiesHolder;
 import application.services.ThreadCollector;
@@ -58,6 +59,8 @@ public class Main extends Application implements IApplicationOps {
 		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
+
+		eventBus.post(new AppInitialisedEvent());
 	}
 
 	@Override
