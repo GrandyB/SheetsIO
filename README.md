@@ -17,12 +17,25 @@ Want to help make this tool as useful as it could be? Try it out - break it! Wri
 
 # Getting started
 
-1. Get your [API key](#apikey) from Google
+1. [Get your API key from Google](#google-sheets-api-key) and enable it
 1. Create your Google Spreadsheet and enable "anyone with the link can view", grab its [spreadsheet ID](#spreadsheetid)
-1. Setup your [config](#config) with your API key cell/file references
-1. Load up the app, choose your config and either hit 'update now' or tick 'autoupdate'
+1. Setup your [config](#config) with your spreadsheet ID/workbook name and cell/file references
+1. Load up the app, put your API key, choose your config and either hit 'update now' or tick 'autoupdate'
 
 Any issues, refer to the [troubleshooting](#troubleshooting) section.
+
+# Google Sheets API key
+Google Sheets v4 API requires the use of an API key 
+
+1. Go to https://console.developers.google.com/
+1. 'Select a project' in the top bar, 'New Project'
+1. Give it a name (`SheetsIO-integration` ?) and create it
+1. View the project; on the dashboard there should be a 'Go to APIs overview'
+1. Under the 'Dashboard' tab, click 'Enable API' at the top
+1. Under the 'Credentials' tab, and click 'Create Credentials' at the top -> 'API key'
+
+It should now display an API key for you to then use in your application! It's important to keep this secure, so whenever sharing configs, ensure you remove your apiKey.
+It is advised (although completely optional) to then 'restrict' that key by IP address, or at least specifically to the sheets API - can do that through the key's settings easily at any time.
 
 ## Config
 
@@ -32,7 +45,6 @@ Configs are json files and can be placed anywhere, selected through the file cho
 {
 	"projectName": "myProject",
 	"worksheetName": "Sheet1",
-	"apiKey": "get_your_key_from_https://console.developers.google.com/",
 	"spreadsheetId": "12YrqfVJENT6FJZB5NZrv2fHKg36XEy2jTE5X-mwC61g",
 	"cells": [
 		{ "cell": "B2", "name": "team1Name" },
@@ -46,22 +58,8 @@ Configs are json files and can be placed anywhere, selected through the file cho
 
 - `"projectName"` - becomes the folder name; files are generated within `/files/projectName`
 - `"worksheetName"` - the sheet/tab within the spreadsheet to observe
-- `"apiKey"` - from Google Developer Console - [see below](#apikey) - **do not share this key with others**
 - `"spreadsheetId"` - from part of the URL you use to access your spreadsheet - [see below](#spreadsheetid)
 - `"cells"` - the configuration of cells to files - [see below](#cells)
-
-### apiKey
-API key is required as of v4 of the Google Sheets API. 
-
-1. Go to https://console.developers.google.com/
-1. 'Select a project' in the top bar, 'New Project'
-1. Give it a name (`SheetsIO-integration` ?) and create it
-1. View the project; on the dashboard there should be a 'Go to APIs overview'
-1. Under the 'Dashboard' tab, click 'Enable API' at the top
-1. Under the 'Credentials' tab, and click 'Create Credentials' at the top -> 'API key'
-
-It should now display an API key for you to then use in your application! It's important to keep this secure, so whenever sharing configs, ensure you remove your apiKey.
-It is advised (although completely optional) to then 'restrict' that key by IP address, or at least specifically to the sheets API - can do that through the key's settings easily at any time.
 
 ### spreadsheetId
 For a sheet with the following URL:
@@ -102,9 +100,12 @@ e.g. **com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJson
 This one is pretty descriptive! Your json file is invalid - even tells you where the issue lies - line number, column number, which array value it's at!
 If you still have issues, remove your apiKey from the file (replace with "") and run it through a service like [JSONLint](https://jsonlint.com/).
 
-## java.io.IOException: Server returned HTTP response code: 403
-HTTP 403 is a HTTP status code meaning access to the requested resource is forbidden. There's a ticket open for improving this error message to users.
-The main cause of 403's is that your Google Spreadsheet is somehow unaccessible or you've used the incorrect [spreadsheetId](#spreadsheetid) - ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
+## 403 - PERMISSION_DENIED
+This means that the key you're using is "correct", but isn't enabled on your project in Google.
+Refer to the [api key section](#google-sheets-api-key) (specifically step #5) to fix.
+
+## 403 - PERMISSION_DENIED - "The caller does not have permission"
+Ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
 
 ## Something else?
 Report any recurring bugs (with log files) in the [issues tab](https://github.com/GrandyB/SheetsIO/issues), or contact me on Discord (Grandy#0243) or [Twitter](https://twitter.com/GrandyB93).

@@ -17,18 +17,14 @@
 package application.services;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.GsonBuilder;
-
 import application.AppUtil;
+import application.exceptions.GoogleSheetsException;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
@@ -79,7 +75,7 @@ public class UpdateController {
 	 * @throws IOException
 	 *             should the {@link FileUpdater} fail
 	 */
-	public void update() throws IOException {
+	public void update() throws IOException, GoogleSheetsException {
 		if (!ConfigHolder.get().isLoaded()) {
 			LOGGER.warn("No config provided");
 			return;
@@ -98,13 +94,10 @@ public class UpdateController {
 	 * @return {@link GoogleSheetsResponse} from our request to the API
 	 * @throws IOException
 	 *             should the connection or input stream fail
+	 * @throws GoogleSheetsException
 	 */
-	private GoogleSheetsResponse getLatestState() throws IOException {
-		URLConnection request = this.url.openConnection();
-		request.connect();
-
-		return new GsonBuilder().create().fromJson(new InputStreamReader((InputStream) request.getContent()),
-				GoogleSheetsResponse.class);
+	private GoogleSheetsResponse getLatestState() throws IOException, GoogleSheetsException {
+		return AppUtil.get().getGoogleSheetsData(this.url);
 	}
 
 	private Map<CellWrapper, String> updateCache(GoogleSheetsResponse data) {
