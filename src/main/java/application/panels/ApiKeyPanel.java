@@ -79,12 +79,16 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 
 			try {
 				getAppUtil().getGoogleSheetsData(new URL(url));
-				getProps().setProperty(PropertiesHolder.API_KEY, potentialKey);
-				getProps().flush();
 				status = ApiKeyStatus.LOADED;
 			} catch (GoogleSheetsException | IOException e) {
 				handleException(e);
 			}
+		}
+		getProps().setProperty(PropertiesHolder.API_KEY, potentialKey);
+		try {
+			getProps().flush();
+		} catch (Exception e) {
+			handleException(e);
 		}
 		getApp().getEventBus().post(new ApiKeySetEvent(status));
 		getGui().setCircle(status);

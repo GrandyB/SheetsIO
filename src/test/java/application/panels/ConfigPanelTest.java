@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 
+import org.greenrobot.eventbus.EventBus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import application.IApplicationOps;
 import application.models.ConfigHolder;
 import application.services.FileIO;
+import application.services.FileUpdater;
 import application.threads.UpdateRunnable;
 
 public class ConfigPanelTest {
@@ -48,6 +51,10 @@ public class ConfigPanelTest {
 	private UpdateRunnable updateRunnable;
 	@Mock
 	private File file;
+	@Mock
+	private IApplicationOps app;
+	@Mock
+	private EventBus eventBus;
 
 	private File parentFile = new File(PARENT_FILE_NAME);
 
@@ -59,6 +66,8 @@ public class ConfigPanelTest {
 		testee = new ConfigPanel(configHolder, fileIO, updateRunnable);
 		testee.setGui(gui);
 
+		testee.setApp(app);
+		when(app.getEventBus()).thenReturn(eventBus);
 		when(file.getParentFile()).thenReturn(parentFile);
 		when(file.getName()).thenReturn(FILE_NAME);
 	}
@@ -73,6 +82,7 @@ public class ConfigPanelTest {
 		testee.initialise();
 		verify(gui).init();
 		verify(fileIO).createFolder(ConfigPanel.LOGS_FOLDER);
+		verify(fileIO).createFolder(FileUpdater.FOLDER_PREFIX);
 	}
 
 	@Test

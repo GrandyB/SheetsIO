@@ -76,6 +76,7 @@ public class ApiKeyPanelTest {
 	@Test
 	public void test_initialise_success() throws IOException, GoogleSheetsException {
 		testee.initialise();
+		verify(eventBus).register(testee);
 
 		// initialise
 		verify(gui).init();
@@ -102,6 +103,7 @@ public class ApiKeyPanelTest {
 	public void test_initialise_exception() throws IOException, GoogleSheetsException {
 		Mockito.when(util.getGoogleSheetsData(Mockito.any())).thenThrow(new GoogleSheetsException(1, "uh", "oh"));
 		testee.initialise();
+		verify(eventBus).register(testee);
 
 		// initialise
 		verify(gui).init();
@@ -118,6 +120,8 @@ public class ApiKeyPanelTest {
 
 		// Fail
 		verify(gui).showErrorDialog("1 - oh", "uh\n" + BasePanel.GENERIC_ERROR_END);
+		verify(props).setProperty(PropertiesHolder.API_KEY, SAMPLE_KEY);
+		verify(props).flush();
 		verify(eventBus).post(new ApiKeySetEvent(ApiKeyStatus.ERROR));
 		verify(gui).setCircle(ApiKeyStatus.ERROR);
 		verify(gui).showHelpLink(true);

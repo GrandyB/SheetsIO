@@ -16,26 +16,32 @@
  */
 package application.guis;
 
+import org.greenrobot.eventbus.EventBus;
+
 //import static org.hamcrest.CoreMatchers.equalTo;
 //import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationTest;
 
-import application.Main;
+import application.IApplicationOps;
 import javafx.stage.Stage;
 
 public class ConfigGuiTest extends ApplicationTest {
 
 	@Mock
-	private Main app;
+	private IApplicationOps app;
+	@Mock
+	private EventBus eventBus;
 	private ConfigGui testee;
 
 	@Override
 	public void start(Stage stage) throws Exception {
 		MockitoAnnotations.initMocks(this);
+		Mockito.when(app.getEventBus()).thenReturn(eventBus);
 		testee = new ConfigGui(app);
 
 		stage.setScene(testee.getScene());

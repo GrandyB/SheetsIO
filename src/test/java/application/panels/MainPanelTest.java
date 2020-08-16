@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import application.IApplicationOps;
 import application.events.ApiKeySetEvent;
 import application.models.ApiKeyStatus;
 
@@ -35,6 +36,9 @@ public class MainPanelTest {
 
 	@Mock
 	private MainPanel.Gui gui;
+	@Mock
+	private IApplicationOps app;
+	private EventBus eventBus = new EventBus();
 
 	private MainPanel testee;
 
@@ -43,7 +47,8 @@ public class MainPanelTest {
 		MockitoAnnotations.initMocks(this);
 		testee = new MainPanel();
 		testee.setGui(gui);
-
+		testee.setApp(app);
+		Mockito.when(app.getEventBus()).thenReturn(eventBus);
 	}
 
 	@AfterEach
@@ -53,7 +58,7 @@ public class MainPanelTest {
 
 	@Test
 	public void test_initialise() throws IOException {
-		initiialiseAndVerify();
+		initialiseAndVerify();
 	}
 
 	@Test
@@ -77,13 +82,13 @@ public class MainPanelTest {
 	}
 
 	private void testEvent(ApiKeyStatus status, boolean expectedEnable) {
-		initiialiseAndVerify();
-		EventBus.getDefault().post(new ApiKeySetEvent(status));
+		initialiseAndVerify();
+		eventBus.post(new ApiKeySetEvent(status));
 
 		verify(gui).enableMainLayout(expectedEnable);
 	}
 
-	private void initiialiseAndVerify() {
+	private void initialiseAndVerify() {
 		testee.initialise();
 		verify(gui).init();
 	}

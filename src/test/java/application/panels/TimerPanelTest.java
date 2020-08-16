@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
+import org.greenrobot.eventbus.EventBus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import application.IApplicationOps;
 import application.models.TimerDuration;
 import application.threads.TimerRunnable;
 
@@ -41,6 +43,10 @@ public class TimerPanelTest {
 	private TimerDuration time;
 	@Mock
 	private TimerRunnable timerRunnable;
+	@Mock
+	private EventBus eventBus;
+	@Mock
+	private IApplicationOps ops;
 
 	private TimerPanel testee;
 
@@ -51,6 +57,8 @@ public class TimerPanelTest {
 		testee = new TimerPanel(time, timerRunnable);
 		testee.setGui(gui);
 
+		testee.setApp(ops);
+		when(ops.getEventBus()).thenReturn(eventBus);
 		when(time.getDisplay()).thenReturn(TIME_DISPLAY);
 	}
 

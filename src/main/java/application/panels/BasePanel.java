@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
- * BasePanel
+ * BasePanel.
  *
  * @author Mark "Grandy" Bishop
  */
