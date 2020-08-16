@@ -20,6 +20,7 @@ import javax.validation.constraints.NotBlank;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Bean equivalent of the [ { "cell": "C4", "file": "file.txt" } ] individual
@@ -27,19 +28,19 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Mark "Grandy" Bishop
  */
+@ToString
 @RequiredArgsConstructor
 public final class Cell implements ICell {
 	@Getter
-	@NotBlank(message = "Cells must have a \"name\" to be identified by")
+	@NotBlank(message = "\"name\" must be supplied and not blank")
 	/** Name to give the cell, eventually used in the file name. */
 	private final String name;
 
 	@Getter
-	@NotBlank(message = "Cells must have a \"cell\" reference")
+	@NotBlank(message = "\"cell\" reference must be supplied and not blank")
 	private final String cell;
 
 	@Getter
-	@NotBlank(message = "Cells must have a \"fileExtension\" defined")
 	/** Eventually to be converted to a {@link FileType}. */
 	private final String fileExtension;
 

@@ -20,31 +20,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Bean equivalent of expected json config file.
  *
  * @author Mark "Grandy" Bishop
  */
+@ToString
 @AllArgsConstructor
 public class Config {
 	@Getter
-	@NotBlank(message = "Please provide a non-blank \"projectName\"")
+	@NotBlank(message = "\"projectName\" must be provided and non-blank")
 	private final String projectName;
 
 	@Getter
-	@NotBlank(message = "Please provide a non-blank \"spreadsheetId\"")
+	@NotBlank(message = "\"spreadsheetId\" must be provided and non-blank")
 	private final String spreadsheetId;
 
 	@Getter
-	@NotBlank(message = "Please provide a non-blank \"worksheetName\"")
+	@NotBlank(message = "\"worksheetName\" must be provided and non-blank")
 	private final String worksheetName;
 
+	@Valid
 	@NotEmpty(message = "\"cells\" array must be provided and have values")
 	private final Cell[] cells;
 

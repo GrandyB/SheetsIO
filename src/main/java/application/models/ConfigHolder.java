@@ -153,7 +153,12 @@ public class ConfigHolder {
 
 		cellWrappers.clear();
 		for (Cell cell : config.getCells()) {
-			cellWrappers.add(new CellWrapper(cell));
+			if (cell != null) {
+				cellWrappers.add(new CellWrapper(cell));
+			} else {
+				LOGGER.debug(
+						"Detected empty/null entry in the 'cells' array; Check that your 'cells' array in config does not have any double commas ,, or a comma after the last element of the array.");
+			}
 		}
 	}
 

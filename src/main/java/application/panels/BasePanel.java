@@ -91,13 +91,9 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 		StringBuilder error = new StringBuilder();
 
 		if (e instanceof JsonValidationException) {
-			error.append("Error while attempting to load config values into the application.\n\n");
 			JsonValidationException jsonEx = (JsonValidationException) e;
-			jsonEx.getViolations().forEach(v -> {
-				error.append(v.getMessage());
-				error.append('\n');
-			});
-
+			error.append(jsonEx.getSummary());
+			error.append('\n');
 		} else if (e instanceof JsonSyntaxException) {
 			error.append("Your json is malformed and needs correcting!\n");
 			error.append(e.getMessage());
