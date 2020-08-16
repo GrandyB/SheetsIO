@@ -22,6 +22,7 @@ import java.io.IOException;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
 import application.services.FileIO;
+import application.services.FileUpdater;
 import application.services.ThreadCollector;
 import application.threads.UpdateRunnable;
 
@@ -80,9 +81,10 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	public void initialise() {
 		super.initialise();
 
-		// Create /logs folder
+		// Create the initial folders
 		try {
 			fileIO.createFolder(LOGS_FOLDER);
+			fileIO.createFolder(FileUpdater.FOLDER_PREFIX);
 		} catch (IOException e) {
 			handleException(e);
 		}

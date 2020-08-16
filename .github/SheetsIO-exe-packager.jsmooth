@@ -9,7 +9,7 @@
 <arguments></arguments>
 <embeddedJar>true</embeddedJar>
 <executableName>..\dist\SheetsIO.exe</executableName>
-<iconLocation>..\src\main\resources\icon.png</iconLocation>
+<iconLocation>..\src\main\java\application\icon.png</iconLocation>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <jarLocation>..\dist\dist.jar</jarLocation>
 <javaProperties>
@@ -27,6 +27,7 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>URL</key>
+<value></value>
 </skeletonProperties>
 <skeletonProperties>
 <key>SingleProcess</key>

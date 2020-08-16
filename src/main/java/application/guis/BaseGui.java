@@ -23,7 +23,6 @@ import application.AppUtil;
 import application.IApplicationOps;
 import application.panels.BasePanel;
 import application.panels.IPanel;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -83,13 +82,11 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 		 * which is separate to the JavaFX application thread; Platform.runLater allows
 		 * the code to be ran on the proper thread.
 		 */
-		Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("SheetsIO error");
-			alert.setHeaderText(sanitisedMessage);
-			alert.setContentText(errorMessage);
-			alert.showAndWait();
-		});
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("SheetsIO error");
+		alert.setHeaderText(sanitisedMessage);
+		alert.setContentText(errorMessage);
+		alert.showAndWait();
 	}
 
 	/**

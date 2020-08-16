@@ -36,4 +36,7 @@ public interface IApplicationOps {
 
 	/** Open the system default browser with the given url */
 	void openBrowser(String url);
+
+	/** Open an alert. */
+	// void openAlert(String title, String header, String message);
 }
