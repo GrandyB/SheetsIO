@@ -100,7 +100,7 @@ e.g. **com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJson
 This one is pretty descriptive! Your json file is invalid - even tells you where the issue lies - line number, column number, which array value it's at!
 If you still have issues, try running your config through a service like [JSONLint](https://jsonlint.com/).
 
-## 403 - PERMISSION_DENIED
+## 403 - PERMISSION_DENIED - "API has not been used in project before or is disabled"
 This means that the key you're using is "correct", but isn't enabled on your project in Google.
 Refer to the [api key section](#google-sheets-api-key) (specifically step #5) to fix.
 
