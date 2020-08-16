@@ -98,7 +98,7 @@ Encountering issues? Hopefully the system is providing error message(s) in the U
 e.g. **com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated array at line 14 column 4 path $.cells[7]**
 
 This one is pretty descriptive! Your json file is invalid - even tells you where the issue lies - line number, column number, which array value it's at!
-If you still have issues, remove your apiKey from the file (replace with "") and run it through a service like [JSONLint](https://jsonlint.com/).
+If you still have issues, try running your config through a service like [JSONLint](https://jsonlint.com/).
 
 ## 403 - PERMISSION_DENIED
 This means that the key you're using is "correct", but isn't enabled on your project in Google.
