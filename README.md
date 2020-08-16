@@ -94,18 +94,18 @@ The timer is a combination of spinners and buttons to control `/files/timer.txt`
 # Troubleshooting
 Encountering issues? Hopefully the system is providing error message(s) in the UI, if not, check the `/logs` folder!
 
-## JsonSyntaxException / MalformedJsonException 
+### JsonSyntaxException / MalformedJsonException 
 e.g. **com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated array at line 14 column 4 path $.cells[7]**
 
 This one is pretty descriptive! Your json file is invalid - even tells you where the issue lies - line number, column number, which array value it's at!
 If you still have issues, try running your config through a service like [JSONLint](https://jsonlint.com/).
 
-## 403 - PERMISSION_DENIED - "API has not been used in project before or is disabled"
+### 403 - PERMISSION_DENIED - "API has not been used in project before or is disabled"
 This means that the key you're using is "correct", but isn't enabled on your project in Google.
 Refer to the [api key section](#google-sheets-api-key) (specifically step #5) to fix.
 
-## 403 - PERMISSION_DENIED - "The caller does not have permission"
+### 403 - PERMISSION_DENIED - "The caller does not have permission"
 Ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
 
-## Something else?
+### Something else?
 Report any recurring bugs (with log files) in the [issues tab](https://github.com/GrandyB/SheetsIO/issues), or contact me on Discord (Grandy#0243) or [Twitter](https://twitter.com/GrandyB93).
