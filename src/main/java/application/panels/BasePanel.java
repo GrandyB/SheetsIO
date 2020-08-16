@@ -18,7 +18,6 @@ package application.panels;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import com.google.gson.JsonSyntaxException;
@@ -81,7 +80,7 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	 * non-Gui related initialisation.
 	 */
 	public void initialise() {
-		EventBus.getDefault().register(this);
+		getApp().getEventBus().register(this);
 		getGui().init();
 	}
 
