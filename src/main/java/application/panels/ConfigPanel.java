@@ -33,6 +33,7 @@ import application.threads.UpdateRunnable;
  */
 public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	public static final String LOGS_FOLDER = "logs";
+	public static final String TEMP_FOLDER = "temp";
 
 	private UpdateRunnable updateRunnable;
 	private ConfigHolder configHolder;
@@ -85,6 +86,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		try {
 			fileIO.createFolder(LOGS_FOLDER);
 			fileIO.createFolder(FileUpdater.FOLDER_PREFIX);
+			fileIO.createFolder(TEMP_FOLDER);
 		} catch (IOException e) {
 			handleException(e);
 		}

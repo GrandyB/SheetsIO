@@ -11,9 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -22,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.models.FileExtension;
+import application.panels.ConfigPanel;
 
 /**
  * Encapsulate all file/folder-related operations.
@@ -81,21 +85,31 @@ public class FileIO {
 	 *             Should reading from the URL or writing/converting go awry
 	 */
 	public void downloadAndConvertImage(String url, String destinationPath, String extension) throws IOException {
-		Instant start = Instant.now();
+		Instant entireStart = Instant.now();
 		File outputFile = new File(destinationPath);
+		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
+
 		InputStream is = new URL(url).openStream();
+		Instant readStart = Instant.now();
 		BufferedImage image = ImageIO.read(is);
+		LOGGER.debug("Read [{}ms]", Duration.between(readStart, Instant.now()).toMillis());
 		if (image == null) {
 			throw new IOException("Unable to read image from URL " + url + " - ensure it is of a supported type: "
 					+ Arrays.toString(FileExtension.IMAGE_EXTENSIONS.toArray()));
 		}
-		OutputStream os = new FileOutputStream(outputFile);
+		OutputStream os = new FileOutputStream(tempFile);
+		Instant writeStart = Instant.now();
 		ImageIO.write(image, extension, os);
-		is.close();
+		LOGGER.debug("Write [{}ms]", Duration.between(writeStart, Instant.now()).toMillis());
 		os.close();
-		Instant end = Instant.now();
-		LOGGER.debug("Image '{}' downloaded and stored to '{}' [{}ms]", url, destinationPath,
-				Duration.between(start, end).toMillis());
+		is.close();
+		LOGGER.debug("Image '{}' downloaded and stored to '{}' [{}ms]", url, tempFile.getPath(),
+				Duration.between(entireStart, Instant.now()).toMillis());
+
+		Instant moveStart = Instant.now();
+		Files.move(tempFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		LOGGER.debug("Image '{}' renamed/moved to '{}' [{}ms]", url, destinationPath,
+				Duration.between(moveStart, Instant.now()).toMillis());
 	}
 
 	/**
@@ -144,5 +158,18 @@ public class FileIO {
 		}
 		LOGGER.debug("Deleting {}", dirForDelete.getAbsolutePath());
 		return dirForDelete.delete();
+	}
+
+	private String getRandomString(int len) {
+		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder salt = new StringBuilder();
+		Random rnd = new Random();
+		while (salt.length() < len) { // length of the random string.
+			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+			salt.append(SALTCHARS.charAt(index));
+		}
+		String saltStr = salt.toString();
+		return saltStr;
+
 	}
 }

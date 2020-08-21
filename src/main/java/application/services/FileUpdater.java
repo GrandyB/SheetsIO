@@ -71,12 +71,12 @@ public class FileUpdater {
 			String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
 			FileExtension ext = cellWrapper.getFileExtension();
 			switch (ext.getType()) {
-			case IMAGE:
-				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
-				break;
 			case TEXT:
 				/** Add padding if applicable (@see {@link CellWrapper#getPadding}). */
 				fileIO.writeTextFile(destFilePath, newValue + cellWrapper.getPadding());
+				break;
+			case IMAGE:
+				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
 				break;
 			case FILE:
 				fileIO.downloadAndSaveFile(newValue, destFilePath);
