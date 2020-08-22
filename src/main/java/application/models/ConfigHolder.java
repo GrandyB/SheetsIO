@@ -51,15 +51,6 @@ import lombok.Getter;
 public class ConfigHolder {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigHolder.class);
 
-	/**
-	 * "This version of the Google Sheets API has a limit of 500 requests per 100
-	 * seconds per project, and 100 requests per 100 seconds per user. Limits for
-	 * reads and writes are tracked separately. There is no daily usage limit."
-	 * 
-	 * https://developers.google.com/sheets/api/limits
-	 */
-	public static final long UPDATE_INTERVAL = 2000L;
-
 	/** Cached version of most recent config {@link File}. */
 	private File lastFile;
 

@@ -53,6 +53,15 @@ public class PropertiesHolder {
 	public static final int AVAILABLE_WIDTH = SCENE_WIDTH - (2 * LAYOUT_SPACING);
 	public static final int INTERNAL_SPACING = 4;
 
+	/**
+	 * "This version of the Google Sheets API has a limit of 500 requests per 100
+	 * seconds per project, and 100 requests per 100 seconds per user. Limits for
+	 * reads and writes are tracked separately. There is no daily usage limit."
+	 * 
+	 * https://developers.google.com/sheets/api/limits
+	 */
+	public static final long UPDATE_INTERVAL = 2000L;
+
 	private final Properties props = new Properties();
 	private ApiKeyStatus apiKeyStatus = ApiKeyStatus.MISSING;
 

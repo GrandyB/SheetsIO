@@ -25,6 +25,7 @@ import application.IExceptionHandler;
 import application.Main;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
+import application.models.PropertiesHolder;
 import application.services.UpdateController;
 
 /**
@@ -41,7 +42,7 @@ public class UpdateRunnable extends IntervalRunnable {
 	private boolean runOnce = false;
 
 	public UpdateRunnable(IExceptionHandler handler) {
-		super(handler, ConfigHolder.UPDATE_INTERVAL);
+		super(handler, PropertiesHolder.UPDATE_INTERVAL);
 	}
 
 	@Override

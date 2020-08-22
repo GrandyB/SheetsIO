@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -24,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.AppUtil;
 import application.models.FileExtension;
 import application.panels.ConfigPanel;
 
@@ -126,7 +128,22 @@ public class FileIO {
 	public void downloadAndSaveFile(String url, String destinationPath) throws IOException {
 		Instant start = Instant.now();
 		File outputFile = new File(destinationPath);
-		FileUtils.copyURLToFile(new URL(url), outputFile, CONNECTION_TIMEOUT, READ_TIMEOUT);
+		// FileUtils.copyURLToFile(new URL(url), outputFile, CONNECTION_TIMEOUT,
+		// READ_TIMEOUT);
+
+		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+
+		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+			InputStream is = conn.getInputStream();
+			FileUtils.copyToFile(is, outputFile);
+		} else {
+			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
+			// Bit hacky but works
+			if (sb.toString().contains("1010")) {
+				sb.append(" - The owner of this website has banned your access based on your browser's signature");
+			}
+			throw new IOException(sb.toString());
+		}
 		Instant end = Instant.now();
 
 		LOGGER.debug("File '{}' downloaded and stored to '{}' [{}ms] (max allowed DL time: {}ms)", url, destinationPath,

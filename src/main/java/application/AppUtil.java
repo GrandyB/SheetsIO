@@ -18,6 +18,7 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -76,14 +77,19 @@ public class AppUtil {
 			return new GsonBuilder().create().fromJson(new InputStreamReader(conn.getInputStream()),
 					GoogleSheetsResponse.class);
 		} else {
-			isr = new InputStreamReader(conn.getErrorStream());
-			BufferedReader br = new BufferedReader(isr);
-			StringBuilder sb = new StringBuilder();
-			String output;
-			while ((output = br.readLine()) != null) {
-				sb.append(output);
-			}
+			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
 			throw GoogleSheetsException.fromJsonString(sb.toString());
 		}
+	}
+
+	public static StringBuilder getErrorFromStream(InputStream err) throws IOException {
+		InputStreamReader isr = new InputStreamReader(err);
+		BufferedReader br = new BufferedReader(isr);
+		StringBuilder sb = new StringBuilder();
+		String output;
+		while ((output = br.readLine()) != null) {
+			sb.append(output);
+		}
+		return sb;
 	}
 }
