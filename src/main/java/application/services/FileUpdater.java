@@ -79,7 +79,7 @@ public class FileUpdater {
 				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
 				break;
 			case FILE:
-				fileIO.downloadAndSaveFile(newValue, destFilePath);
+				fileIO.downloadAndSaveFile(newValue, destFilePath, ext.getExtension());
 				break;
 			default:
 				throw new IllegalStateException(

@@ -36,10 +36,6 @@ import application.panels.ConfigPanel;
  */
 public class FileIO {
 	private static final Logger LOGGER = LogManager.getLogger(FileIO.class);
-	/** Max time (ms) allowed to connect to a site to download its file. */
-	private static final int CONNECTION_TIMEOUT = 2000;
-	/** Max time (ms) allowed to read/download the file. */
-	private static final int READ_TIMEOUT = 20000;
 
 	/**
 	 * Creates a folder from a path.
@@ -122,20 +118,21 @@ public class FileIO {
 	 *            http://dl5.webmfiles.org/big-buck-bunny_trailer.webm
 	 * @param destinationPath
 	 *            The file path including extension
+	 * @param extension
 	 * @throws IOException
 	 *             Should reading from the URL or writing/converting go awry
 	 */
-	public void downloadAndSaveFile(String url, String destinationPath) throws IOException {
+	public void downloadAndSaveFile(String url, String destinationPath, String extension) throws IOException {
 		Instant start = Instant.now();
-		File outputFile = new File(destinationPath);
-		// FileUtils.copyURLToFile(new URL(url), outputFile, CONNECTION_TIMEOUT,
-		// READ_TIMEOUT);
+		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
 		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
 			InputStream is = conn.getInputStream();
-			FileUtils.copyToFile(is, outputFile);
+			Instant copyStart = Instant.now();
+			FileUtils.copyToFile(is, tempFile);
+			LOGGER.debug("Copy [{}ms]", Duration.between(copyStart, Instant.now()).toMillis());
 		} else {
 			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
 			// Bit hacky but works
@@ -144,10 +141,14 @@ public class FileIO {
 			}
 			throw new IOException(sb.toString());
 		}
-		Instant end = Instant.now();
 
-		LOGGER.debug("File '{}' downloaded and stored to '{}' [{}ms] (max allowed DL time: {}ms)", url, destinationPath,
-				Duration.between(start, end).toMillis(), READ_TIMEOUT);
+		File outputFile = new File(destinationPath);
+		Instant moveStart = Instant.now();
+		Files.move(tempFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		LOGGER.debug("File '{}' renamed/moved to '{}' [{}ms]", url, destinationPath,
+				Duration.between(moveStart, Instant.now()).toMillis());
+
+		LOGGER.debug("Full process [{}ms]", Duration.between(start, Instant.now()).toMillis());
 	}
 
 	/**
