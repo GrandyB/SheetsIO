@@ -107,5 +107,12 @@ Refer to the [api key section](#google-sheets-api-key) (specifically step #5) to
 ### 403 - PERMISSION_DENIED - "The caller does not have permission"
 Ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
 
+### 'no protocol' error message
+If you're using a fileExtension (e.g. using images, videos) and the cell you specify in the config does _not_ contain a link to media of an applicable type on the sheet, this error message may appear.
+
+e.g. if your config is `{ "cell": "A1", "name": "anImage", "fileExtension": "png" }`" and the actual contents of A1 is 'thisisnotanimage', you'd get the error `no protocol: thisisnotanimage`, because it is attempting to connect to (what it expects to be) a hyperlink and failing.
+
+`no protocol: #N/A` is a common one, as `#N/A` is sheets' common lookup error that it puts in the cell. In Google Sheets, you can add error handling to cases like these, e.g. `=IFNA(VLOOKUP_HERE,)` - this way, if the lookup returns nothing, it uses the second parameter (and leaves the cell empty instead of putting `#N/A` in there).
+
 ### Something else?
 Report any recurring bugs (with log files) in the [issues tab](https://github.com/GrandyB/SheetsIO/issues), or contact me on Discord (Grandy#0243) or [Twitter](https://twitter.com/GrandyB93).
