@@ -72,7 +72,6 @@ public class AppUtil {
 	public GoogleSheetsResponse getGoogleSheetsData(URL url) throws IOException, GoogleSheetsException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-		InputStreamReader isr;
 		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
 			return new GsonBuilder().create().fromJson(new InputStreamReader(conn.getInputStream()),
 					GoogleSheetsResponse.class);

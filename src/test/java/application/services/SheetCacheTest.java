@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
 import application.models.json.Cell;
-import application.services.SheetCache;
 
 public class SheetCacheTest {
 	private SheetCache testee = new SheetCache();
@@ -100,6 +99,25 @@ public class SheetCacheTest {
 		Assertions.assertEquals("", testee.get(b2));
 		Assertions.assertEquals("", testee.get(d4));
 		Assertions.assertEquals("", testee.get(ab5));
+	}
+
+	@Test
+	public void test_update_fromValueToEmpty() throws IllegalFileExtensionException {
+		testee.setup(testCells);
+
+		String message = "Test message";
+		Map<CellWrapper, String> rawCellData = new HashMap<>();
+		rawCellData.put(cz55, message);
+
+		// Emulate the sheet updating to have a1Message in A1
+		testee.update(rawCellData);
+		// Should get a cache hit with that message
+		Assertions.assertEquals(message, testee.get(cz55));
+
+		rawCellData.clear();
+		rawCellData.put(cz55, null);
+		testee.update(rawCellData);
+		Assertions.assertEquals("", testee.get(cz55));
 	}
 
 	private CellWrapper dataFromRef(String ref) throws IllegalFileExtensionException {

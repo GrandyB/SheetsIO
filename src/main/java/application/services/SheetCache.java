@@ -54,8 +54,8 @@ public class SheetCache {
 	 *
 	 * @param fullValueMap
 	 *            mutated from {@link GoogleSheetsResponse}, the raw data in full
-	 * @return a Map of {@link CellWrapper} to String for the changed cells and their
-	 *         new values
+	 * @return a Map of {@link CellWrapper} to String for the changed cells and
+	 *         their new values
 	 */
 	public Map<CellWrapper, String> update(Map<CellWrapper, String> fullValueMap) {
 		Map<CellWrapper, String> changedElements = new HashMap<>();
@@ -68,7 +68,8 @@ public class SheetCache {
 
 			if (newVal == null) {
 				// We didn't find the cell (from config) in the update (from sheet)
-				continue;
+				// TODO Might want to request a range (e.g. A1:B3) in the API request itself
+				newVal = "";
 			}
 
 			if (!newVal.equals(cacheEntry.getValue())) {
