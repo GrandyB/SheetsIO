@@ -25,14 +25,14 @@ Want to help make this tool as useful as it could be? Try it out - break it! Wri
 Any issues, refer to the [troubleshooting](#troubleshooting) section.
 
 # Google Sheets API key
-Google Sheets v4 API requires the use of an API key 
+SheetsIO uses the Google Sheets v4 API; unlike previous version of the API, this one requires the use of an API key that you have to generate using Google's developer console.
+To do this, you can either create a project and then enable the Google Sheets API on that project _or_ search for the API and enable it (which will automatically create you a project).
 
 1. Go to https://console.developers.google.com/
-1. 'Select a project' in the top bar, 'New Project'
-1. Give it a name (`SheetsIO-integration` ?) and create it
-1. View the project; on the dashboard there should be a 'Go to APIs overview'
-1. Under the 'Dashboard' tab, click 'Enable API' at the top
-1. Under the 'Credentials' tab, and click 'Create Credentials' at the top -> 'API key'
+1. Create a new project; this can be done in multiple ways but here's one:
+    1. In the upper left 'Select a project' drop down, open it up and use 'New Project'
+    1. Give it a name (`SheetsIO-integration` ?) and create it (this may take a moment)
+1. Navigate through 'Credentials' in the left-side menu, click 'Create Credentials' at the top and choose 'API key'
 
 It should now display an API key for you to then use in your application! It's important to keep this secure, so whenever sharing configs, ensure you remove your apiKey.
 It is advised (although completely optional) to then 'restrict' that key by IP address, or at least specifically to the sheets API - can do that through the key's settings easily at any time.
@@ -57,7 +57,7 @@ Configs are json files and can be placed anywhere, selected through the file cho
 ```
 
 - `"projectName"` - becomes the folder name; files are generated within `/files/projectName`
-- `"worksheetName"` - the sheet/tab within the spreadsheet to observe
+- `"worksheetName"` - sheets API only allows a single 'tab' within your worksheet to read, so this is the name of that tab in the lower bar
 - `"spreadsheetId"` - from part of the URL you use to access your spreadsheet - [see below](#spreadsheetid)
 - `"cells"` - the configuration of cells to files - [see below](#cells)
 
