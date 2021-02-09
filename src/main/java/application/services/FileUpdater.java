@@ -63,7 +63,7 @@ public class FileUpdater {
 	}
 
 	/** Update all the files from the Map with their new values. */
-	public void updateFiles(Map<CellWrapper, String> updatedCells) throws IOException {
+	public void updateFiles(Map<CellWrapper, String> updatedCells) throws Exception {
 		for (Entry<CellWrapper, String> entry : updatedCells.entrySet()) {
 			CellWrapper cellWrapper = entry.getKey();
 			String newValue = entry.getValue();

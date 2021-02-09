@@ -17,7 +17,6 @@
 package application.models;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.exceptions.JsonValidationException;
@@ -100,13 +98,10 @@ public class ConfigHolder {
 	/**
 	 * Reloads the most recently successful config file.
 	 * 
-	 * @throws JsonValidationException
-	 *             if validation of the incoming config goes awry.
-	 * @throws IllegalFileExtensionException
-	 *             if
+	 * @throws Exception
+	 *             any exception from config loading.
 	 */
-	public synchronized void reload()
-			throws JsonSyntaxException, IOException, JsonValidationException, IllegalFileExtensionException {
+	public synchronized void reload() throws Exception {
 		assert lastFile != null : "There is no existing config file loaded";
 		LOGGER.debug("Reloading.");
 		loadFile(lastFile);
@@ -116,12 +111,10 @@ public class ConfigHolder {
 	 * Loads the given {@link File} into java beans, which are then accessible from
 	 * this class.
 	 * 
-	 * @throws JsonValidationException
-	 *             if validation of the incoming config goes awry.
-	 * @throws IllegalFileExtensionException
+	 * @throws Exception
+	 *             any exception from config loading.
 	 */
-	public synchronized void loadFile(File file)
-			throws IOException, JsonSyntaxException, JsonValidationException, IllegalFileExtensionException {
+	public synchronized void loadFile(File file) throws Exception {
 		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
 		LOGGER.debug("Config file has been loaded.");

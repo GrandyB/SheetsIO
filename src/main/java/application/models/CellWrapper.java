@@ -59,13 +59,7 @@ public final class CellWrapper implements ICell {
 		this.coordString = cell.getCell();
 		this.col = toColumnNumber(this.coordString);
 		this.row = toRowNumber(this.coordString);
-
-		// If an extension is not provided, use default
-		if (cell.getFileExtension() == null) {
-			fileExtension = FileExtension.defaultType();
-		} else {
-			fileExtension = new FileExtension(cell.getFileExtension());
-		}
+		this.fileExtension = FileExtension.fromRaw(cell.getFileExtension());
 	}
 
 	/**

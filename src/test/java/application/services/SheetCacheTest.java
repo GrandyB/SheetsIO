@@ -25,9 +25,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
-import application.models.json.Cell;
+import application.models.json.CellBuilder;
 
 public class SheetCacheTest {
 	private SheetCache testee = new SheetCache();
@@ -42,7 +41,7 @@ public class SheetCacheTest {
 	private List<CellWrapper> testCells;
 
 	@BeforeEach
-	public void setUp() throws IllegalFileExtensionException {
+	public void setUp() throws Exception {
 		a1 = dataFromRef("A1");
 		b2 = dataFromRef("B2");
 		c3 = dataFromRef("C3");
@@ -54,7 +53,7 @@ public class SheetCacheTest {
 	}
 
 	@Test
-	public void test_get() throws IllegalFileExtensionException {
+	public void test_get() throws Exception {
 		testee.setup(testCells);
 		// Ensure we get hits for the ones we expect
 		Assertions.assertEquals("", testee.get(a1));
@@ -67,7 +66,7 @@ public class SheetCacheTest {
 	}
 
 	@Test
-	public void test_update() throws IllegalFileExtensionException {
+	public void test_update() throws Exception {
 		testee.setup(testCells);
 
 		String a1Message = "0,0 (aka. A1) exists in config";
@@ -102,7 +101,7 @@ public class SheetCacheTest {
 	}
 
 	@Test
-	public void test_update_fromValueToEmpty() throws IllegalFileExtensionException {
+	public void test_update_fromValueToEmpty() throws Exception {
 		testee.setup(testCells);
 
 		String message = "Test message";
@@ -120,7 +119,7 @@ public class SheetCacheTest {
 		Assertions.assertEquals("", testee.get(cz55));
 	}
 
-	private CellWrapper dataFromRef(String ref) throws IllegalFileExtensionException {
-		return new CellWrapper(new Cell(ref, ref, "txt"));
+	private CellWrapper dataFromRef(String ref) throws Exception {
+		return new CellWrapper(new CellBuilder().withName(ref).withCell(ref).build());
 	}
 }

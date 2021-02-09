@@ -18,6 +18,7 @@ package application.models.json;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -30,6 +31,7 @@ import lombok.ToString;
  */
 @ToString
 @RequiredArgsConstructor
+@AllArgsConstructor
 public final class Cell implements ICell {
 	@Getter
 	@NotBlank(message = "\"name\" must be supplied and not blank")
@@ -41,8 +43,8 @@ public final class Cell implements ICell {
 	private final String cell;
 
 	@Getter
-	/** Eventually to be converted to a {@link FileType}. */
-	private final String fileExtension;
+	/** Eventually to be converted to a {@link FileExtension}. */
+	private String fileExtension;
 
 	@Getter
 	/**

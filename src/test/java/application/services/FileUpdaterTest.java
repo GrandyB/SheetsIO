@@ -31,10 +31,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import application.exceptions.IllegalFileExtensionException;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
-import application.models.json.Cell;
+import application.models.json.CellBuilder;
 import application.models.json.Config;
 
 public class FileUpdaterTest {
@@ -53,11 +52,12 @@ public class FileUpdaterTest {
 
 	@SuppressWarnings("deprecation")
 	@BeforeEach
-	public void setUp() throws IOException, IllegalFileExtensionException {
+	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(io.createFolder(Mockito.any())).thenReturn(new File(FOLDER_NAME));
 
-		exampleCell = new CellWrapper(new Cell(FILE_NAME, "A3", TXT_EXTENSION));
+		exampleCell = new CellWrapper(
+				new CellBuilder().withName(FILE_NAME).withCell("A3").withFileExtension(TXT_EXTENSION).build());
 		cells.add(exampleCell);
 
 		Mockito.when(config.getProjectName()).thenReturn(FOLDER_NAME);
@@ -72,13 +72,13 @@ public class FileUpdaterTest {
 	}
 
 	@Test
-	public void test_setup() throws IOException, IllegalFileExtensionException {
+	public void test_setup() throws Exception {
 		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
 	}
 
 	@Test
-	public void test_updateFiles() throws IOException, IllegalFileExtensionException {
+	public void test_updateFiles() throws Exception {
 		// Must first setup
 		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
@@ -89,10 +89,12 @@ public class FileUpdaterTest {
 		 * config, not random given ones like we have below.
 		 */
 		Map<CellWrapper, String> updatedCells = new HashMap<>();
-		CellWrapper a8 = new CellWrapper(new Cell(FILE_NAME + "1", "A8", TXT_EXTENSION));
+		CellWrapper a8 = new CellWrapper(
+				new CellBuilder().withName(FILE_NAME + "1").withCell("A8").withFileExtension(TXT_EXTENSION).build());
 		updatedCells.put(a8, "newVal1");
 
-		CellWrapper b8 = new CellWrapper(new Cell(FILE_NAME + "2", "B8", TXT_EXTENSION));
+		CellWrapper b8 = new CellWrapper(
+				new CellBuilder().withName(FILE_NAME + "2").withCell("B8").withFileExtension(TXT_EXTENSION).build());
 		updatedCells.put(b8, "newVal2");
 
 		fileUpdater.updateFiles(updatedCells);
@@ -101,13 +103,13 @@ public class FileUpdaterTest {
 	}
 
 	@Test
-	public void test_cleanUp_noFolder() throws IOException {
+	public void test_cleanUp_noFolder() throws Exception {
 		fileUpdater.cleanUp();
 		// Nothing to do
 	}
 
 	@Test
-	public void test_cleanUp_hasFolder() throws IOException, IllegalFileExtensionException {
+	public void test_cleanUp_hasFolder() throws Exception {
 		// Must first setup
 		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);
@@ -123,7 +125,7 @@ public class FileUpdaterTest {
 	}
 
 	@Test
-	public void test_createFilePath() throws IOException, IllegalFileExtensionException {
+	public void test_createFilePath() throws Exception {
 		// Must first setup
 		fileUpdater.setup();
 		verifySetup(FOLDER_NAME);

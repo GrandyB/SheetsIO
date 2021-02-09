@@ -86,7 +86,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		try {
 			fileIO.createFolder(LOGS_FOLDER);
 			fileIO.createFolder(FileUpdater.FOLDER_PREFIX);
-			fileIO.createFolder(TEMP_FOLDER);
+			fileIO.createFolder(ConfigPanel.TEMP_FOLDER);
 		} catch (IOException e) {
 			handleException(e);
 		}

@@ -75,7 +75,7 @@ public class UpdateController {
 	 * @throws IOException
 	 *             should the {@link FileUpdater} fail
 	 */
-	public void update() throws IOException, GoogleSheetsException {
+	public void update() throws Exception {
 		if (!ConfigHolder.get().isLoaded()) {
 			LOGGER.warn("No config provided");
 			return;

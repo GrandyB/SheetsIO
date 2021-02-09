@@ -83,6 +83,7 @@ public class ConfigPanelTest {
 		verify(gui).init();
 		verify(fileIO).createFolder(ConfigPanel.LOGS_FOLDER);
 		verify(fileIO).createFolder(FileUpdater.FOLDER_PREFIX);
+		verify(fileIO).createFolder(ConfigPanel.TEMP_FOLDER);
 	}
 
 	@Test

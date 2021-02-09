@@ -5,12 +5,14 @@ package application.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -34,7 +36,7 @@ import application.panels.ConfigPanel;
  *
  * @author Mark "Grandy" Bishop
  */
-public class FileIO {
+public final class FileIO {
 	private static final Logger LOGGER = LogManager.getLogger(FileIO.class);
 
 	/**
@@ -82,12 +84,21 @@ public class FileIO {
 	 * @throws IOException
 	 *             Should reading from the URL or writing/converting go awry
 	 */
-	public void downloadAndConvertImage(String url, String destinationPath, String extension) throws IOException {
+	public void downloadAndConvertImage(String url, String destinationPath, String extension) throws Exception {
 		Instant entireStart = Instant.now();
 		File outputFile = new File(destinationPath);
 		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		InputStream is = new URL(url).openStream();
+		URI uri = new URI(url);
+		InputStream is;
+		if (uri.getScheme().equals("file")) {
+			LOGGER.debug("Treating {} as a local file", uri);
+			// Treat it as a local file
+			is = new FileInputStream(new File(uri.getPath()));
+		} else {
+			LOGGER.debug("Treating {} as a remote url", uri);
+			is = uri.toURL().openStream();
+		}
 		Instant readStart = Instant.now();
 		BufferedImage image = ImageIO.read(is);
 		LOGGER.debug("Read [{}ms]", Duration.between(readStart, Instant.now()).toMillis());

@@ -21,13 +21,17 @@ import java.util.List;
 
 import application.exceptions.IllegalFileExtensionException;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Type of extension, based on preset lists of acceptable extensions per type.
  *
  * @author Mark "Grandy" Bishop
  */
+@ToString
+@EqualsAndHashCode
 public class FileExtension {
 	public static final List<String> IMAGE_EXTENSIONS = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
 	public static final List<String> TEXT_EXTENSIONS = Arrays.asList("txt");
@@ -38,9 +42,17 @@ public class FileExtension {
 	@Getter
 	private FileExtensionType type;
 
-	public FileExtension(String extension) throws IllegalFileExtensionException {
+	private FileExtension(String extension) throws IllegalFileExtensionException {
 		this.extension = extension;
 		this.type = FileExtensionType.from(extension);
+	}
+
+	public static FileExtension fromRaw(String rawExtension) throws IllegalFileExtensionException {
+		if (rawExtension == null) {
+			return defaultType();
+		} else {
+			return new FileExtension(rawExtension);
+		}
 	}
 
 	public static FileExtension defaultType() throws IllegalFileExtensionException {
