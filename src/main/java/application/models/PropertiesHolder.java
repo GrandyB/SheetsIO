@@ -46,6 +46,7 @@ public class PropertiesHolder {
 	public static final String API_KEY = "apiKey";
 	public static final String API_KEY_TEST_SPREADSHEET_ID = "apiKey.test.spreadsheetId";
 	public static final String API_KEY_TEST_WORKBOOK_ID = "apiKey.test.workbookId";
+	public static final String LAST_CONFIG = "last.config";
 
 	public static final int SCENE_WIDTH = 210;
 	public static final int SCENE_HEIGHT = 370;
@@ -89,6 +90,7 @@ public class PropertiesHolder {
 		props.setProperty("apiKey", "");
 		props.setProperty(API_KEY_TEST_SPREADSHEET_ID, SAMPLE_API_TEST_SPREADSHEET_ID);
 		props.setProperty(API_KEY_TEST_WORKBOOK_ID, SAMPLE_API_TEST_WORKBOOK_ID);
+		props.setProperty(LAST_CONFIG, "");
 		try {
 			flush();
 		} catch (Exception e) {
@@ -105,6 +107,7 @@ public class PropertiesHolder {
 		return this.apiKeyStatus;
 	}
 
+	/** @return String property if exists, or null. */
 	public String getProperty(String key) {
 		return props.getProperty(key);
 	}

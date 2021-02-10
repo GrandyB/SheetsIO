@@ -35,11 +35,12 @@ import application.models.FileExtension;
 import application.panels.ConfigPanel;
 
 /**
- * Encapsulate all file/folder-related operations.
+ * Encapsulate all file/folder-related operations. Not final as needs to be
+ * mocked.
  *
  * @author Mark "Grandy" Bishop
  */
-public final class FileIO {
+public class FileIO {
 	private static final Logger LOGGER = LogManager.getLogger(FileIO.class);
 
 	/**

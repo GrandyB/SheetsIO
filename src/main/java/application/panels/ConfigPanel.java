@@ -19,8 +19,13 @@ package application.panels;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import application.AppUtil;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
+import application.models.PropertiesHolder;
 import application.services.FileIO;
 import application.services.FileUpdater;
 import application.services.ThreadCollector;
@@ -32,6 +37,8 @@ import application.threads.UpdateRunnable;
  * @author Mark "Grandy" Bishop
  */
 public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
+	private static final Logger LOGGER = LogManager.getLogger(ConfigPanel.class);
+
 	public static final String LOGS_FOLDER = "logs";
 	public static final String TEMP_FOLDER = "temp";
 
@@ -54,8 +61,9 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	}
 
 	/** Dependency injection, for use in tests. */
-	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable) {
-		super();
+	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable, AppUtil appUtil,
+			PropertiesHolder props) {
+		super(appUtil, props);
 		this.configHolder = configHolder;
 		this.fileIO = fileIO;
 		this.updateRunnable = updateRunnable;
@@ -90,9 +98,20 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		} catch (IOException e) {
 			handleException(e);
 		}
+
+		// Load the previous config if there is one
+		String previousConfigPath = getProps().getProperty(PropertiesHolder.LAST_CONFIG);
+		if (previousConfigPath != null && !previousConfigPath.isEmpty()) {
+			handleConfigSelection(new File(previousConfigPath));
+		}
 	}
 
-	/** Handle the selection of a config file from the chooser. */
+	/**
+	 * Handle the selection of a config file from the chooser.
+	 * 
+	 * @throws Exception
+	 *             if the saving of the 'last selected config' fails.
+	 */
 	public void handleConfigSelection(File file) {
 		if (file == null) {
 			return;
@@ -106,10 +125,19 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 			return;
 		}
 
-		getGui().setConfigChooserDirectory(file.getParentFile());
+		getGui().setConfigChooserDirectory(file.getAbsoluteFile().getParentFile());
 		getGui().setConfigLabel(file.getName());
 		getGui().setReloadConfigLinkVisible(true);
 		getGui().setAutoUpdateCheckState(this.configHolder.isAutoUpdate());
+
+		// Set 'last config' option in application.properties
+		getProps().setProperty(PropertiesHolder.LAST_CONFIG, file.getAbsolutePath());
+		try {
+			getProps().flush();
+		} catch (IOException e) {
+			LOGGER.error("Unable to set the property '{}' to '{}': {}", PropertiesHolder.LAST_CONFIG,
+					file.getAbsolutePath(), e);
+		}
 	}
 
 	/** Handle a click of the 'reload' config button in the UI. */

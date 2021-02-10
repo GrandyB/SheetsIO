@@ -30,8 +30,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import application.AppUtil;
 import application.IApplicationOps;
 import application.models.ConfigHolder;
+import application.models.PropertiesHolder;
 import application.services.FileIO;
 import application.services.FileUpdater;
 import application.threads.UpdateRunnable;
@@ -39,6 +41,7 @@ import application.threads.UpdateRunnable;
 public class ConfigPanelTest {
 
 	private static final String FILE_NAME = "fileName";
+	private static final String FILE_PATH = "C:/file/" + FILE_NAME;
 	private static final String PARENT_FILE_NAME = "parentFileName";
 
 	@Mock
@@ -54,6 +57,10 @@ public class ConfigPanelTest {
 	@Mock
 	private IApplicationOps app;
 	@Mock
+	private AppUtil appUtil;
+	@Mock
+	private PropertiesHolder props;
+	@Mock
 	private EventBus eventBus;
 
 	private File parentFile = new File(PARENT_FILE_NAME);
@@ -63,18 +70,20 @@ public class ConfigPanelTest {
 	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		testee = new ConfigPanel(configHolder, fileIO, updateRunnable);
+		testee = new ConfigPanel(configHolder, fileIO, updateRunnable, appUtil, props);
 		testee.setGui(gui);
 
 		testee.setApp(app);
 		when(app.getEventBus()).thenReturn(eventBus);
+		when(file.getAbsolutePath()).thenReturn(FILE_PATH);
+		when(file.getAbsoluteFile()).thenReturn(file);
 		when(file.getParentFile()).thenReturn(parentFile);
 		when(file.getName()).thenReturn(FILE_NAME);
 	}
 
 	@AfterEach
 	public void tearDown() {
-		Mockito.verifyNoMoreInteractions(gui, fileIO, configHolder);
+		Mockito.verifyNoMoreInteractions(gui, fileIO, configHolder, props);
 	}
 
 	@Test
@@ -84,6 +93,7 @@ public class ConfigPanelTest {
 		verify(fileIO).createFolder(ConfigPanel.LOGS_FOLDER);
 		verify(fileIO).createFolder(FileUpdater.FOLDER_PREFIX);
 		verify(fileIO).createFolder(ConfigPanel.TEMP_FOLDER);
+		verify(props).getProperty(PropertiesHolder.LAST_CONFIG);
 	}
 
 	@Test
@@ -94,11 +104,11 @@ public class ConfigPanelTest {
 		verify(gui).init();
 		verify(fileIO).createFolder(ConfigPanel.LOGS_FOLDER);
 		verify(gui).showErrorDialog(Mockito.anyString(), Mockito.anyString());
+		verify(props).getProperty(PropertiesHolder.LAST_CONFIG);
 	}
 
 	@Test
 	public void test_handleConfigSelection() throws Exception {
-
 		testee.handleConfigSelection(file);
 
 		verify(configHolder).loadFile(file);
@@ -109,6 +119,8 @@ public class ConfigPanelTest {
 		verify(gui).setReloadConfigLinkVisible(true);
 		verify(configHolder).isAutoUpdate();
 		verify(gui).setAutoUpdateCheckState(Mockito.anyBoolean());
+		verify(props).setProperty(PropertiesHolder.LAST_CONFIG, FILE_PATH);
+		verify(props).flush();
 	}
 
 	@Test
