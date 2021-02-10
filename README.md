@@ -13,6 +13,9 @@ A common issue as a producer is having an unruly mass of raw data - caster names
 
 There's other tools/methods out there that attempt to address this problem - Microsoft Excel (and other spreadsheet programs) often have the capability to record macros and save data to files, however this requires some technical knowledge to create, and requires the right type of spreadsheet program to use (as MS/Libre/Openoffice each their own language for writing macros, often making it difficult to share). Then there's project(s) such as [RewindRL](https://github.com/rewindrl/updater)'s updater system, which brings Google Sheets data into browser-based graphics, which while powerful, requires a fair bit of coding knowledge to use properly. SheetsIO on the other hand requires zero coding knowledge to implement, uses shareable configs, can bring in an unlimited amount of data of various types, allows for remote editing of data on Google Sheets, and is generally very simple to use.
 
+Here's a full video on first-time setup and an advanced use-case (timestamps in video description):
+[![SheetsIO Intro Video Thumbnail](https://github.com/GrandyB/SheetsIO/blob/master/.github/sheetsio-introvid-thumb.png)](https://youtu.be/kEC2R8FYBAc)
+
 Want to help make this tool as useful as it could be? Try it out - break it! Write up all your bug reports and feature requests in the [issues tab](https://github.com/GrandyB/SheetsIO/issues).
 
 # Getting started
@@ -22,7 +25,7 @@ Want to help make this tool as useful as it could be? Try it out - break it! Wri
 1. Setup your [config](#config) with your spreadsheet ID/workbook name and cell/file references
 1. Load up the app, put your API key, choose your config and either hit 'update now' or tick 'autoupdate'
 
-Any issues, refer to the [troubleshooting](#troubleshooting) section.
+Any issues, refer to the [troubleshooting wiki page](https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting).
 
 # Google Sheets API key
 SheetsIO uses the Google Sheets v4 API; unlike previous version of the API, this one requires the use of an API key that you have to generate using Google's developer console.
@@ -91,28 +94,5 @@ The timer is a combination of spinners and buttons to control `/files/timer.txt`
 - `Update` button forces the countdown to the values in the box; if the timer is running, it'll then continue ticking down but from the new value, if the timer is paused, it'll set this new value but not resume automatically
 - `Reset` button forces the countdown to its starting 00:00 display but does not affect the spinners
 
-# Troubleshooting
-Encountering issues? Hopefully the system is providing error message(s) in the UI, if not, check the `/logs` folder!
-
-### JsonSyntaxException / MalformedJsonException 
-e.g. **com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated array at line 14 column 4 path $.cells[7]**
-
-This one is pretty descriptive! Your json file is invalid - even tells you where the issue lies - line number, column number, which array value it's at!
-If you still have issues, try running your config through a service like [JSONLint](https://jsonlint.com/).
-
-### 403 - PERMISSION_DENIED - "API has not been used in project before or is disabled"
-This means that the key you're using is "correct", but isn't enabled on your project in Google.
-Refer to the [api key section](#google-sheets-api-key) (specifically step #5) to fix.
-
-### 403 - PERMISSION_DENIED - "The caller does not have permission"
-Ensure that your Google Spreadsheet has been shared so that 'anyone with the link can view'.
-
-### 'no protocol' error message
-If you're using a fileExtension (e.g. using images, videos) and the cell you specify in the config does _not_ contain a link to media of an applicable type on the sheet, this error message may appear.
-
-e.g. if your config is `{ "cell": "A1", "name": "anImage", "fileExtension": "png" }`" and the actual contents of A1 is 'thisisnotanimage', you'd get the error `no protocol: thisisnotanimage`, because it is attempting to connect to (what it expects to be) a hyperlink and failing.
-
-`no protocol: #N/A` is a common one, as `#N/A` is sheets' common lookup error that it puts in the cell. In Google Sheets, you can add error handling to cases like these, e.g. `=IFNA(VLOOKUP_HERE,)` - this way, if the lookup returns nothing, it uses the second parameter (and leaves the cell empty instead of putting `#N/A` in there).
-
-### Something else?
-Report any recurring bugs (with log files) in the [issues tab](https://github.com/GrandyB/SheetsIO/issues), or contact me on Discord (Grandy#0243) or [Twitter](https://twitter.com/GrandyB93).
+# Issues?
+Head on over to the [troubleshooting](https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting) wiki page.
