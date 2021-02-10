@@ -11,8 +11,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -89,12 +92,12 @@ public final class FileIO {
 		File outputFile = new File(destinationPath);
 		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		URI uri = new URI(url);
+		URI uri = encodeUri(url);
 		InputStream is;
 		if (uri.getScheme().equals("file")) {
 			LOGGER.debug("Treating {} as a local file", uri);
 			// Treat it as a local file
-			is = new FileInputStream(new File(uri.getPath()));
+			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
 			LOGGER.debug("Treating {} as a remote url", uri);
 			is = uri.toURL().openStream();
@@ -199,6 +202,21 @@ public final class FileIO {
 		}
 		String saltStr = salt.toString();
 		return saltStr;
+	}
 
+	private URI encodeUri(String url) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
+		String encodedUrl = url;
+		if (url.contains("\\")) {
+			encodedUrl = encodedUrl.replace('\\', '/');
+			LOGGER.debug("URL contains '\\'; auto-converting to '/': '{}' -> '{}'", url, encodedUrl);
+		}
+		if (!url.matches("((http://)|(https://)|(file://)).*")) {
+			throw new MalformedURLException("URL requires either http://, https:// or file:// schema: '" + url + "'");
+		}
+		if (url.contains(" ")) {
+			encodedUrl = encodedUrl.replace(" ", "%20");
+			LOGGER.debug("URL contains space(s); auto-replace with '%20': '{}' -> '{}'", url, encodedUrl);
+		}
+		return new URI(encodedUrl);
 	}
 }
