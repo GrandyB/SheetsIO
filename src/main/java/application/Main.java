@@ -26,6 +26,7 @@ import application.events.AppInitialisedEvent;
 import application.guis.MainGui;
 import application.models.PropertiesHolder;
 import application.services.ThreadCollector;
+import application.services.http.AppHttpServer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -61,6 +62,8 @@ public class Main extends Application implements IApplicationOps {
 		primaryStage.show();
 
 		eventBus.post(new AppInitialisedEvent());
+
+		new AppHttpServer().start();
 	}
 
 	@Override
