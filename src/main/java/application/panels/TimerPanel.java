@@ -66,7 +66,7 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 
 		if (this.timerRunnable == null) {
 			// Ensure there is only ever one
-			this.timerRunnable = ThreadCollector.registerThread(new TimerRunnable(this));
+			this.timerRunnable = ThreadCollector.registerRunnable(new TimerRunnable(this));
 		}
 		this.timerRunnable.setTimer(this);
 		new Thread(timerRunnable).start();

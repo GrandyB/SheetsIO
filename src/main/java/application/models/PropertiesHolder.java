@@ -40,6 +40,7 @@ public class PropertiesHolder {
 	// Sample
 	private static final String SAMPLE_API_TEST_SPREADSHEET_ID = "1z2BtJTik73zIUvKi0y9RZbImDyWp_RiQikaEeFBF5E8";
 	private static final String SAMPLE_API_TEST_WORKBOOK_ID = "Test";
+	private static final String DEFAULT_PORT = "8001";
 
 	public static final String COMMENT = " Set 'apiKey' below as the key from https://console.developers.google.com/ - e.g. apikey=123abc;";
 	public static final String FILE_NAME = "application.properties";
@@ -47,6 +48,8 @@ public class PropertiesHolder {
 	public static final String API_KEY_TEST_SPREADSHEET_ID = "apiKey.test.spreadsheetId";
 	public static final String API_KEY_TEST_WORKBOOK_ID = "apiKey.test.workbookId";
 	public static final String LAST_CONFIG = "last.config";
+	public static final String HTTP_PORT = "http.port";
+	public static final String FOLDER_CONTEXT = "";
 
 	public static final int SCENE_WIDTH = 210;
 	public static final int SCENE_HEIGHT = 370;
@@ -80,23 +83,37 @@ public class PropertiesHolder {
 
 			String apiKey = props.getProperty(API_KEY);
 			LOGGER.trace("{}: {}", API_KEY, apiKey);
-			apiKeyStatus = apiKey == null || apiKey.isEmpty() ? ApiKeyStatus.INCOMPLETE : ApiKeyStatus.LOADED;
-			return;
+			apiKeyStatus = (apiKey == null || apiKey.isEmpty()) ? ApiKeyStatus.INCOMPLETE : ApiKeyStatus.LOADED;
 		} catch (Exception e) {
 			LOGGER.debug("Reading input file failed; assuming no file exists", e);
 		}
 
-		LOGGER.debug("Write empty properties");
-		props.setProperty("apiKey", "");
-		props.setProperty(API_KEY_TEST_SPREADSHEET_ID, SAMPLE_API_TEST_SPREADSHEET_ID);
-		props.setProperty(API_KEY_TEST_WORKBOOK_ID, SAMPLE_API_TEST_WORKBOOK_ID);
-		props.setProperty(LAST_CONFIG, "");
+		loadDefaultsIfNotExist();
+	}
+
+	/**
+	 * Apply defaults for missing properties and save/re-save.
+	 */
+	private void loadDefaultsIfNotExist() {
+		loadWithDefaultIfNotExist(API_KEY, "");
+		loadWithDefaultIfNotExist(API_KEY_TEST_SPREADSHEET_ID, SAMPLE_API_TEST_SPREADSHEET_ID);
+		loadWithDefaultIfNotExist(API_KEY_TEST_WORKBOOK_ID, SAMPLE_API_TEST_WORKBOOK_ID);
+		loadWithDefaultIfNotExist(LAST_CONFIG, "");
+		loadWithDefaultIfNotExist(HTTP_PORT, DEFAULT_PORT);
 		try {
 			flush();
 		} catch (Exception e) {
 			LOGGER.debug("Saving properties file failed", e);
 		}
-		apiKeyStatus = ApiKeyStatus.INCOMPLETE;
+	}
+
+	private void loadWithDefaultIfNotExist(String key, String value) {
+		if (getProperty(key) == null) {
+			LOGGER.info("'{}' does not exist; loading default '{}'", key, value);
+			props.setProperty(key, value);
+		} else {
+			LOGGER.info("'{}' application property has been loaded", key);
+		}
 	}
 
 	public boolean isLoaded() {

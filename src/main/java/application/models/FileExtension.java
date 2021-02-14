@@ -33,9 +33,10 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class FileExtension {
-	public static final List<String> IMAGE_EXTENSIONS = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
+	public static final List<String> IMAGE_EXTENSIONS = Arrays.asList("png", "jpeg", "gif");
 	public static final List<String> TEXT_EXTENSIONS = Arrays.asList("txt");
-	public static final List<String> FILE_EXTENSIONS = Arrays.asList("webm");
+	public static final List<String> VIDEO_EXTENSIONS = Arrays.asList("webm", "mp4");
+	public static final List<String> WEB_EXTENSIONS = Arrays.asList("html");
 
 	@Getter
 	private String extension;
@@ -59,12 +60,25 @@ public class FileExtension {
 		return new FileExtension("txt");
 	}
 
+	/**
+	 * @return the content-type label for use in http requests, e.g. "text/html",
+	 *         "image/png".
+	 */
+	public String getContentType() {
+		return type.getContentTypePrefix() + extension;
+	}
+
 	@AllArgsConstructor
 	public enum FileExtensionType {
-		TEXT(TEXT_EXTENSIONS), IMAGE(IMAGE_EXTENSIONS), FILE(FILE_EXTENSIONS);
+		TEXT(TEXT_EXTENSIONS, "text/"),
+		IMAGE(IMAGE_EXTENSIONS, "image/"),
+		VIDEO(VIDEO_EXTENSIONS, "video/"),
+		HTTP(WEB_EXTENSIONS, "text/");
 
 		@Getter
 		private List<String> extensions;
+		@Getter
+		private String contentTypePrefix;
 
 		static FileExtensionType from(String extension) throws IllegalFileExtensionException {
 			for (FileExtensionType type : FileExtensionType.values()) {

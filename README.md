@@ -82,9 +82,8 @@ Each cell is formed of:
 - `"pad"` _[optional]_ - if using a 'Text' type, this number of spaces will be added to end of your text. e.g. `"15"` will add 15 spaces to the end - useful for marquee-type text you wish to use in conjunction with the 'scroll' filter in OBS
 
 Valid `fileExtension` values:
-- Images: "png", "jpg", "jpeg", "gif", "bmp"
+- Images: "png", "jpg", "gif"
 - Text: "txt"
-- Video: "webm"
 
 ## Timer
 
