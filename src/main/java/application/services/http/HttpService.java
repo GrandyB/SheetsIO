@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,7 +34,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import application.models.CellWrapper;
-import application.models.FileExtension;
 import application.models.FileExtension.FileExtensionType;
 import application.models.PropertiesHolder;
 import application.services.SheetCache;
@@ -44,6 +44,23 @@ import lombok.NoArgsConstructor;
 
 /**
  * A singleton http server that handles/controls a local webserver.
+ * 
+ * For simplicity, we want to follow similar URL behaviour to local folder
+ * behaviour - for instance, we want 'caster1Name.txt' (that gets saved in
+ * '/files/project/caster1Name.txt') to be accessed from
+ * 'http://server:port/project/caster1Name'.
+ * 
+ * To achieve realtime updating, we first construct a {@link ConnectionRequest}
+ * to figure out what we're after, use the {@link SheetCache} to get the current
+ * value, and serve a templated version of the value using
+ * {@link HtmlResponseBuilder}. This template includes livejs, which is the
+ * method by which we achieve the realtime updating.
+ * 
+ * Livejs works by sending HEAD requests to the server every second, comparing
+ * 'etag' (basically a version number) of the existing page to the etag from the
+ * server response. If they differ, livejs then sends a GET request and reloads
+ * the page. For our use case, we use the .hashCode() of the value String to
+ * determine whether the cache's value has changed.
  *
  * @author Mark "Grandy" Bishop
  */
@@ -68,8 +85,13 @@ public class HttpService implements HttpHandler {
 		return INSTANCE;
 	}
 
+	/**
+	 * Begin the {@link HttpService} and begin listening on the port from
+	 * application.properties.
+	 */
 	public void start(SheetCache sheetCache) throws IOException {
 		if (server != null) {
+			LOGGER.info("Web server stopped");
 			server.stop(0);
 		}
 		this.sheetCache = sheetCache;
@@ -81,9 +103,13 @@ public class HttpService implements HttpHandler {
 
 		server.setExecutor(EXECUTOR);
 		server.start();
-		LOGGER.info("Web server started on port {}", port);
+		LOGGER.info("Web server began listening on port {}", port);
 	}
 
+	/**
+	 * Forcibly stop the {@link HttpService} AND thread pool; should only be called
+	 * on application shutdown.
+	 */
 	public void stop() {
 		EXECUTOR.shutdownNow();
 		server.stop(0);
@@ -93,7 +119,7 @@ public class HttpService implements HttpHandler {
 	public void handle(HttpExchange httpExchange) throws IOException {
 		String requestParamValue = httpExchange.getRequestURI().getPath();
 		String reqMethod = httpExchange.getRequestMethod();
-		LOGGER.info("REQUEST: {} - {}", requestParamValue, reqMethod);
+		LOGGER.trace("REQUEST: {} - {}", requestParamValue, reqMethod);
 
 		Optional<ConnectionRequest> request = ConnectionRequest.from(httpExchange.getRequestURI());
 		if (request.isPresent()) {
@@ -113,23 +139,25 @@ public class HttpService implements HttpHandler {
 		}
 	}
 
+	/**
+	 * HEAD requests are sent in from livejs on the webpages served up every second.
+	 */
 	private void handleHeadRequest(ConnectionRequest req, HttpExchange httpExchange) throws IOException {
+		LOGGER.trace("HEAD -> {}", req);
 		if (ConnectionRequestType.HTML.equals(req.getType())) {
-			// HttpBinding potential = HttpBinding.from(httpExchange.getLocalAddress(),
-			// req);
-
 			// Look up value from SheetCache for the value of the cell
 			CellWrapper cell = getCell(req);
 			String cellValue = sheetCache.get(cell);
 
-			// Compare hash to that of the request's etag
-			if (Integer.toString(cellValue.hashCode()) != httpExchange.getRequestHeaders().getFirst("etag")) {
-				httpExchange.getResponseHeaders().add("etag", Integer.toString(cellValue.hashCode()));
-				httpExchange.getResponseHeaders().add("content-type", "text/html");
-			}
+			/*
+			 * Send an etag with the current value; livejs will compare it to its existing
+			 * value and perform a GET request if it differs to what it already has.
+			 */
+			httpExchange.getResponseHeaders().add("etag", Integer.toString(cellValue.hashCode()));
+			httpExchange.getResponseHeaders().add("content-type", "text/html");
 			httpExchange.sendResponseHeaders(200, -1);
 		} else {
-			LOGGER.debug("Received an unexpected HEAD request: {}", req);
+			LOGGER.debug("Received an unexpected non-HTML HEAD request: {}", req);
 		}
 	}
 
@@ -147,17 +175,25 @@ public class HttpService implements HttpHandler {
 		}
 	}
 
-	/** GET request - serving new things, in this case it's files on our system. */
+	/**
+	 * GET request - serving new things, in this case it's files on our system.
+	 * 
+	 * TODO: This should not be hit right now, unless people manually try to access
+	 * e.g. "file.png" rather than "file". In the future, we may want to replace
+	 * most remote assets (images, videos etc) with local references, so we download
+	 * and serve locally - but not necessary for the moment.
+	 */
 	private void handleFileGetRequest(ConnectionRequest req, HttpExchange httpExchange) throws IOException {
-		File file = new File(System.getProperty("user.dir") + "/files" + req.getFullRequest());
+		LOGGER.info("GET file -> {}", req);
+		LOGGER.warn(
+				"Attempted to get a file, this is unusual as webpages are only currently serving remote files, not local ones: {}",
+				req);
+
+		String path = System.getProperty("user.dir") + "/files" + req.getFullRequest();
+		File file = new File(path);
 		httpExchange.sendResponseHeaders(200, file.length());
-
-		CellWrapper cell = getCell(req);
-		FileExtension ext = cell.getFileExtension();
-		httpExchange.getResponseHeaders().add("content-type", ext.getContentType());
-
-		// TODO: Serve local files rather than remote ones
-		LOGGER.warn("Attempted to get a file, shouldn't need to yet: {}", req);
+		httpExchange.getResponseHeaders().add("content-type",
+				Files.probeContentType(Paths.get(file.getAbsolutePath())));
 
 		OutputStream outputStream = httpExchange.getResponseBody();
 		Files.copy(file.toPath(), outputStream);
@@ -165,12 +201,12 @@ public class HttpService implements HttpHandler {
 	}
 
 	/**
-	 * GET request - non-file, so assume it's serving a cell value in its
-	 * appropriate form.
+	 * GET request - non-file, so assume it's serving a cell value from the cache in
+	 * its appropriate form.
 	 */
 	private void handleHtmlGetRequest(ConnectionRequest req, HttpExchange httpExchange) throws IOException {
-		OutputStream outputStream = httpExchange.getResponseBody();
 		LOGGER.info("GET html -> {}", req);
+		OutputStream outputStream = httpExchange.getResponseBody();
 
 		HtmlResponseBuilder templater = new HtmlResponseBuilder().empty();
 
@@ -197,17 +233,13 @@ public class HttpService implements HttpHandler {
 			default:
 				throw new IllegalArgumentException("Unable to handle " + FileExtensionType.class.getName() + " "
 						+ cell.getFileExtension().getType());
-
 			}
 
 			if (req.hasParam("noscale")) {
 				templater = templater.scale(false);
 			}
-
-			// httpExchange.getResponseHeaders().add("content-type",
-			// cell.getFileExtension().getContentType());
-			httpExchange.getResponseHeaders().add("etag", Integer.toString(cellValue.hashCode()));
 		}
+
 		String builtHtmlResponse = templater.build();
 		httpExchange.sendResponseHeaders(200, builtHtmlResponse.length());
 		outputStream.write(builtHtmlResponse.getBytes());
@@ -215,13 +247,18 @@ public class HttpService implements HttpHandler {
 		outputStream.close();
 	}
 
+	/**
+	 * @return {@link CellWrapper} from the cache, using the details from the
+	 *         url/request.
+	 */
 	private CellWrapper getCell(ConnectionRequest req) {
 		Optional<CellWrapper> cell = sheetCache.findByName(req.getAsset());
 		if (cell.isPresent()) {
 			return cell.get();
-		} else {
-			LOGGER.warn("Attempted to get {} but found nothing in the {}", req, SheetCache.class.getSimpleName());
-			return null;
+		} else if (req.isValid()) {
+			// Warn if we were trying to retrieve something valid
+			LOGGER.error("Attempted to get {} but found nothing in the {}", req, SheetCache.class.getSimpleName());
 		}
+		return null;
 	}
 }

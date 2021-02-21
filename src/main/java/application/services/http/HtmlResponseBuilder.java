@@ -38,6 +38,8 @@ public class HtmlResponseBuilder {
 	static String DIV_TEMPLATE = "<div id=\"content\"><span id=\"text\">%s</span></div>";
 	static String VIDEO_TEMPLATE = "<video width=\"100%\" height=\"100%\" autoplay loop><source src=\"<src>\" type=\"<type>\" autoplay></video>";
 
+	static String EMPTY_IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
+
 	private String innerContent;
 	private boolean scale = true;
 
@@ -61,7 +63,11 @@ public class HtmlResponseBuilder {
 	 * @return a html doc with an <img> tag for a given src url
 	 */
 	public HtmlResponseBuilder buildImgTemplate(String url) {
-		this.innerContent = String.format(IMG_TEMPLATE, url);
+		String src = EMPTY_IMG_SRC;
+		if (url != null && !url.trim().isEmpty()) {
+			src = url;
+		}
+		this.innerContent = String.format(IMG_TEMPLATE, src);
 		return this;
 	}
 

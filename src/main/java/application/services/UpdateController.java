@@ -86,10 +86,14 @@ public class UpdateController {
 			LOGGER.warn("No config provided");
 			return;
 		}
-		LOGGER.trace("Performing update");
 
 		List<CellUpdate> updatedCells = updateCache(getLatestState());
+		if (updatedCells.isEmpty()) {
+			LOGGER.debug("Not performing file update(s) - no values to update.");
+			return;
+		}
 		// Update applicable files
+		LOGGER.debug("Performing file update(s)");
 		fileUpdater.updateFiles(updatedCells.stream().filter(CellUpdate::isForFile).collect(Collectors.toList()));
 	}
 

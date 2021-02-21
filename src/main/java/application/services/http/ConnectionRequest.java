@@ -69,22 +69,31 @@ public class ConnectionRequest {
 		String path = uri.getPath();
 		String paramString = uri.getQuery();
 
+		// Validate what type of asset this is by attempting to retrieve it
+		File file = new File(System.getProperty("user.dir") + "/files" + path);
+		ConnectionRequestType type = file.exists() ? ConnectionRequestType.FILE : ConnectionRequestType.HTML;
+
 		Matcher urlMatcher = URL_PATTERN.matcher(path);
+		String proj = "";
+		String asset = "";
 		if (urlMatcher.matches()) {
-			String proj = urlMatcher.group(1);
-			String ass = urlMatcher.group(2);
-
-			// TODO: Value toggling parameters? e.g. ?value=thing, instead of just ?thing
-			List<String> params = (paramString == null) ? new ArrayList<>()
-					: Arrays.asList(paramString.replace("?", "").split("&"));
-
-			// Validate what type of asset this is by attempting to retrieve it
-			File file = new File(System.getProperty("user.dir") + "/files" + path);
-			ConnectionRequestType type = file.exists() ? ConnectionRequestType.FILE : ConnectionRequestType.HTML;
-
-			return Optional.of(new ConnectionRequest(path, proj, ass, params, type));
+			proj = urlMatcher.group(1);
+			asset = urlMatcher.group(2);
+		} else {
+			// Invalid URL, just use HTML
+			type = ConnectionRequestType.HTML;
 		}
-		return Optional.empty();
+
+		// TODO: Value toggling parameters? e.g. ?value=thing, instead of just ?thing
+		List<String> params = (paramString == null) ? new ArrayList<>()
+				: Arrays.asList(paramString.replace("?", "").split("&"));
+
+		return Optional.of(new ConnectionRequest(path, proj, asset, params, type));
+	}
+
+	/** @return whether the request is for a valid resource. */
+	public boolean isValid() {
+		return asset != null && !asset.isEmpty();
 	}
 
 	/**

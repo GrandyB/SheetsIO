@@ -57,13 +57,13 @@ public abstract class IntervalRunnable implements Runnable {
 	protected abstract void perform() throws Exception;
 
 	/** Pause the thread. */
-	public void pause() {
+	public synchronized void pause() {
 		LOGGER.debug("Pausing.");
 		this.paused = true;
 	}
 
 	/* Unpause the thread. */
-	public void unpause() {
+	public synchronized void unpause() {
 		LOGGER.debug("Resuming.");
 		this.paused = false;
 	}

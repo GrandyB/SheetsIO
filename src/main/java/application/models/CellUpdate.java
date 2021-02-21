@@ -34,6 +34,6 @@ public final class CellUpdate {
 
 	/** @return whether this update is a file. */
 	public boolean isForFile() {
-		return getCellWrapper().getFileExtension().getType().equals(FileExtensionType.HTTP);
+		return !getCellWrapper().getFileExtension().getType().equals(FileExtensionType.HTTP);
 	}
 }

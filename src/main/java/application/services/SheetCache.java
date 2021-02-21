@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import org.apache.logging.log4j.core.util.Assert;
-
 import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.json.Config;
@@ -99,7 +97,6 @@ public class SheetCache {
 	 *         caster1Name).
 	 */
 	public Optional<CellWrapper> findByName(String name) {
-		Assert.requireNonEmpty(name);
 		return values.keySet().stream().filter(cw -> name.equals(cw.getName())).findFirst();
 	}
 }
