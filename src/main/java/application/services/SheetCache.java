@@ -27,7 +27,6 @@ import org.apache.logging.log4j.core.util.Assert;
 
 import application.models.CellUpdate;
 import application.models.CellWrapper;
-import application.models.VersionedString;
 import application.models.json.Config;
 import application.models.json.GoogleSheetsResponse;
 
@@ -39,7 +38,7 @@ import application.models.json.GoogleSheetsResponse;
  * @author Mark "Grandy" Bishop
  */
 public class SheetCache {
-	private Map<CellWrapper, VersionedString> values = new HashMap<>();
+	private Map<CellWrapper, String> values = new HashMap<>();
 
 	/**
 	 * Prep the cache with the {@link CellWrapper} of the cells we're interested in
@@ -51,7 +50,7 @@ public class SheetCache {
 	 */
 	public void setup(List<CellWrapper> cellsOfInterest) {
 		values.clear();
-		cellsOfInterest.forEach(c -> values.put(c, VersionedString.of("")));
+		cellsOfInterest.forEach(c -> values.put(c, ""));
 	}
 
 	/**
@@ -67,11 +66,11 @@ public class SheetCache {
 		List<CellUpdate> changedElements = new ArrayList<>();
 
 		// Loop through cache keys
-		for (Entry<CellWrapper, VersionedString> cacheEntry : this.values.entrySet()) {
+		for (Entry<CellWrapper, String> cacheEntry : this.values.entrySet()) {
 
 			// Look up value in new map, and contrast to stored value
 			String newVal = updatedValueMap.get(cacheEntry.getKey());
-			VersionedString cacheValue = cacheEntry.getValue();
+			String cacheValue = cacheEntry.getValue();
 
 			if (newVal == null) {
 				// We didn't find the cell (from config) in the update (from sheet)
@@ -79,12 +78,11 @@ public class SheetCache {
 				newVal = "";
 			}
 
-			if (!newVal.equals(cacheValue.getValue())) {
-				VersionedString newCacheValue = VersionedString.update(cacheValue, newVal);
+			if (!newVal.equals(cacheValue)) {
 				// Collect a list of the new values
-				changedElements.add(new CellUpdate(cacheEntry.getKey(), newCacheValue));
+				changedElements.add(new CellUpdate(cacheEntry.getKey(), newVal));
 				// ...and update the cache
-				this.values.put(cacheEntry.getKey(), newCacheValue);
+				this.values.put(cacheEntry.getKey(), newVal);
 			}
 		}
 
@@ -92,7 +90,7 @@ public class SheetCache {
 	}
 
 	/** @return String the data from the cell, from the cache. */
-	public VersionedString get(CellWrapper cellData) {
+	public String get(CellWrapper cellData) {
 		return values.get(cellData);
 	}
 

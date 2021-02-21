@@ -69,7 +69,7 @@ public class FileUpdater {
 				continue;
 			}
 			CellWrapper cellWrapper = entry.getCellWrapper();
-			String newValue = entry.getNewValue().getValue();
+			String newValue = entry.getNewValue();
 
 			String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
 			FileExtension ext = cellWrapper.getFileExtension();

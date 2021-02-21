@@ -32,7 +32,6 @@ import org.mockito.MockitoAnnotations;
 import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
-import application.models.VersionedString;
 import application.models.json.CellBuilder;
 import application.models.json.Config;
 
@@ -91,11 +90,11 @@ public class FileUpdaterTest {
 		List<CellUpdate> updatedCells = new ArrayList<>();
 		CellWrapper a8 = new CellWrapper(
 				new CellBuilder().withName(FILE_NAME + "1").withCell("A8").withFileExtension(TXT_EXTENSION).build());
-		updatedCells.add(new CellUpdate(a8, VersionedString.of("newVal1")));
+		updatedCells.add(new CellUpdate(a8, "newVal1"));
 
 		CellWrapper b8 = new CellWrapper(
 				new CellBuilder().withName(FILE_NAME + "2").withCell("B8").withFileExtension(TXT_EXTENSION).build());
-		updatedCells.add(new CellUpdate(b8, VersionedString.of("newVal2")));
+		updatedCells.add(new CellUpdate(b8, "newVal2"));
 
 		fileUpdater.updateFiles(updatedCells);
 		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, a8), "newVal1");

@@ -36,7 +36,6 @@ import application.models.CellWrapper;
 import application.models.FileExtension;
 import application.models.FileExtension.FileExtensionType;
 import application.models.PropertiesHolder;
-import application.models.VersionedString;
 import application.services.SheetCache;
 import application.services.ThreadCollector;
 import application.services.http.ConnectionRequest.ConnectionRequestType;
@@ -121,7 +120,7 @@ public class HttpService implements HttpHandler {
 
 			// Look up value from SheetCache for the value of the cell
 			CellWrapper cell = getCell(req);
-			VersionedString cellValue = sheetCache.get(cell);
+			String cellValue = sheetCache.get(cell);
 
 			// Compare hash to that of the request's etag
 			if (Integer.toString(cellValue.hashCode()) != httpExchange.getRequestHeaders().getFirst("etag")) {
@@ -179,22 +178,21 @@ public class HttpService implements HttpHandler {
 		CellWrapper cell = getCell(req);
 		// Cell could be null if we haven't hit 'update now' for the first time
 		if (cell != null) {
-			VersionedString cellValue = sheetCache.get(cell);
+			String cellValue = sheetCache.get(cell);
 
 			// TODO: Use downloaded version of file rather than passing in remote url?
 			switch (cell.getFileExtension().getType()) {
 			case IMAGE:
-				templater = templater.buildImgTemplate(cellValue.getValue());
+				templater = templater.buildImgTemplate(cellValue);
 				break;
 			case TEXT:
-				templater = templater.buildDivTemplate(cellValue.getValue());
+				templater = templater.buildDivTemplate(cellValue);
 				break;
 			case VIDEO:
-				templater = templater.buildVideoTemplate(cellValue.getValue(),
-						cell.getFileExtension().getContentType());
+				templater = templater.buildVideoTemplate(cellValue, cell.getFileExtension().getContentType());
 				break;
 			case HTTP:
-				templater = templater.buildIframeTemplate(cellValue.getValue());
+				templater = templater.buildIframeTemplate(cellValue);
 				break;
 			default:
 				throw new IllegalArgumentException("Unable to handle " + FileExtensionType.class.getName() + " "

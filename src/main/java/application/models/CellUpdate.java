@@ -30,7 +30,7 @@ public final class CellUpdate {
 	@Getter
 	private CellWrapper cellWrapper;
 	@Getter
-	private VersionedString newValue;
+	private String newValue;
 
 	/** @return whether this update is a file. */
 	public boolean isForFile() {
