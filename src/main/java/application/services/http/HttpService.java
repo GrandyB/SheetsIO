@@ -186,7 +186,7 @@ public class HttpService implements HttpHandler {
 	private void handleFileGetRequest(ConnectionRequest req, HttpExchange httpExchange) throws IOException {
 		LOGGER.info("GET file -> {}", req);
 		LOGGER.warn(
-				"Attempted to get a file, this is unusual as webpages are only currently serving remote files, not local ones: {}",
+				"Attempted to get a file, this is unusual as webpages are only currently serving remote files (asides from file:// img sources): {}",
 				req);
 
 		String path = System.getProperty("user.dir") + "/files" + req.getFullRequest();
@@ -219,7 +219,7 @@ public class HttpService implements HttpHandler {
 			// TODO: Use downloaded version of file rather than passing in remote url?
 			switch (cell.getFileExtension().getType()) {
 			case IMAGE:
-				templater = templater.buildImgTemplate(cellValue);
+				templater = templater.buildImgTemplate(cell, cellValue);
 				break;
 			case TEXT:
 				templater = templater.buildDivTemplate(cellValue);

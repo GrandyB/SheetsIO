@@ -16,6 +16,8 @@
  */
 package application.services.http;
 
+import application.models.CellWrapper;
+
 /**
  * Builder mechanism for the Html templating of various file types.
  *
@@ -58,13 +60,24 @@ public class HtmlResponseBuilder {
 	}
 
 	/**
+	 * Build in an img tag with a src. If this image is a local file url, we instead
+	 * just use the filename as the src; this way, the browser will send a file GET
+	 * request, which is handled by {@link HttpService#handleFileGetRequest} and
+	 * serves it from disk.
+	 * 
+	 * @param cell
+	 *            The {@link CellWrapper} that this request is for
 	 * @param url
 	 *            e.g. 'https://i.imgur.com/asd123.png'
 	 * @return a html doc with an <img> tag for a given src url
 	 */
-	public HtmlResponseBuilder buildImgTemplate(String url) {
+	public HtmlResponseBuilder buildImgTemplate(CellWrapper cell, String url) {
 		String src = EMPTY_IMG_SRC;
-		if (url != null && !url.trim().isEmpty()) {
+		boolean isForLocalFile = url.contains("file://");
+		if (isForLocalFile) {
+			// Use the file name as the src, resulting in a file GET request when served
+			src = cell.getName() + "." + cell.getFileExtension().getExtension();
+		} else if (url != null && !url.trim().isEmpty()) {
 			src = url;
 		}
 		this.innerContent = String.format(IMG_TEMPLATE, src);
