@@ -185,7 +185,7 @@ public class HttpService implements HttpHandler {
 	 */
 	private void handleFileGetRequest(ConnectionRequest req, HttpExchange httpExchange) throws IOException {
 		LOGGER.info("GET file -> {}", req);
-		LOGGER.warn(
+		LOGGER.debug(
 				"Attempted to get a file, this is unusual as webpages are only currently serving remote files (asides from file:// img sources): {}",
 				req);
 

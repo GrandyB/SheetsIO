@@ -42,7 +42,7 @@ public class UpdateRunnable extends IntervalRunnable {
 	private boolean runOnce = false;
 
 	public UpdateRunnable(IExceptionHandler handler) {
-		super(handler, PropertiesHolder.UPDATE_INTERVAL);
+		super(handler, PropertiesHolder.get().getUpdateInterval());
 	}
 
 	@Override

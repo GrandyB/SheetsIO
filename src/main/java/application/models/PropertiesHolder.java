@@ -49,6 +49,7 @@ public class PropertiesHolder {
 	public static final String API_KEY_TEST_WORKBOOK_ID = "apiKey.test.workbookId";
 	public static final String LAST_CONFIG = "last.config";
 	public static final String HTTP_PORT = "http.port";
+	public static final String UPDATE_INTERVAL = "update.interval";
 	public static final String FOLDER_CONTEXT = "";
 
 	public static final int SCENE_WIDTH = 210;
@@ -64,7 +65,7 @@ public class PropertiesHolder {
 	 * 
 	 * https://developers.google.com/sheets/api/limits
 	 */
-	public static final long UPDATE_INTERVAL = 2000L;
+	private static final long DEFAULT_UPDATE_INTERVAL = 2000L;
 
 	private final Properties props = new Properties();
 	private ApiKeyStatus apiKeyStatus = ApiKeyStatus.MISSING;
@@ -100,6 +101,7 @@ public class PropertiesHolder {
 		loadWithDefaultIfNotExist(API_KEY_TEST_WORKBOOK_ID, SAMPLE_API_TEST_WORKBOOK_ID);
 		loadWithDefaultIfNotExist(LAST_CONFIG, "");
 		loadWithDefaultIfNotExist(HTTP_PORT, DEFAULT_PORT);
+		loadWithDefaultIfNotExist(UPDATE_INTERVAL, Long.toString(DEFAULT_UPDATE_INTERVAL));
 		try {
 			flush();
 		} catch (Exception e) {
@@ -122,6 +124,25 @@ public class PropertiesHolder {
 
 	public ApiKeyStatus getStatus() {
 		return this.apiKeyStatus;
+	}
+
+	public Long getUpdateInterval() {
+		String prop = getProperty(UPDATE_INTERVAL);
+
+		try {
+			if (prop == null) {
+				throw new NumberFormatException();
+			}
+			Long castedProp = Long.parseLong(prop);
+			return castedProp;
+
+		} catch (NumberFormatException e) {
+			LOGGER.warn(
+					"Failed to load update interval from 'application.properties': '{}'ms - instead resetting to the default of '{}'ms",
+					prop, DEFAULT_UPDATE_INTERVAL);
+			props.setProperty(UPDATE_INTERVAL, Long.toString(DEFAULT_UPDATE_INTERVAL));
+			return DEFAULT_UPDATE_INTERVAL;
+		}
 	}
 
 	/** @return String property if exists, or null. */
