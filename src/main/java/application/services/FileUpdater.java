@@ -65,7 +65,7 @@ public class FileUpdater {
 	/** Update all the files from the Map with their new values. */
 	public void updateFiles(List<CellUpdate> updatedCells) throws Exception {
 		for (CellUpdate entry : updatedCells) {
-			if (entry.getCellWrapper().getFileExtension().getType().equals(FileExtensionType.HTTP)) {
+			if (!entry.getCellWrapper().getFileExtension().isForFile()) {
 				continue;
 			}
 			CellWrapper cellWrapper = entry.getCellWrapper();
@@ -106,7 +106,7 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
 		for (CellWrapper cellWrapper : ConfigHolder.get().getCells()) {
-			if (cellWrapper.isForFile()) {
+			if (cellWrapper.getFileExtension().isForFile()) {
 				fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
 			}
 		}

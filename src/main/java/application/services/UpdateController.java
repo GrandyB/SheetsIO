@@ -92,10 +92,12 @@ public class UpdateController {
 			LOGGER.debug("Not performing file update(s) - no values to update.");
 			return;
 		}
+
 		// Update applicable files
 		LOGGER.debug("Performing file update(s)");
-		fileUpdater.updateFiles(
-				updatedCells.stream().filter(cu -> cu.getCellWrapper().isForFile()).collect(Collectors.toList()));
+		fileUpdater.updateFiles(updatedCells.stream() //
+				.filter(cu -> cu.getCellWrapper().getFileExtension().isForFile()) //
+				.collect(Collectors.toList()));
 	}
 
 	/**

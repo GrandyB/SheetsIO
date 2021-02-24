@@ -38,7 +38,7 @@ public class HtmlResponseBuilder {
 	static String IFRAME_TEMPLATE = "<iframe src=\"%s\" id=\"content\" frameborder=\"0\"></iframe>";
 	static String IMG_TEMPLATE = "<img src=\"%s\" id=\"content\" />";
 	static String DIV_TEMPLATE = "<div id=\"content\"><span id=\"text\">%s</span></div>";
-	static String VIDEO_TEMPLATE = "<video width=\"100%\" height=\"100%\" autoplay loop><source src=\"<src>\" type=\"<type>\" autoplay></video>";
+	static String VIDEO_TEMPLATE = "<video width=\"100%\" height=\"100%\" autoplay loop><source src=\"<src>\" type=\"<type>\"></video>";
 
 	static String EMPTY_IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 
@@ -72,14 +72,7 @@ public class HtmlResponseBuilder {
 	 * @return a html doc with an <img> tag for a given src url
 	 */
 	public HtmlResponseBuilder buildImgTemplate(CellWrapper cell, String url) {
-		String src = EMPTY_IMG_SRC;
-		boolean isForLocalFile = url.contains("file://");
-		if (isForLocalFile) {
-			// Use the file name as the src, resulting in a file GET request when served
-			src = cell.getName() + "." + cell.getFileExtension().getExtension();
-		} else if (url != null && !url.trim().isEmpty()) {
-			src = url;
-		}
+		String src = getSrc(cell, url, EMPTY_IMG_SRC);
 		this.innerContent = String.format(IMG_TEMPLATE, src);
 		return this;
 	}
@@ -101,8 +94,11 @@ public class HtmlResponseBuilder {
 	 *            e.g. 'video/webm'
 	 * @return a html doc with a <video> tag for a given src url and content-type
 	 */
-	public HtmlResponseBuilder buildVideoTemplate(String url, String type) {
-		this.innerContent = VIDEO_TEMPLATE.replace("<src>", url).replace("<type>", type);
+	public HtmlResponseBuilder buildVideoTemplate(CellWrapper cell, String url) {
+		String src = getSrc(cell, url, "");
+		this.innerContent = VIDEO_TEMPLATE //
+				.replace("<src>", src) //
+				.replace("<type>", cell.getFileExtension().getContentType());
 		return this;
 	}
 
@@ -123,5 +119,17 @@ public class HtmlResponseBuilder {
 	/** Format the CORE_TEMPLATE to replace the placeholder with a value. */
 	private static String formatCoreTemplate(String value, boolean scale) {
 		return CORE_TEMPLATE.replace("<content></content>", value).replace("<scale>", scale ? SCALE_CSS : "");
+	}
+
+	private static String getSrc(CellWrapper cell, String url, String emptyDefault) {
+		String src = emptyDefault;
+		boolean isForLocalFile = url.contains("file://");
+		if (isForLocalFile) {
+			// Use the file name as the src, resulting in a file GET request when served
+			src = cell.getName() + "." + cell.getFileExtension().getExtension();
+		} else if (url != null && !url.trim().isEmpty()) {
+			src = url;
+		}
+		return src;
 	}
 }

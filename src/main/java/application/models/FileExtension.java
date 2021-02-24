@@ -68,6 +68,11 @@ public class FileExtension {
 		return type.getContentTypePrefix() + extension;
 	}
 
+	/** @return whether or not this type is for a file. Used for working out if we should be creating initial files/considering this cell for file updating. */
+	public boolean isForFile() {
+		return !type.equals(FileExtensionType.HTTP);
+	}
+
 	@AllArgsConstructor
 	public enum FileExtensionType {
 		TEXT(TEXT_EXTENSIONS, "text/"),

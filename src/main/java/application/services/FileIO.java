@@ -96,11 +96,10 @@ public class FileIO {
 		URI uri = encodeUri(url);
 		InputStream is;
 		if (uri.getScheme().equals("file")) {
-			LOGGER.debug("Treating {} as a local file", uri);
-			// Treat it as a local file
+			LOGGER.debug("Treating {} as a local image url", uri);
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			LOGGER.debug("Treating {} as a remote url", uri);
+			LOGGER.debug("Treating {} as a remote image url", uri);
 			is = uri.toURL().openStream();
 		}
 		Instant readStart = Instant.now();
@@ -137,25 +136,36 @@ public class FileIO {
 	 * @throws IOException
 	 *             Should reading from the URL or writing/converting go awry
 	 */
-	public void downloadAndSaveFile(String url, String destinationPath, String extension) throws IOException {
+	public void downloadAndSaveFile(String url, String destinationPath, String extension) throws Exception {
 		Instant start = Instant.now();
 		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-
-		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
-			InputStream is = conn.getInputStream();
-			Instant copyStart = Instant.now();
-			FileUtils.copyToFile(is, tempFile);
-			LOGGER.debug("Copy [{}ms]", Duration.between(copyStart, Instant.now()).toMillis());
+		URI uri = encodeUri(url);
+		InputStream is;
+		if (uri.getScheme().equals("file")) {
+			LOGGER.debug("Treating {} as a local file", uri);
+			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
-			// Bit hacky but works
-			if (sb.toString().contains("1010")) {
-				sb.append(" - The owner of this website has banned your access based on your browser's signature");
+			LOGGER.debug("Treating {} as a remote url", uri);
+			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+
+			if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+				is = conn.getInputStream();
+			} else {
+				StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
+				// Bit hacky but works
+				if (sb.toString().contains("1010")) {
+					sb.append(
+							" - The owner of this website has prevented access to this file based on your browser's signature");
+				}
+				throw new IOException(sb.toString());
 			}
-			throw new IOException(sb.toString());
 		}
+
+		Instant copyStart = Instant.now();
+		FileUtils.copyToFile(is, tempFile);
+		is.close();
+		LOGGER.debug("Copy [{}ms]", Duration.between(copyStart, Instant.now()).toMillis());
 
 		File outputFile = new File(destinationPath);
 		Instant moveStart = Instant.now();

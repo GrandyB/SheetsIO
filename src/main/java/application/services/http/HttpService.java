@@ -189,7 +189,7 @@ public class HttpService implements HttpHandler {
 	private void handleFileGetRequest(ConnectionRequest req, HttpExchange httpExchange) throws IOException {
 		LOGGER.info("GET file -> {}", req);
 		LOGGER.debug(
-				"Attempted to get a file, this is unusual as webpages are only currently serving remote files (asides from file:// img sources): {}",
+				"Attempted to get a file, this is unusual as webpages are only currently serving remote files (asides from file:// sources for images/videos): {}",
 				req);
 
 		String path = System.getProperty("user.dir") + "/files" + req.getFullRequest();
@@ -218,7 +218,7 @@ public class HttpService implements HttpHandler {
 		// Cell could be null if we haven't hit 'update now' for the first time
 		if (cell != null) {
 			String cellValue = sheetCache.get(cell);
-			LOGGER.debug("Cell value is '{}' with file extension '{}'", cellValue, cell.getFileExtension().getType());
+			LOGGER.debug("Cell value is '{}' with file extension '{}'", cellValue, cell.getFileExtension());
 
 			// TODO: Use downloaded version of file rather than passing in remote url?
 			switch (cell.getFileExtension().getType()) {
@@ -229,7 +229,7 @@ public class HttpService implements HttpHandler {
 				templater = templater.buildDivTemplate(cellValue);
 				break;
 			case VIDEO:
-				templater = templater.buildVideoTemplate(cellValue, cell.getFileExtension().getContentType());
+				templater = templater.buildVideoTemplate(cell, cellValue);
 				break;
 			case HTTP:
 				templater = templater.buildIframeTemplate(cellValue);
