@@ -106,7 +106,9 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
 		for (CellWrapper cellWrapper : ConfigHolder.get().getCells()) {
-			fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
+			if (cellWrapper.isForFile()) {
+				fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
+			}
 		}
 	}
 

@@ -17,6 +17,7 @@
 package application.models;
 
 import application.exceptions.IllegalFileExtensionException;
+import application.models.FileExtension.FileExtensionType;
 import application.models.json.Cell;
 import application.models.json.ICell;
 import lombok.EqualsAndHashCode;
@@ -118,5 +119,10 @@ public final class CellWrapper implements ICell {
 	/* @see application.models.json.ICell#getCell() */
 	public String getCell() {
 		return cell.getCell();
+	}
+
+	/** @return whether this update is a file. */
+	public boolean isForFile() {
+		return !getFileExtension().getType().equals(FileExtensionType.HTTP);
 	}
 }

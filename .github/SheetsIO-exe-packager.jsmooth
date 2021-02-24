@@ -6,7 +6,6 @@
 <JVMSearchPath>jdkpath</JVMSearchPath>
 <JVMSearchPath>exepath</JVMSearchPath>
 <JVMSearchPath>jview</JVMSearchPath>
-<arguments></arguments>
 <embeddedJar>true</embeddedJar>
 <executableName>..\dist\SheetsIO.exe</executableName>
 <iconLocation>..\src\main\java\application\icon.png</iconLocation>
@@ -27,7 +26,6 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>URL</key>
-<value></value>
 </skeletonProperties>
 <skeletonProperties>
 <key>SingleProcess</key>

@@ -79,6 +79,8 @@ public class ConnectionRequest {
 		if (urlMatcher.matches()) {
 			proj = urlMatcher.group(1);
 			asset = urlMatcher.group(2);
+		} else if ("/favicon.ico".equals(path)) {
+			type = ConnectionRequestType.FAVICON;
 		} else {
 			// Invalid URL, just use HTML
 			type = ConnectionRequestType.HTML;
@@ -105,6 +107,6 @@ public class ConnectionRequest {
 	}
 
 	enum ConnectionRequestType {
-		FILE, HTML;
+		FILE, HTML, FAVICON;
 	}
 }

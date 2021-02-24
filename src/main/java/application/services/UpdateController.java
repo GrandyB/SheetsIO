@@ -94,7 +94,8 @@ public class UpdateController {
 		}
 		// Update applicable files
 		LOGGER.debug("Performing file update(s)");
-		fileUpdater.updateFiles(updatedCells.stream().filter(CellUpdate::isForFile).collect(Collectors.toList()));
+		fileUpdater.updateFiles(
+				updatedCells.stream().filter(cu -> cu.getCellWrapper().isForFile()).collect(Collectors.toList()));
 	}
 
 	/**

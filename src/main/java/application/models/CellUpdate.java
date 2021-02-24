@@ -16,7 +16,6 @@
  */
 package application.models;
 
-import application.models.FileExtension.FileExtensionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -31,9 +30,4 @@ public final class CellUpdate {
 	private CellWrapper cellWrapper;
 	@Getter
 	private String newValue;
-
-	/** @return whether this update is a file. */
-	public boolean isForFile() {
-		return !getCellWrapper().getFileExtension().getType().equals(FileExtensionType.HTTP);
-	}
 }

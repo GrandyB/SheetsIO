@@ -169,6 +169,9 @@ public class HttpService implements HttpHandler {
 		case HTML:
 			handleHtmlGetRequest(req, httpExchange);
 			break;
+		case FAVICON:
+			// Just ignore it...
+			break;
 		default:
 			throw new IllegalArgumentException(
 					"Unable to handle GET request with " + ConnectionRequestType.class.getName() + " " + req.getType());
@@ -215,6 +218,7 @@ public class HttpService implements HttpHandler {
 		// Cell could be null if we haven't hit 'update now' for the first time
 		if (cell != null) {
 			String cellValue = sheetCache.get(cell);
+			LOGGER.debug("Cell value is '{}' with file extension '{}'", cellValue, cell.getFileExtension().getType());
 
 			// TODO: Use downloaded version of file rather than passing in remote url?
 			switch (cell.getFileExtension().getType()) {
@@ -241,6 +245,7 @@ public class HttpService implements HttpHandler {
 		}
 
 		String builtHtmlResponse = templater.build();
+		LOGGER.debug("Responding with html:\n{}", builtHtmlResponse);
 		httpExchange.sendResponseHeaders(200, builtHtmlResponse.length());
 		outputStream.write(builtHtmlResponse.getBytes());
 		outputStream.flush();
