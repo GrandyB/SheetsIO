@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -32,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.AppUtil;
 import application.models.FileExtension;
+import application.models.FileExtension.FileExtensionType;
 import application.panels.ConfigPanel;
 
 /**
@@ -107,8 +109,12 @@ public class FileIO {
 		LOGGER.debug("Read [{}ms]", Duration.between(readStart, Instant.now()).toMillis());
 		if (image == null) {
 			throw new IOException("Unable to read image from URL " + url + " - ensure it is of a supported type: "
-					+ Arrays.toString(FileExtension.IMAGE_EXTENSIONS.toArray()));
+					+ Arrays.asList(FileExtension.values()).stream() //
+							.filter(f -> FileExtensionType.IMAGE.equals(f.getType())) //
+							.map(f -> f.getExtension()) //
+							.collect(Collectors.toList()));
 		}
+
 		OutputStream os = new FileOutputStream(tempFile);
 		Instant writeStart = Instant.now();
 		ImageIO.write(image, extension, os);

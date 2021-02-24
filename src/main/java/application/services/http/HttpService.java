@@ -242,6 +242,9 @@ public class HttpService implements HttpHandler {
 			if (req.hasParam("noscale")) {
 				templater = templater.scale(false);
 			}
+			if (req.hasParam("loop")) {
+				templater = templater.loop(true);
+			}
 		}
 
 		String builtHtmlResponse = templater.build();

@@ -28,7 +28,7 @@ public class HtmlResponseBuilder {
 	static String CORE_TEMPLATE = "<html>" //
 			+ "	<head>" //
 			+ "		<script type=\"text/javascript\" src=\"http://livejs.com/live.js\"></script>" //
-			+ "		<style>body { margin: 0; padding: 0; } <scale> </style>" //
+			+ "		<style>body, iframe { margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0); overflow: hidden; } [scale] </style>" //
 			+ "	</head>" //
 			+ "	<body>" //
 			+ "		<content></content>" //
@@ -38,15 +38,19 @@ public class HtmlResponseBuilder {
 	static String IFRAME_TEMPLATE = "<iframe src=\"%s\" id=\"content\" frameborder=\"0\"></iframe>";
 	static String IMG_TEMPLATE = "<img src=\"%s\" id=\"content\" />";
 	static String DIV_TEMPLATE = "<div id=\"content\"><span id=\"text\">%s</span></div>";
-	static String VIDEO_TEMPLATE = "<video width=\"100%\" height=\"100%\" autoplay loop><source src=\"<src>\" type=\"<type>\"></video>";
+	static String VIDEO_TEMPLATE = "<video width=\"100%\" height=\"100%\" autoplay [loop]><source src=\"[src]\" type=\"[type]\"></video>";
 
 	static String EMPTY_IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 
 	private String innerContent;
 	private boolean scale = true;
+	private boolean loop = false;
 
 	public String build() {
-		return formatCoreTemplate(innerContent, scale);
+		return CORE_TEMPLATE.replace("<content></content>", innerContent) //
+				// Global parameters
+				.replace("[scale]", scale ? SCALE_CSS : "") //
+				.replace("[loop]", loop ? "loop" : "");
 	}
 
 	/**
@@ -97,8 +101,8 @@ public class HtmlResponseBuilder {
 	public HtmlResponseBuilder buildVideoTemplate(CellWrapper cell, String url) {
 		String src = getSrc(cell, url, "");
 		this.innerContent = VIDEO_TEMPLATE //
-				.replace("<src>", src) //
-				.replace("<type>", cell.getFileExtension().getContentType());
+				.replace("[src]", src) //
+				.replace("[type]", cell.getFileExtension().getContentType());
 		return this;
 	}
 
@@ -116,9 +120,12 @@ public class HtmlResponseBuilder {
 		return this;
 	}
 
-	/** Format the CORE_TEMPLATE to replace the placeholder with a value. */
-	private static String formatCoreTemplate(String value, boolean scale) {
-		return CORE_TEMPLATE.replace("<content></content>", value).replace("<scale>", scale ? SCALE_CSS : "");
+	/**
+	 * @return a builder that either loops its content or not (for video).
+	 */
+	public HtmlResponseBuilder loop(boolean loop) {
+		this.loop = loop;
+		return this;
 	}
 
 	private static String getSrc(CellWrapper cell, String url, String emptyDefault) {
