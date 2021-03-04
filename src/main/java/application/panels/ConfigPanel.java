@@ -55,7 +55,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		// Create/begin the update thread
 		if (updateRunnable == null) {
 			// Ensure only ever have one
-			updateRunnable = ThreadCollector.registerThread(new UpdateRunnable(this));
+			updateRunnable = ThreadCollector.registerRunnable(new UpdateRunnable(this));
 		}
 		new Thread(this.updateRunnable).start();
 	}

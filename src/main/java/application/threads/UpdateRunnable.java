@@ -42,11 +42,11 @@ public class UpdateRunnable extends IntervalRunnable {
 	private boolean runOnce = false;
 
 	public UpdateRunnable(IExceptionHandler handler) {
-		super(handler, PropertiesHolder.UPDATE_INTERVAL);
+		super(handler, PropertiesHolder.get().getUpdateInterval());
 	}
 
 	@Override
-	public void perform() throws Exception {
+	public synchronized void perform() throws Exception {
 		LOGGER.trace("Updater: {}\n" + "Auto update: {}\n" + "RunOnce: {}", this.updater,
 				ConfigHolder.get().isAutoUpdate(), this.runOnce);
 		if (this.updater != null && (ConfigHolder.get().isAutoUpdate() || this.runOnce)) {

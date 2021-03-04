@@ -16,11 +16,14 @@
  */
 package application.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
+import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.json.Config;
 import application.models.json.GoogleSheetsResponse;
@@ -52,19 +55,20 @@ public class SheetCache {
 	 * Update the cache, provide a list of changed cell info (from the data source)
 	 * so we can update files.
 	 *
-	 * @param fullValueMap
+	 * @param updatedValueMap
 	 *            mutated from {@link GoogleSheetsResponse}, the raw data in full
 	 * @return a Map of {@link CellWrapper} to String for the changed cells and
 	 *         their new values
 	 */
-	public Map<CellWrapper, String> update(Map<CellWrapper, String> fullValueMap) {
-		Map<CellWrapper, String> changedElements = new HashMap<>();
+	public List<CellUpdate> update(Map<CellWrapper, String> updatedValueMap) {
+		List<CellUpdate> changedElements = new ArrayList<>();
 
 		// Loop through cache keys
 		for (Entry<CellWrapper, String> cacheEntry : this.values.entrySet()) {
 
 			// Look up value in new map, and contrast to stored value
-			String newVal = fullValueMap.get(cacheEntry.getKey());
+			String newVal = updatedValueMap.get(cacheEntry.getKey());
+			String cacheValue = cacheEntry.getValue();
 
 			if (newVal == null) {
 				// We didn't find the cell (from config) in the update (from sheet)
@@ -72,8 +76,10 @@ public class SheetCache {
 				newVal = "";
 			}
 
-			if (!newVal.equals(cacheEntry.getValue())) {
-				changedElements.put(cacheEntry.getKey(), newVal);
+			if (!newVal.equals(cacheValue)) {
+				// Collect a list of the new values
+				changedElements.add(new CellUpdate(cacheEntry.getKey(), newVal));
+				// ...and update the cache
 				this.values.put(cacheEntry.getKey(), newVal);
 			}
 		}
@@ -84,5 +90,13 @@ public class SheetCache {
 	/** @return String the data from the cell, from the cache. */
 	public String get(CellWrapper cellData) {
 		return values.get(cellData);
+	}
+
+	/**
+	 * @return {@link CellWrapper} based on the name of the output (e.g.
+	 *         caster1Name).
+	 */
+	public Optional<CellWrapper> findByName(String name) {
+		return values.keySet().stream().filter(cw -> name.equals(cw.getName())).findFirst();
 	}
 }

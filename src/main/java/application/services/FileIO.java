@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -32,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.AppUtil;
 import application.models.FileExtension;
+import application.models.FileExtension.FileExtensionType;
 import application.panels.ConfigPanel;
 
 /**
@@ -96,11 +98,10 @@ public class FileIO {
 		URI uri = encodeUri(url);
 		InputStream is;
 		if (uri.getScheme().equals("file")) {
-			LOGGER.debug("Treating {} as a local file", uri);
-			// Treat it as a local file
+			LOGGER.debug("Treating {} as a local image url", uri);
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			LOGGER.debug("Treating {} as a remote url", uri);
+			LOGGER.debug("Treating {} as a remote image url", uri);
 			is = uri.toURL().openStream();
 		}
 		Instant readStart = Instant.now();
@@ -108,8 +109,12 @@ public class FileIO {
 		LOGGER.debug("Read [{}ms]", Duration.between(readStart, Instant.now()).toMillis());
 		if (image == null) {
 			throw new IOException("Unable to read image from URL " + url + " - ensure it is of a supported type: "
-					+ Arrays.toString(FileExtension.IMAGE_EXTENSIONS.toArray()));
+					+ Arrays.asList(FileExtension.values()).stream() //
+							.filter(f -> FileExtensionType.IMAGE.equals(f.getType())) //
+							.map(f -> f.getExtension()) //
+							.collect(Collectors.toList()));
 		}
+
 		OutputStream os = new FileOutputStream(tempFile);
 		Instant writeStart = Instant.now();
 		ImageIO.write(image, extension, os);
@@ -137,25 +142,36 @@ public class FileIO {
 	 * @throws IOException
 	 *             Should reading from the URL or writing/converting go awry
 	 */
-	public void downloadAndSaveFile(String url, String destinationPath, String extension) throws IOException {
+	public void downloadAndSaveFile(String url, String destinationPath, String extension) throws Exception {
 		Instant start = Instant.now();
 		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-
-		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
-			InputStream is = conn.getInputStream();
-			Instant copyStart = Instant.now();
-			FileUtils.copyToFile(is, tempFile);
-			LOGGER.debug("Copy [{}ms]", Duration.between(copyStart, Instant.now()).toMillis());
+		URI uri = encodeUri(url);
+		InputStream is;
+		if (uri.getScheme().equals("file")) {
+			LOGGER.debug("Treating {} as a local file", uri);
+			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
-			// Bit hacky but works
-			if (sb.toString().contains("1010")) {
-				sb.append(" - The owner of this website has banned your access based on your browser's signature");
+			LOGGER.debug("Treating {} as a remote url", uri);
+			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+
+			if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+				is = conn.getInputStream();
+			} else {
+				StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
+				// Bit hacky but works
+				if (sb.toString().contains("1010")) {
+					sb.append(
+							" - The owner of this website has prevented access to this file based on your browser's signature");
+				}
+				throw new IOException(sb.toString());
 			}
-			throw new IOException(sb.toString());
 		}
+
+		Instant copyStart = Instant.now();
+		FileUtils.copyToFile(is, tempFile);
+		is.close();
+		LOGGER.debug("Copy [{}ms]", Duration.between(copyStart, Instant.now()).toMillis());
 
 		File outputFile = new File(destinationPath);
 		Instant moveStart = Instant.now();

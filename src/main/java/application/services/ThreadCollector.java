@@ -19,8 +19,8 @@ package application.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.services.http.HttpService;
 import application.threads.IntervalRunnable;
-import lombok.Getter;
 
 /**
  * Central place to keep track of all threads running in the app; to be shut
@@ -30,15 +30,27 @@ import lombok.Getter;
  */
 public final class ThreadCollector {
 
-	@Getter
-	private static List<IntervalRunnable> threads = new ArrayList<>();
+	private static List<IntervalRunnable> runnables = new ArrayList<>();
 
-	public static void stopAllThreads() {
-		threads.forEach(l -> l.doStop());
+	private static HttpService httpServiceInstance;
+
+	public static void setHttpService(HttpService httpService) {
+		if (httpServiceInstance == null) {
+			httpServiceInstance = httpService;
+		} else {
+			throw new IllegalArgumentException("Unexpected new HttpService");
+		}
 	}
 
-	public static <L extends IntervalRunnable> L registerThread(L loop) {
-		threads.add(loop);
+	public static void stopAllThreads() {
+		runnables.forEach(l -> l.doStop());
+		if (httpServiceInstance != null) {
+			httpServiceInstance.stop();
+		}
+	}
+
+	public static <L extends IntervalRunnable> L registerRunnable(L loop) {
+		runnables.add(loop);
 		return loop;
 	}
 }

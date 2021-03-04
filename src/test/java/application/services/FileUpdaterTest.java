@@ -19,9 +19,7 @@ package application.services;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -31,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
 import application.models.json.CellBuilder;
@@ -88,14 +87,14 @@ public class FileUpdaterTest {
 		 * cache; which should mean they're only for cells that initially came from the
 		 * config, not random given ones like we have below.
 		 */
-		Map<CellWrapper, String> updatedCells = new HashMap<>();
+		List<CellUpdate> updatedCells = new ArrayList<>();
 		CellWrapper a8 = new CellWrapper(
 				new CellBuilder().withName(FILE_NAME + "1").withCell("A8").withFileExtension(TXT_EXTENSION).build());
-		updatedCells.put(a8, "newVal1");
+		updatedCells.add(new CellUpdate(a8, "newVal1"));
 
 		CellWrapper b8 = new CellWrapper(
 				new CellBuilder().withName(FILE_NAME + "2").withCell("B8").withFileExtension(TXT_EXTENSION).build());
-		updatedCells.put(b8, "newVal2");
+		updatedCells.add(new CellUpdate(b8, "newVal2"));
 
 		fileUpdater.updateFiles(updatedCells);
 		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, a8), "newVal1");

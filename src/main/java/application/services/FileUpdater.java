@@ -18,13 +18,13 @@ package application.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.exceptions.IllegalFileExtensionException;
+import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
 import application.models.FileExtension;
@@ -63,22 +63,25 @@ public class FileUpdater {
 	}
 
 	/** Update all the files from the Map with their new values. */
-	public void updateFiles(Map<CellWrapper, String> updatedCells) throws Exception {
-		for (Entry<CellWrapper, String> entry : updatedCells.entrySet()) {
-			CellWrapper cellWrapper = entry.getKey();
-			String newValue = entry.getValue();
+	public void updateFiles(List<CellUpdate> updatedCells) throws Exception {
+		for (CellUpdate entry : updatedCells) {
+			if (!entry.getCellWrapper().getFileExtension().isForFile()) {
+				continue;
+			}
+			CellWrapper cellWrapper = entry.getCellWrapper();
+			String newValue = entry.getNewValue();
 
 			String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
 			FileExtension ext = cellWrapper.getFileExtension();
 			switch (ext.getType()) {
 			case TEXT:
 				/** Add padding if applicable (@see {@link CellWrapper#getPadding}). */
-				fileIO.writeTextFile(destFilePath, newValue + cellWrapper.getPadding());
+				fileIO.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
 				break;
 			case IMAGE:
 				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
 				break;
-			case FILE:
+			case VIDEO:
 				fileIO.downloadAndSaveFile(newValue, destFilePath, ext.getExtension());
 				break;
 			default:
@@ -103,7 +106,9 @@ public class FileUpdater {
 	 */
 	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
 		for (CellWrapper cellWrapper : ConfigHolder.get().getCells()) {
-			fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
+			if (cellWrapper.getFileExtension().isForFile()) {
+				fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
+			}
 		}
 	}
 

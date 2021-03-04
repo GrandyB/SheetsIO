@@ -18,7 +18,9 @@ package application.services;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,10 +28,12 @@ import org.apache.logging.log4j.Logger;
 import application.AppUtil;
 import application.exceptions.GoogleSheetsException;
 import application.exceptions.IllegalFileExtensionException;
+import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
 import application.models.json.GoogleSheetsResponse;
+import application.services.http.HttpService;
 import application.threads.UpdateRunnable;
 import lombok.RequiredArgsConstructor;
 
@@ -67,6 +71,8 @@ public class UpdateController {
 			this.fileUpdater.setup();
 		}
 
+		HttpService.getInstance().start(this.cache);
+
 	}
 
 	/**
@@ -80,12 +86,18 @@ public class UpdateController {
 			LOGGER.warn("No config provided");
 			return;
 		}
-		LOGGER.trace("Performing update");
 
-		Map<CellWrapper, String> updatedCells = updateCache(getLatestState());
-		if (!updatedCells.isEmpty()) {
-			fileUpdater.updateFiles(updatedCells);
+		List<CellUpdate> updatedCells = updateCache(getLatestState());
+		if (updatedCells.isEmpty()) {
+			LOGGER.debug("Not performing file update(s) - no values to update.");
+			return;
 		}
+
+		// Update applicable files
+		LOGGER.debug("Performing file update(s)");
+		fileUpdater.updateFiles(updatedCells.stream() //
+				.filter(cu -> cu.getCellWrapper().getFileExtension().isForFile()) //
+				.collect(Collectors.toList()));
 	}
 
 	/**
@@ -100,7 +112,7 @@ public class UpdateController {
 		return AppUtil.get().getGoogleSheetsData(this.url);
 	}
 
-	private Map<CellWrapper, String> updateCache(GoogleSheetsResponse data) {
+	private List<CellUpdate> updateCache(GoogleSheetsResponse data) {
 		Map<CellWrapper, String> fullValueMap = data.getMutatedRowColumnData();
 
 		// Update the cache
