@@ -71,8 +71,9 @@ public class UpdateController {
 			this.fileUpdater.setup();
 		}
 
-		HttpService.getInstance().start(this.cache);
-
+		if (PropertiesHolder.get().isHttpEnabled()) {
+			HttpService.getInstance().start(this.cache);
+		}
 	}
 
 	/**

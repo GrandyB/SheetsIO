@@ -54,7 +54,9 @@ Configs are json files and can be placed anywhere, selected through the file cho
 		{ "cell": "B3", "name": "team1Logo", "fileExtension": "png" },
 		{ "cell": "B4", "name": "team2Name" },
 		{ "cell": "B5", "name": "team2Logo", "fileExtension": "png" },
-		{ "cell": "B6", "name": "marqueeText", "pad": "15" }
+		{ "cell": "B6", "name": "marqueeText", "pad": "15" },
+		{ "cell": "B7", "name": "thisVideo", "fileExtension": "html" },
+		{ "cell": "B8", "name": "urlSwitcher", "fileExtension": "html" }
 	]
 }
 ```
@@ -84,6 +86,8 @@ Each cell is formed of:
 Valid `fileExtension` values:
 - Images: "png", "jpg", "gif"
 - Text: "txt"
+- Video: "mp4", "webm"
+- Html: (special case, serves as a webpage switcher)
 
 ## Timer
 

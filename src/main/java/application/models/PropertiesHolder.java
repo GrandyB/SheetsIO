@@ -48,6 +48,7 @@ public class PropertiesHolder {
 	public static final String API_KEY_TEST_SPREADSHEET_ID = "apiKey.test.spreadsheetId";
 	public static final String API_KEY_TEST_WORKBOOK_ID = "apiKey.test.workbookId";
 	public static final String LAST_CONFIG = "last.config";
+	public static final String HTTP_ENABLED = "http.enabled";
 	public static final String HTTP_PORT = "http.port";
 	public static final String UPDATE_INTERVAL = "update.interval";
 	public static final String FOLDER_CONTEXT = "";
@@ -100,6 +101,7 @@ public class PropertiesHolder {
 		loadWithDefaultIfNotExist(API_KEY_TEST_SPREADSHEET_ID, SAMPLE_API_TEST_SPREADSHEET_ID);
 		loadWithDefaultIfNotExist(API_KEY_TEST_WORKBOOK_ID, SAMPLE_API_TEST_WORKBOOK_ID);
 		loadWithDefaultIfNotExist(LAST_CONFIG, "");
+		loadWithDefaultIfNotExist(HTTP_ENABLED, Boolean.TRUE.toString());
 		loadWithDefaultIfNotExist(HTTP_PORT, DEFAULT_PORT);
 		loadWithDefaultIfNotExist(UPDATE_INTERVAL, Long.toString(DEFAULT_UPDATE_INTERVAL));
 		try {
@@ -143,6 +145,10 @@ public class PropertiesHolder {
 			props.setProperty(UPDATE_INTERVAL, Long.toString(DEFAULT_UPDATE_INTERVAL));
 			return DEFAULT_UPDATE_INTERVAL;
 		}
+	}
+
+	public boolean isHttpEnabled() {
+		return Boolean.parseBoolean(getProperty(HTTP_ENABLED));
 	}
 
 	/** @return String property if exists, or null. */
