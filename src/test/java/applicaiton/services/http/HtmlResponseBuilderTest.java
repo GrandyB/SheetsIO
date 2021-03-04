@@ -28,7 +28,7 @@ public class HtmlResponseBuilderTest {
 		Assertions.assertEquals("<html>" //
 				+ "	<head>" //
 				+ "		<script type=\"text/javascript\" src=\"http://livejs.com/live.js\"></script>" //
-				+ "		<style>body { margin: 0; padding: 0; } #content { width: 100%; height: 100%; } </style>" //
+				+ "		<style>body, iframe { margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0); overflow: hidden; } #content { width: 100%; height: 100%; } </style>" //
 				+ "	</head>" //
 				+ "	<body>" //
 				+ "		" //
@@ -41,7 +41,7 @@ public class HtmlResponseBuilderTest {
 		Assertions.assertEquals("<html>" //
 				+ "	<head>" //
 				+ "		<script type=\"text/javascript\" src=\"http://livejs.com/live.js\"></script>" //
-				+ "		<style>body { margin: 0; padding: 0; }  </style>" //
+				+ "		<style>body, iframe { margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0); overflow: hidden; }  </style>" //
 				+ "	</head>" //
 				+ "	<body>" //
 				+ "		<div id=\"content\"><span id=\"text\">Test</span></div>" //
@@ -55,7 +55,7 @@ public class HtmlResponseBuilderTest {
 		Assertions.assertEquals("<html>" //
 				+ "	<head>" //
 				+ "		<script type=\"text/javascript\" src=\"http://livejs.com/live.js\"></script>" //
-				+ "		<style>body { margin: 0; padding: 0; } #content { width: 100%; height: 100%; } </style>" //
+				+ "		<style>body, iframe { margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0); overflow: hidden; } #content { width: 100%; height: 100%; } </style>" //
 				+ "	</head>" //
 				+ "	<body>" //
 				+ "		<div id=\"content\"><span id=\"text\">Test</span></div>" //
