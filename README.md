@@ -35,6 +35,7 @@ To do this, you can either create a project and then enable the Google Sheets AP
 1. Create a new project; this can be done in multiple ways but here's one:
     1. In the upper left 'Select a project' drop down, open it up and use 'New Project'
     1. Give it a name (`SheetsIO-integration` ?) and create it (this may take a moment)
+1. In the top-middle search bar, search for 'Google Sheets API', navigate to that and press the 'Enable' button, then go back to your project
 1. Navigate through 'Credentials' in the left-side menu, click 'Create Credentials' at the top and choose 'API key'
 
 It should now display an API key for you to then use in your application! It's important to keep this secure, so whenever sharing configs, ensure you remove your apiKey.
