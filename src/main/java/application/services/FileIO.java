@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
@@ -102,7 +103,10 @@ public class FileIO {
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
 			LOGGER.debug("Treating {} as a remote image url", uri);
-			is = uri.toURL().openStream();
+			URLConnection conn = uri.toURL().openConnection();
+			// Provide a User-Agent, without it, many sites block incoming requests with 403
+			conn.addRequestProperty("User-Agent", "SheetsIO");
+			is = conn.getInputStream();
 		}
 		Instant readStart = Instant.now();
 		BufferedImage image = ImageIO.read(is);
@@ -156,6 +160,8 @@ public class FileIO {
 			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
 			if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+				// Provide a User-Agent, without it, many sites block incoming requests with 403
+				conn.addRequestProperty("User-Agent", "SheetsIO");
 				is = conn.getInputStream();
 			} else {
 				StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
