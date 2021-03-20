@@ -28,7 +28,7 @@ import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
 import application.services.FileIO;
 import application.services.FileUpdater;
-import application.services.ThreadCollector;
+import application.threads.ThreadCollector;
 import application.threads.UpdateRunnable;
 
 /**
@@ -55,7 +55,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		// Create/begin the update thread
 		if (updateRunnable == null) {
 			// Ensure only ever have one
-			updateRunnable = ThreadCollector.registerRunnable(new UpdateRunnable(this));
+			updateRunnable = ThreadCollector.registerUpdateLoop(new UpdateRunnable(this));
 		}
 		new Thread(this.updateRunnable).start();
 	}

@@ -37,8 +37,9 @@ import application.models.CellWrapper;
 import application.models.FileExtension.FileExtensionType;
 import application.models.PropertiesHolder;
 import application.services.SheetCache;
-import application.services.ThreadCollector;
 import application.services.http.ConnectionRequest.ConnectionRequestType;
+import application.threads.ThreadCollector;
+import application.threads.UpdateRunnable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -124,6 +125,13 @@ public class HttpService implements HttpHandler {
 		Optional<ConnectionRequest> request = ConnectionRequest.from(httpExchange.getRequestURI());
 		if (request.isPresent()) {
 			// Request format is valid; e.g. '/project/asset' or '/project/asset.png'
+
+			if (ConnectionRequestType.UPDATE.equals(request.get().getType())) {
+				// We don't care whether it's a GET or HEAD or PUSH
+				handleUpdateRequest(request.get());
+				return;
+			}
+
 			switch (reqMethod) {
 			case "GET":
 				// Respond with initial page body
@@ -253,6 +261,22 @@ public class HttpService implements HttpHandler {
 		outputStream.write(builtHtmlResponse.getBytes());
 		outputStream.flush();
 		outputStream.close();
+	}
+
+	/**
+	 * Handle (any kind of) request (GET/PUSH for example) to the /update route;
+	 * should force the sheets update loop to run.
+	 */
+	public void handleUpdateRequest(ConnectionRequest request) {
+		Optional<UpdateRunnable> updateLoop = ThreadCollector.getUpdateLoop();
+		if (updateLoop.isPresent()) {
+			LOGGER.debug("Requested an update call from {}", HttpService.class.getName());
+			updateLoop.get().runOnce();
+		} else {
+			LOGGER.debug(
+					"Attempted to perform an update using {}'s /update call, but there was no updateLoop available",
+					HttpService.class.getName());
+		}
 	}
 
 	/**

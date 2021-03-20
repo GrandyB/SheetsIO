@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.models.TimerDuration;
-import application.services.ThreadCollector;
+import application.threads.ThreadCollector;
 import application.threads.TimerRunnable;
 
 /**

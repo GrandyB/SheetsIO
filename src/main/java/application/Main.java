@@ -25,7 +25,7 @@ import org.greenrobot.eventbus.EventBus;
 import application.events.AppInitialisedEvent;
 import application.guis.MainGui;
 import application.models.PropertiesHolder;
-import application.services.ThreadCollector;
+import application.threads.ThreadCollector;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;

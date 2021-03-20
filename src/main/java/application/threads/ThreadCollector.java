@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.services;
+package application.threads;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import application.services.http.HttpService;
-import application.threads.IntervalRunnable;
 
 /**
  * Central place to keep track of all threads running in the app; to be shut
@@ -30,6 +30,7 @@ import application.threads.IntervalRunnable;
  */
 public final class ThreadCollector {
 
+	private static UpdateRunnable updateLoop;
 	private static List<IntervalRunnable> runnables = new ArrayList<>();
 
 	private static HttpService httpServiceInstance;
@@ -43,6 +44,7 @@ public final class ThreadCollector {
 	}
 
 	public static void stopAllThreads() {
+		updateLoop.doStop();
 		runnables.forEach(l -> l.doStop());
 		if (httpServiceInstance != null) {
 			httpServiceInstance.stop();
@@ -52,5 +54,14 @@ public final class ThreadCollector {
 	public static <L extends IntervalRunnable> L registerRunnable(L loop) {
 		runnables.add(loop);
 		return loop;
+	}
+
+	public static UpdateRunnable registerUpdateLoop(UpdateRunnable loop) {
+		ThreadCollector.updateLoop = loop;
+		return loop;
+	}
+
+	public static Optional<UpdateRunnable> getUpdateLoop() {
+		return Optional.of(updateLoop);
 	}
 }
