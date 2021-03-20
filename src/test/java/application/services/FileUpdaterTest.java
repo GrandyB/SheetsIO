@@ -96,9 +96,36 @@ public class FileUpdaterTest {
 				new CellBuilder().withName(FILE_NAME + "2").withCell("B8").withFileExtension(TXT_EXTENSION).build());
 		updatedCells.add(new CellUpdate(b8, "newVal2"));
 
+		ConfigHolder.get().getCells().add(a8);
+		ConfigHolder.get().getCells().add(b8);
+
 		fileUpdater.updateFiles(updatedCells);
 		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, a8), "newVal1");
 		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, b8), "newVal2");
+	}
+
+	@Test
+	public void test_updateFiles_multipleOutputsConfiguredWithSameCellReference() throws Exception {
+		// Must first setup
+		fileUpdater.setup();
+		verifySetup(FOLDER_NAME);
+
+		List<CellUpdate> updatedCells = new ArrayList<>();
+		CellWrapper a8v1 = new CellWrapper(
+				new CellBuilder().withName(FILE_NAME + "1").withCell("A8").withFileExtension(TXT_EXTENSION).build());
+		CellWrapper a8v2 = new CellWrapper(
+				new CellBuilder().withName(FILE_NAME + "2").withCell("A8").withFileExtension(TXT_EXTENSION).build());
+
+		ConfigHolder.get().getCells().add(a8v1);
+		ConfigHolder.get().getCells().add(a8v2);
+
+		// One update (that would in the app come from the cache/google sheets update
+		updatedCells.add(new CellUpdate(a8v1, "newVal"));
+
+		fileUpdater.updateFiles(updatedCells);
+		// ...that should update multiple files
+		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, a8v1), "newVal");
+		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, a8v2), "newVal");
 	}
 
 	@Test

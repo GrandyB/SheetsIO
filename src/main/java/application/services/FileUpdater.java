@@ -19,6 +19,7 @@ package application.services;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,23 +72,40 @@ public class FileUpdater {
 			CellWrapper cellWrapper = entry.getCellWrapper();
 			String newValue = entry.getNewValue();
 
-			String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
-			FileExtension ext = cellWrapper.getFileExtension();
-			switch (ext.getType()) {
-			case TEXT:
-				/** Add padding if applicable (@see {@link CellWrapper#getPadding}). */
-				fileIO.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
-				break;
-			case IMAGE:
-				fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
-				break;
-			case VIDEO:
-				fileIO.downloadAndSaveFile(newValue, destFilePath, ext.getExtension());
-				break;
-			default:
-				throw new IllegalStateException(
-						"Unable to handle " + FileExtensionType.class.getSimpleName() + ": " + ext.getType());
+			/**
+			 * {@link CellUpdate}s are made up of {@link CellWrapper}s created from changes
+			 * in the Google Sheet - "A1 now has value X". The {@link SheetCache} will only
+			 * ever store one wrapper to a value (uses a Map to store it), but our config
+			 * could theoretically have multiple pieces of cell config all wanting to be
+			 * updated when the value changes. Here, we look up these multiple pieces.
+			 */
+			List<CellWrapper> allWrappersForCell = ConfigHolder.get().getCells().stream()
+					.filter(cw -> cw.equals(cellWrapper)) //
+					.collect(Collectors.toList());
+			for (CellWrapper w : allWrappersForCell) {
+				updateFile(w, newValue);
 			}
+		}
+	}
+
+	public void updateFile(CellWrapper cellWrapper, String newValue) throws Exception {
+
+		String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
+		FileExtension ext = cellWrapper.getFileExtension();
+		switch (ext.getType()) {
+		case TEXT:
+			/** Add padding if applicable (@see {@link CellWrapper#getPadding}). */
+			fileIO.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
+			break;
+		case IMAGE:
+			fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
+			break;
+		case VIDEO:
+			fileIO.downloadAndSaveFile(newValue, destFilePath, ext.getExtension());
+			break;
+		default:
+			throw new IllegalStateException(
+					"Unable to handle " + FileExtensionType.class.getSimpleName() + ": " + ext.getType());
 		}
 	}
 
