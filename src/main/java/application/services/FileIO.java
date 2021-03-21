@@ -4,6 +4,8 @@
 package application.services;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
@@ -102,11 +103,7 @@ public class FileIO {
 			LOGGER.debug("Treating {} as a local image url", uri);
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			LOGGER.debug("Treating {} as a remote image url", uri);
-			URLConnection conn = uri.toURL().openConnection();
-			// Provide a User-Agent, without it, many sites block incoming requests with 403
-			conn.addRequestProperty("User-Agent", "SheetsIO");
-			is = conn.getInputStream();
+			is = getInputStreamForRemoteUrl(url, createEmptyImage(extension));
 		}
 		Instant readStart = Instant.now();
 		BufferedImage image = ImageIO.read(is);
@@ -125,12 +122,12 @@ public class FileIO {
 		LOGGER.debug("Write [{}ms]", Duration.between(writeStart, Instant.now()).toMillis());
 		os.close();
 		is.close();
-		LOGGER.debug("Image '{}' downloaded and stored to '{}' [{}ms]", url, tempFile.getPath(),
+		LOGGER.debug("Image stored to '{}' [{}ms]", tempFile.getPath(),
 				Duration.between(entireStart, Instant.now()).toMillis());
 
 		Instant moveStart = Instant.now();
 		Files.move(tempFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		LOGGER.debug("Image '{}' renamed/moved to '{}' [{}ms]", url, destinationPath,
+		LOGGER.debug("Image renamed/moved to '{}' [{}ms]\n----------", destinationPath,
 				Duration.between(moveStart, Instant.now()).toMillis());
 	}
 
@@ -156,22 +153,7 @@ public class FileIO {
 			LOGGER.debug("Treating {} as a local file", uri);
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			LOGGER.debug("Treating {} as a remote url", uri);
-			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-
-			if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
-				// Provide a User-Agent, without it, many sites block incoming requests with 403
-				conn.addRequestProperty("User-Agent", "SheetsIO");
-				is = conn.getInputStream();
-			} else {
-				StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
-				// Bit hacky but works
-				if (sb.toString().contains("1010")) {
-					sb.append(
-							" - The owner of this website has prevented access to this file based on your browser's signature");
-				}
-				throw new IOException(sb.toString());
-			}
+			is = getInputStreamForRemoteUrl(url, new ByteArrayInputStream(new byte[] {}));
 		}
 
 		Instant copyStart = Instant.now();
@@ -182,10 +164,43 @@ public class FileIO {
 		File outputFile = new File(destinationPath);
 		Instant moveStart = Instant.now();
 		Files.move(tempFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		LOGGER.debug("File '{}' renamed/moved to '{}' [{}ms]", url, destinationPath,
+		LOGGER.debug("File renamed/moved to '{}' [{}ms]", destinationPath,
 				Duration.between(moveStart, Instant.now()).toMillis());
 
-		LOGGER.debug("Full process [{}ms]", Duration.between(start, Instant.now()).toMillis());
+		LOGGER.debug("Full process [{}ms]\n----------", Duration.between(start, Instant.now()).toMillis());
+	}
+
+	/**
+	 * Retrieve an {@link InputStream} for the given remote URL.
+	 *
+	 * @param url
+	 *            The URL to connect to
+	 * @param fallBack
+	 *            A {@link ByteArrayInputStream} that represents an empty file of
+	 *            the wanted type, should loading from remote URL fails
+	 * @return An {@link InputStream} to use for writing the file out
+	 */
+	private InputStream getInputStreamForRemoteUrl(String url, ByteArrayInputStream fallBack) throws Exception {
+		LOGGER.debug("Treating '{}' as a remote url", url);
+		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+		// Provide a User-Agent, without it, many sites block incoming requests with 403
+		conn.addRequestProperty("User-Agent", "SheetsIO");
+		InputStream is;
+		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+			is = conn.getInputStream();
+		} else {
+			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
+			// Bit hacky but works
+			if (sb.toString().contains("1010")) {
+				sb.append(
+						" - The owner of this website has prevented access to this file based on your browser's signature");
+				throw new IOException(sb.toString());
+			} else {
+				LOGGER.warn("Error while attempting to load the remote URL - replacing with empty file", sb.toString());
+				is = fallBack;
+			}
+		}
+		return is;
 	}
 
 	/**
@@ -241,5 +256,14 @@ public class FileIO {
 			LOGGER.debug("URL contains space(s); auto-replace with '%20': '{}' -> '{}'", url, encodedUrl);
 		}
 		return new URI(encodedUrl);
+	}
+
+	private ByteArrayInputStream createEmptyImage(String extension) throws Exception {
+		// Sadly 0x0 is not an option
+		BufferedImage result = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ImageIO.write(result, extension, os);
+		return new ByteArrayInputStream(os.toByteArray());
 	}
 }
