@@ -196,7 +196,8 @@ public class FileIO {
 						" - The owner of this website has prevented access to this file based on your browser's signature");
 				throw new IOException(sb.toString());
 			} else {
-				LOGGER.warn("Error while attempting to load the remote URL - replacing with empty file", sb.toString());
+				LOGGER.error("Error while attempting to load the remote URL - replacing with empty file",
+						sb.toString());
 				is = fallBack;
 			}
 		}

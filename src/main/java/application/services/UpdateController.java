@@ -83,7 +83,7 @@ public class UpdateController {
 	 */
 	public void update() throws Exception {
 		if (!ConfigHolder.get().isLoaded()) {
-			LOGGER.warn("No config provided");
+			LOGGER.error("No config provided");
 			return;
 		}
 

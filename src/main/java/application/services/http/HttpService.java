@@ -128,7 +128,7 @@ public class HttpService implements HttpHandler {
 
 			if (ConnectionRequestType.UPDATE.equals(request.get().getType())) {
 				// We don't care whether it's a GET or HEAD or PUSH
-				handleUpdateRequest(request.get());
+				handleUpdateRequest(request.get(), httpExchange);
 				return;
 			}
 
@@ -266,17 +266,22 @@ public class HttpService implements HttpHandler {
 	/**
 	 * Handle (any kind of) request (GET/PUSH for example) to the /update route;
 	 * should force the sheets update loop to run.
+	 * 
+	 * Responds to request with a 404 if no update loop present, or 200.
 	 */
-	public void handleUpdateRequest(ConnectionRequest request) {
+	public void handleUpdateRequest(ConnectionRequest request, HttpExchange httpExchange) throws IOException {
 		Optional<UpdateRunnable> updateLoop = ThreadCollector.getUpdateLoop();
+		int responseCode = 404;
 		if (updateLoop.isPresent()) {
 			LOGGER.debug("Requested an update call from {}", HttpService.class.getName());
 			updateLoop.get().runOnce();
+			responseCode = 200;
 		} else {
 			LOGGER.debug(
 					"Attempted to perform an update using {}'s /update call, but there was no updateLoop available",
 					HttpService.class.getName());
 		}
+		httpExchange.sendResponseHeaders(responseCode, 0);
 	}
 
 	/**
