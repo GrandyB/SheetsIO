@@ -60,8 +60,10 @@ public class UpdateController {
 	 */
 	public synchronized void setConfig(boolean fromScratch) throws IOException, IllegalFileExtensionException {
 
-		this.urlString = String.format(AppUtil.SPREADSHEET_URL_FORMAT, ConfigHolder.get().getSpreadsheetId(),
-				ConfigHolder.get().getWorksheetName(), PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY));
+		this.urlString = String.format(AppUtil.SPREADSHEET_URL_FORMAT, //
+				ConfigHolder.get().getSpreadsheetId(), //
+				AppUtil.encodeUrlContent(ConfigHolder.get().getWorksheetName()),
+				PropertiesHolder.get().getProperty(PropertiesHolder.API_KEY));
 
 		LOGGER.debug("URL: {}", AppUtil.get().sanitiseApiKey(this.urlString));
 
@@ -109,7 +111,7 @@ public class UpdateController {
 	 * @throws GoogleSheetsException
 	 */
 	private GoogleSheetsResponse getLatestState() throws IOException, GoogleSheetsException {
-		return AppUtil.get().getGoogleSheetsData(this.url);
+		return AppUtil.get().getGoogleSheetsData(this.urlString);
 	}
 
 	private List<CellUpdate> updateCache(GoogleSheetsResponse data) {

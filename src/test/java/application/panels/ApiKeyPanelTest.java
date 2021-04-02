@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.greenrobot.eventbus.EventBus;
 import org.junit.jupiter.api.AfterEach;
@@ -90,8 +89,8 @@ public class ApiKeyPanelTest {
 		// Try url out
 		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID);
 		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID);
-		verify(util).getGoogleSheetsData(
-				new URL(String.format(AppUtil.SPREADSHEET_URL_FORMAT, SAMPLE_ID, SAMPLE_BOOK, SAMPLE_KEY)));
+		verify(util)
+				.getGoogleSheetsData(String.format(AppUtil.SPREADSHEET_URL_FORMAT, SAMPLE_ID, SAMPLE_BOOK, SAMPLE_KEY));
 
 		// Success
 		verifyUpdateUI(ApiKeyStatus.LOADED, false);
@@ -99,7 +98,8 @@ public class ApiKeyPanelTest {
 
 	@Test
 	public void test_initialise_exception() throws IOException, GoogleSheetsException {
-		Mockito.when(util.getGoogleSheetsData(Mockito.any())).thenThrow(new GoogleSheetsException(1, "uh", "oh"));
+		Mockito.when(util.getGoogleSheetsData(Mockito.any()))
+				.thenThrow(new GoogleSheetsException("url", 1, "message", "status"));
 		testee.handleAppInitialised(new AppInitialisedEvent());
 
 		verify(props).getProperty(PropertiesHolder.API_KEY);
@@ -112,12 +112,12 @@ public class ApiKeyPanelTest {
 		// Try url out
 		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID);
 		verify(props).getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID);
-		verify(util).getGoogleSheetsData(
-				new URL(String.format(AppUtil.SPREADSHEET_URL_FORMAT, SAMPLE_ID, SAMPLE_BOOK, SAMPLE_KEY)));
+		verify(util)
+				.getGoogleSheetsData(String.format(AppUtil.SPREADSHEET_URL_FORMAT, SAMPLE_ID, SAMPLE_BOOK, SAMPLE_KEY));
 
 		// Fail
 		verifyUpdateUI(ApiKeyStatus.ERROR, true);
-		verify(gui).showErrorDialog("1 - oh", "uh\n" + BasePanel.GENERIC_ERROR_END);
+		verify(gui).showErrorDialog("1 - status", "url\n\nmessage\n" + BasePanel.GENERIC_ERROR_END);
 
 	}
 

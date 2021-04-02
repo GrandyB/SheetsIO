@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package applicaiton.services.http;
+package application.services.http;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import application.services.http.HtmlResponseBuilder;
 
 public class HtmlResponseBuilderTest {
 

@@ -17,7 +17,6 @@
 package application.panels;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,7 +77,7 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 					getProps().getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID), potentialKey);
 
 			try {
-				getAppUtil().getGoogleSheetsData(new URL(url));
+				getAppUtil().getGoogleSheetsData(url);
 				updateUI(ApiKeyStatus.LOADED);
 			} catch (GoogleSheetsException | IOException e) {
 				updateUI(ApiKeyStatus.ERROR);

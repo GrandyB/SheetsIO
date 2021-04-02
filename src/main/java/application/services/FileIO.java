@@ -13,11 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -97,7 +94,7 @@ public class FileIO {
 		File outputFile = new File(destinationPath);
 		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		URI uri = encodeUri(url);
+		URI uri = AppUtil.encodeForUrl(url);
 		InputStream is;
 		if (uri.getScheme().equals("file")) {
 			LOGGER.debug("Treating {} as a local image url", uri);
@@ -147,7 +144,7 @@ public class FileIO {
 		Instant start = Instant.now();
 		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		URI uri = encodeUri(url);
+		URI uri = AppUtil.encodeForUrl(url);
 		InputStream is;
 		if (uri.getScheme().equals("file")) {
 			LOGGER.debug("Treating {} as a local file", uri);
@@ -189,7 +186,7 @@ public class FileIO {
 		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
 			is = conn.getInputStream();
 		} else {
-			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
+			StringBuilder sb = AppUtil.getMessageFromStream(conn.getErrorStream());
 			// Bit hacky but works
 			if (sb.toString().contains("1010")) {
 				sb.append(
@@ -241,22 +238,6 @@ public class FileIO {
 		}
 		String saltStr = salt.toString();
 		return saltStr;
-	}
-
-	private URI encodeUri(String url) throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
-		String encodedUrl = url;
-		if (url.contains("\\")) {
-			encodedUrl = encodedUrl.replace('\\', '/');
-			LOGGER.debug("URL contains '\\'; auto-converting to '/': '{}' -> '{}'", url, encodedUrl);
-		}
-		if (!url.matches("((http://)|(https://)|(file://)).*")) {
-			throw new MalformedURLException("URL requires either http://, https:// or file:// schema: '" + url + "'");
-		}
-		if (url.contains(" ")) {
-			encodedUrl = encodedUrl.replace(" ", "%20");
-			LOGGER.debug("URL contains space(s); auto-replace with '%20': '{}' -> '{}'", url, encodedUrl);
-		}
-		return new URI(encodedUrl);
 	}
 
 	private ByteArrayInputStream createEmptyImage(String extension) throws Exception {

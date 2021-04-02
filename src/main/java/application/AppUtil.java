@@ -20,14 +20,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.GsonBuilder;
 
 import application.exceptions.GoogleSheetsException;
 import application.models.PropertiesHolder;
 import application.models.json.GoogleSheetsResponse;
+import application.services.FileIO;
 
 /**
  * Utility methods to perform common actions.
@@ -35,6 +43,7 @@ import application.models.json.GoogleSheetsResponse;
  * @author Mark "Grandy" Bishop
  */
 public class AppUtil {
+	private static final Logger LOGGER = LogManager.getLogger(AppUtil.class);
 	private static final AppUtil INSTANCE = new AppUtil();
 
 	/** the format for the URL, needing spreadsheetId, worksheetName, and apiKey. */
@@ -69,20 +78,54 @@ public class AppUtil {
 	 *             {@link GoogleSheetsResponse} fails
 	 * @throws GoogleSheetsException
 	 */
-	public GoogleSheetsResponse getGoogleSheetsData(URL url) throws IOException, GoogleSheetsException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	public GoogleSheetsResponse getGoogleSheetsData(String url) throws IOException, GoogleSheetsException {
+		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
 		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
 			return new GsonBuilder().create().fromJson(new InputStreamReader(conn.getInputStream()),
 					GoogleSheetsResponse.class);
 		} else {
-			StringBuilder sb = AppUtil.getErrorFromStream(conn.getErrorStream());
-			throw GoogleSheetsException.fromJsonString(sb.toString());
+			StringBuilder sb = AppUtil.getMessageFromStream(conn.getErrorStream());
+			throw GoogleSheetsException.fromJsonString(url, sb.toString());
 		}
 	}
 
-	public static StringBuilder getErrorFromStream(InputStream err) throws IOException {
-		InputStreamReader isr = new InputStreamReader(err);
+	/**
+	 * @return a safe, escaped {@link URI} for use in {@link FileIO} when
+	 *         downloading files.
+	 */
+	public static URI encodeForUrl(String url)
+			throws MalformedURLException, URISyntaxException, UnsupportedEncodingException {
+		String encodedUrl = url;
+
+		if (!url.matches("((http://)|(https://)|(file://)).*")) {
+			throw new MalformedURLException("URL requires either http://, https:// or file:// schema: '" + url + "'");
+		}
+
+		return new URI(encodeUrlContent(encodedUrl));
+	}
+
+	/** @return a safe, escaped version of the url for use in queries. */
+	public static String encodeUrlContent(String url) {
+		String encodedUrl = url;
+		encodedUrl = replaceCharInUrl("\\", "/", encodedUrl, url);
+		encodedUrl = replaceCharInUrl(" ", "%20", encodedUrl, url);
+		encodedUrl = replaceCharInUrl("-", "%2D", encodedUrl, url);
+		encodedUrl = replaceCharInUrl(".", "%2E", encodedUrl, url);
+		return encodedUrl;
+	}
+
+	private static String replaceCharInUrl(String c, String replacement, String encodedUrl, String url) {
+		String newUrl = encodedUrl;
+		if (url.contains(c)) {
+			newUrl = encodedUrl.replace(c, replacement);
+			LOGGER.trace("URL contains \"{}\"; auto-replace with '{}': '{}' -> '{}'", c, replacement, url, encodedUrl);
+		}
+		return newUrl;
+	}
+
+	public static StringBuilder getMessageFromStream(InputStream stream) throws IOException {
+		InputStreamReader isr = new InputStreamReader(stream);
 		BufferedReader br = new BufferedReader(isr);
 		StringBuilder sb = new StringBuilder();
 		String output;

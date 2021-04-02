@@ -281,7 +281,8 @@ public class HttpService implements HttpHandler {
 					"Attempted to perform an update using {}'s /update call, but there was no updateLoop available",
 					HttpService.class.getName());
 		}
-		httpExchange.sendResponseHeaders(responseCode, 0);
+		LOGGER.debug("Responding for update with {}", responseCode);
+		httpExchange.sendResponseHeaders(responseCode, -1);
 	}
 
 	/**

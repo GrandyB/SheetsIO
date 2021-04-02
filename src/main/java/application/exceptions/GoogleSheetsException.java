@@ -17,6 +17,7 @@
 package application.exceptions;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import lombok.Getter;
@@ -32,28 +33,58 @@ public class GoogleSheetsException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	@Getter
-	private final int code;
+	private final String url;
 
 	@Getter
+	private final int code;
+
 	private final String message;
 
 	@Getter
 	private final String status;
 
 	/** Create a {@link GoogleSheetsException} from the given response json. */
-	public static GoogleSheetsException fromJsonString(String json) {
-		JsonElement elem = JsonParser.parseString(json);
-		JsonElement error = elem.getAsJsonObject().get("error");
+	public static GoogleSheetsException fromJsonString(String url, String json) {
+		try {
+			JsonElement elem = JsonParser.parseString(json);
+			JsonElement error = elem.getAsJsonObject().get("error");
 
-		int code = error.getAsJsonObject().get("code").getAsInt();
-		String message = error.getAsJsonObject().get("message").getAsString();
-		String status = error.getAsJsonObject().get("status").getAsString();
+			int code = error.getAsJsonObject().get("code").getAsInt();
+			String message = error.getAsJsonObject().get("message").getAsString();
+			String status = error.getAsJsonObject().get("status").getAsString();
 
-		return new GoogleSheetsException(code, message, status);
+			return new GoogleSheetsException(url, code, message, status);
+		} catch (JsonParseException e) {
+			/*
+			 * In the case of a 'bad request', we don't get json back, we get html in a
+			 * weird format.
+			 */
+			return new GoogleSheetsException(url, -1, json,
+					"Unable to parse response from Google - expected json but received the following");
+		}
 	}
 
-	/** @return formatted string of 'code - ERROR'. */
+	/**
+	 * @return formatted header of the following format.
+	 * 
+	 *         <pre>
+	 *         code - status
+	 *         </pre>
+	 */
 	public String getHeader() {
 		return String.format("%d - %s", code, status);
+	}
+
+	/**
+	 * @return formatted message of the following format.
+	 * 
+	 *         <pre>
+	 * 				url
+	 * 				message
+	 *         </pre>
+	 */
+	@Override
+	public String getMessage() {
+		return String.format("%s\n\n%s", url, message);
 	}
 }

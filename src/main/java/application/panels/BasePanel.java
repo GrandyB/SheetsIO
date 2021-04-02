@@ -97,7 +97,7 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 			error.append("Your json is malformed and needs correcting!\n");
 			error.append(e.getMessage());
 			error.append(
-					"\n\nCheck the line/column numbers in the error above for hints on where your json is failing.\nIf that doesn't help, consider running your config through a validation service such as https://jsonlint.com/ - removing your apiKey first of course!\n");
+					"\n\nCheck the line/column numbers in the error above for hints on where your json is failing.\nIf that doesn't help, consider running your config through a validation service such as https://jsonlint.com/\n");
 
 		} else if (e instanceof GoogleSheetsException) {
 			GoogleSheetsException gsEx = (GoogleSheetsException) e;
