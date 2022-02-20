@@ -6,6 +6,7 @@
 <JVMSearchPath>jdkpath</JVMSearchPath>
 <JVMSearchPath>exepath</JVMSearchPath>
 <JVMSearchPath>jview</JVMSearchPath>
+<arguments></arguments>
 <embeddedJar>true</embeddedJar>
 <executableName>..\dist\SheetsIO.exe</executableName>
 <iconLocation>..\src\main\java\application\icon.png</iconLocation>
@@ -22,7 +23,10 @@
 <skeletonName>Windowed Wrapper</skeletonName>
 <skeletonProperties>
 <key>Message</key>
-<value>Java has not been found on your computer.</value>
+<value>Java has not been found on your computer.
+
+Please check the troubleshooting guide on the GitHub repo's wiki:
+https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting</value>
 </skeletonProperties>
 <skeletonProperties>
 <key>URL</key>
@@ -41,6 +45,6 @@
 </skeletonProperties>
 <skeletonProperties>
 <key>Debug</key>
-<value>0</value>
+<value>1</value>
 </skeletonProperties>
 </jsmoothproject>
