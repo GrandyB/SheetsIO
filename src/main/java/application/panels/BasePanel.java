@@ -93,6 +93,7 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 			JsonValidationException jsonEx = (JsonValidationException) e;
 			error.append(jsonEx.getSummary());
 			error.append('\n');
+
 		} else if (e instanceof JsonSyntaxException) {
 			error.append("Your json is malformed and needs correcting!\n");
 			error.append(e.getMessage());
@@ -104,6 +105,7 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 			headerText = gsEx.getHeader();
 			error.append(gsEx.getMessage());
 			error.append("\n");
+
 		} else {
 			StackTraceElement[] stack = e.getStackTrace();
 			// If stack smaller than preset length, use that; otherwise limit to defined max

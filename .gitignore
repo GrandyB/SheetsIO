@@ -1,6 +1,7 @@
 config.json
 files/
 target/
+temp/
 .settings/
 .classpath
 bin/

@@ -18,6 +18,7 @@ package application.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.exceptions.IllegalFileExtensionException;
+import application.exceptions.ImageReadException;
+import application.exceptions.UnableToLoadRemoteURLException;
 import application.models.CellUpdate;
 import application.models.CellWrapper;
 import application.models.ConfigHolder;
@@ -98,14 +101,46 @@ public class FileUpdater {
 			fileIO.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
 			break;
 		case IMAGE:
-			fileIO.downloadAndConvertImage(newValue, destFilePath, ext.getExtension());
+			updateImage(newValue, destFilePath, ext.getExtension());
 			break;
 		case VIDEO:
-			fileIO.downloadAndSaveFile(newValue, destFilePath, ext.getExtension());
+			updateVideo(newValue, destFilePath, ext.getExtension());
 			break;
 		default:
 			throw new IllegalStateException(
 					"Unable to handle " + FileExtensionType.class.getSimpleName() + ": " + ext.getType());
+		}
+	}
+
+	private void updateImage(String newValue, String destFilePath, String ext) throws Exception {
+		try {
+			fileIO.downloadAndConvertImage(newValue, destFilePath, ext);
+		} catch (MalformedURLException e) {
+			if (newValue.trim().isEmpty() || "#n/a".equals(newValue.trim().toLowerCase())) {
+				// URL isn't a link, but be lenient
+				// Log it but don't throw it in the user's face; create an empty image
+				LOGGER.warn("URL found in cell was '{}' - permitting it, but outputting a transparent image", newValue);
+				fileIO.saveTransparentImage(destFilePath, ext);
+			} else {
+				// Let the error filter down to the popup
+				throw e;
+			}
+		} catch (UnableToLoadRemoteURLException e) {
+			LOGGER.error("URL was unable to be loaded: '{}'\nOutputting a transparent image", newValue, e);
+			fileIO.saveTransparentImage(destFilePath, ext);
+		} catch (IOException e) {
+			throw new ImageReadException(
+					"Unable to read image from URL '" + newValue + "' - ensure it is of a supported type", e);
+		}
+	}
+
+	private void updateVideo(String newValue, String destFilePath, String ext) throws Exception {
+		try {
+			fileIO.downloadAndSaveFile(newValue, destFilePath, ext);
+		} catch (UnableToLoadRemoteURLException e) {
+			throw new UnableToLoadRemoteURLException("Unable to load video from remote URL '" + newValue + "'", e);
+		} catch (Exception e) {
+			throw e;
 		}
 	}
 

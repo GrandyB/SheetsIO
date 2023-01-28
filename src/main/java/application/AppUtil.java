@@ -99,7 +99,8 @@ public class AppUtil {
 		String encodedUrl = url;
 
 		if (!url.matches("((http://)|(https://)|(file://)).*")) {
-			throw new MalformedURLException("URL requires either http://, https:// or file:// schema: '" + url + "'");
+			throw new MalformedURLException(String.format("Attempted to get an image from url: '%s'.\n"
+					+ "The URL was invalid - requires either http://, https:// or file:// prefix", url));
 		}
 
 		return new URI(encodeUrlContent(encodedUrl));

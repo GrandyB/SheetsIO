@@ -20,9 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -31,8 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.AppUtil;
-import application.models.FileExtension;
-import application.models.FileExtension.FileExtensionType;
+import application.exceptions.UnableToLoadRemoteURLException;
 import application.panels.ConfigPanel;
 
 /**
@@ -90,27 +87,31 @@ public class FileIO {
 	 *             Should reading from the URL or writing/converting go awry
 	 */
 	public void downloadAndConvertImage(String url, String destinationPath, String extension) throws Exception {
-		Instant entireStart = Instant.now();
-		File outputFile = new File(destinationPath);
-		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
-		URI uri = AppUtil.encodeForUrl(url);
+		BufferedImage image;
 		InputStream is;
+		URI uri = AppUtil.encodeForUrl(url);
 		if (uri.getScheme().equals("file")) {
 			LOGGER.debug("Treating {} as a local image url", uri);
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			is = getInputStreamForRemoteUrl(url, createEmptyImage(extension));
+			is = getInputStreamForRemoteUrl(url);
 		}
+
+		writeImage(is, destinationPath, extension);
+	}
+
+	private void writeImage(InputStream is, String destinationPath, String extension) throws Exception {
+		Instant entireStart = Instant.now();
+
+		File outputFile = new File(destinationPath);
+		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
+
 		Instant readStart = Instant.now();
 		BufferedImage image = ImageIO.read(is);
 		LOGGER.debug("Read [{}ms]", Duration.between(readStart, Instant.now()).toMillis());
 		if (image == null) {
-			throw new IOException("Unable to read image from URL " + url + " - ensure it is of a supported type: "
-					+ Arrays.asList(FileExtension.values()).stream() //
-							.filter(f -> FileExtensionType.IMAGE.equals(f.getType())) //
-							.map(f -> f.getExtension()) //
-							.collect(Collectors.toList()));
+			throw new IOException("Unable to read image from url");
 		}
 
 		OutputStream os = new FileOutputStream(tempFile);
@@ -129,7 +130,8 @@ public class FileIO {
 	}
 
 	/**
-	 * Downloads file from the url and saves as destinationPath.
+	 * Downloads file from the url and saves as destinationPath. This is only used
+	 * for video files.
 	 * 
 	 * @param url
 	 *            A full URL, e.g.
@@ -150,7 +152,7 @@ public class FileIO {
 			LOGGER.debug("Treating {} as a local file", uri);
 			is = new FileInputStream(new File(uri.getAuthority() + uri.getPath()));
 		} else {
-			is = getInputStreamForRemoteUrl(url, new ByteArrayInputStream(new byte[] {}));
+			is = getInputStreamForRemoteUrl(url);
 		}
 
 		Instant copyStart = Instant.now();
@@ -172,12 +174,9 @@ public class FileIO {
 	 *
 	 * @param url
 	 *            The URL to connect to
-	 * @param fallBack
-	 *            A {@link ByteArrayInputStream} that represents an empty file of
-	 *            the wanted type, should loading from remote URL fails
 	 * @return An {@link InputStream} to use for writing the file out
 	 */
-	private InputStream getInputStreamForRemoteUrl(String url, ByteArrayInputStream fallBack) throws Exception {
+	private InputStream getInputStreamForRemoteUrl(String url) throws Exception {
 		LOGGER.debug("Treating '{}' as a remote url", url);
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 		// Provide a User-Agent, without it, many sites block incoming requests with 403
@@ -191,12 +190,8 @@ public class FileIO {
 			if (sb.toString().contains("1010")) {
 				sb.append(
 						" - The owner of this website has prevented access to this file based on your browser's signature");
-				throw new IOException(sb.toString());
-			} else {
-				LOGGER.error("Error while attempting to load the remote URL - replacing with empty file",
-						sb.toString());
-				is = fallBack;
 			}
+			throw new UnableToLoadRemoteURLException(sb.toString());
 		}
 		return is;
 	}
@@ -241,11 +236,25 @@ public class FileIO {
 	}
 
 	private ByteArrayInputStream createEmptyImage(String extension) throws Exception {
-		// Sadly 0x0 is not an option
-		BufferedImage result = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+		// Sadly 0x0 is not an option, create 50x50 so it's moveable in OBS more easily
+		BufferedImage result = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+		int color = (0 << 24) | (0 << 16) | (0 << 8) | 0; // ARGB format
+		for (int x = 0; x < 50; x++) {
+			for (int y = 0; y < 50; y++) {
+				result.setRGB(x, y, color);
+			}
+		}
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		ImageIO.write(result, extension, os);
 		return new ByteArrayInputStream(os.toByteArray());
+	}
+
+	/**
+	 * @param destFilePath
+	 * @param ext
+	 */
+	public void saveTransparentImage(String destFilePath, String ext) throws Exception {
+		writeImage(createEmptyImage(ext), destFilePath, ext);
 	}
 }

@@ -76,7 +76,7 @@ public class SheetCache {
 				newVal = "";
 			}
 
-			if (!newVal.equals(cacheValue)) {
+			if (!newVal.equals(cacheValue) || newVal.isEmpty()) {
 				// Collect a list of the new values
 				changedElements.add(new CellUpdate(cacheEntry.getKey(), newVal));
 				// ...and update the cache

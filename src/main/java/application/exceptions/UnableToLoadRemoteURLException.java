@@ -1,5 +1,5 @@
 /**
- * CellUpdate.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2021.
+ * UnableToReadURLException.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2023.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.models;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+package application.exceptions;
 
 /**
- * Small model for an update to a value within a Google Sheet.
+ * Checked exception when loading remote URLs fails.
  *
  * @author Mark "Grandy" Bishop
  */
-@AllArgsConstructor
-@ToString
-public final class CellUpdate {
-	@Getter
-	private CellWrapper cellWrapper;
-	@Getter
-	private String newValue;
+public class UnableToLoadRemoteURLException extends Exception {
+	private static final long serialVersionUID = 1L;
+
+	public UnableToLoadRemoteURLException(String message) {
+		super(message);
+	}
+
+	public UnableToLoadRemoteURLException(String message, Exception e) {
+		super(message, e);
+	}
 }
