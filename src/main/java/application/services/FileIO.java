@@ -88,7 +88,6 @@ public class FileIO {
 	 */
 	public void downloadAndConvertImage(String url, String destinationPath, String extension) throws Exception {
 
-		BufferedImage image;
 		InputStream is;
 		URI uri = AppUtil.encodeForUrl(url);
 		if (uri.getScheme().equals("file")) {
