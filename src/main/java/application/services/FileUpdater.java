@@ -97,8 +97,12 @@ public class FileUpdater {
 		FileExtension ext = cellWrapper.getFileExtension();
 		switch (ext.getType()) {
 		case TEXT:
-			/** Add padding if applicable (@see {@link CellWrapper#getPadding}). */
-			fileIO.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
+			/**
+			 * Add padding if applicable (@see {@link CellWrapper#getPadding}), and replace
+			 * GSheet errors with blank values.
+			 */
+			fileIO.writeTextFile(destFilePath,
+					cellWrapper.getPadding().insert(0, isGoogleSheetErrorCode(newValue) ? "" : newValue).toString());
 			break;
 		case IMAGE:
 			updateImage(newValue, destFilePath, ext.getExtension());
@@ -116,7 +120,7 @@ public class FileUpdater {
 		try {
 			fileIO.downloadAndConvertImage(newValue, destFilePath, ext);
 		} catch (MalformedURLException e) {
-			if (newValue.trim().isEmpty() || "#n/a".equals(newValue.trim().toLowerCase())) {
+			if (newValue.trim().isEmpty() || isGoogleSheetErrorCode(newValue)) {
 				// URL isn't a link, but be lenient
 				// Log it but don't throw it in the user's face; create an empty image
 				LOGGER.warn("URL found in cell was '{}' - permitting it, but outputting a transparent image", newValue);
@@ -131,6 +135,22 @@ public class FileUpdater {
 		} catch (IOException e) {
 			throw new ImageReadException(
 					"Unable to read image from URL '" + newValue + "' - ensure it is of a supported type", e);
+		}
+	}
+
+	private boolean isGoogleSheetErrorCode(String value) {
+		switch (value.trim().toLowerCase()) {
+		case "#n/a":
+		case "#div/0!":
+		case "#name?":
+		case "#null!":
+		case "#num!":
+		case "#ref!":
+		case "#value!":
+		case "#error!":
+			return true;
+		default:
+			return false;
 		}
 	}
 
