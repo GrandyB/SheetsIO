@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import application.models.CellWrapper;
 import application.models.json.CellBuilder;
+import application.services.old.SheetCache;
 
 public class SheetCacheTest {
 	private SheetCache testee = new SheetCache();

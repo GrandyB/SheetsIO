@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import application.services.http.HttpService;
+import application.services.old.http.HttpService;
 
 /**
  * Central place to keep track of all threads running in the app; to be shut

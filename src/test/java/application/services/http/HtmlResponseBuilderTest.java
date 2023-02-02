@@ -19,6 +19,8 @@ package application.services.http;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import application.services.old.http.HtmlResponseBuilder;
+
 public class HtmlResponseBuilderTest {
 
 	@Test

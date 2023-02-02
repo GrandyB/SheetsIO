@@ -21,10 +21,14 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.EventBus;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import application.events.AppInitialisedEvent;
 import application.guis.MainGui;
 import application.models.PropertiesHolder;
+import application.sheetsio.SheetsIOApplication;
 import application.threads.ThreadCollector;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -37,8 +41,16 @@ import lombok.Getter;
  *
  * @author Mark "Grandy" Bishop
  */
+@SpringBootApplication
 public class Main extends Application implements IApplicationOps {
 	private static final Logger LOGGER = LogManager.getLogger(Main.class);
+
+	@Override
+	public void init() throws Exception {
+		SpringApplicationBuilder builder = new SpringApplicationBuilder(SheetsIOApplication.class);
+		builder.application().setWebApplicationType(WebApplicationType.NONE);
+		builder.build();
+	}
 
 	@Getter
 	private Stage primaryStage;

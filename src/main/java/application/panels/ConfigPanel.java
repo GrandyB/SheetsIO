@@ -26,8 +26,8 @@ import application.AppUtil;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
-import application.services.FileIO;
-import application.services.FileUpdater;
+import application.services.old.FileIO;
+import application.services.old.FileUpdater;
 import application.threads.ThreadCollector;
 import application.threads.UpdateRunnable;
 

@@ -26,7 +26,7 @@ import application.Main;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
-import application.services.UpdateController;
+import application.services.old.UpdateController;
 
 /**
  * Meat of the thread running the update loop. Runs continuously based on the
