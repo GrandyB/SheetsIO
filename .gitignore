@@ -11,3 +11,4 @@ build.fxbuild
 /logs/
 /sampleConfig.json
 /application.properties
+*.properties
