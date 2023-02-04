@@ -48,6 +48,7 @@ public class ApplicationProperties extends AbstractReloadableProperties {
 		if (!isLoaded()) {
 			// Create a default file
 			PropertiesConfiguration newConfig = new PropertiesConfiguration();
+			newConfig.setAutoSave(true);
 			newConfig.setProperty(API_KEY, "");
 			newConfig.setProperty(UPDATE_INTERVAL, "2000");
 			newConfig.setProperty(TEST_WORKBOOKID, SAMPLE_API_TEST_WORKBOOK_ID);

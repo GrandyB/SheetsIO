@@ -30,13 +30,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import application.AppUtil;
 import application.IApplicationOps;
 import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
-import application.services.old.FileIO;
 import application.services.old.FileUpdater;
 import application.threads.UpdateRunnable;
+import application.utils.AppUtil;
+import application.utils.FileIO;
 
 public class ConfigPanelTest {
 

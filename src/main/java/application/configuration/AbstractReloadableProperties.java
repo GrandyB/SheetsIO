@@ -46,6 +46,7 @@ public abstract class AbstractReloadableProperties {
 		try {
 			LOGGER.debug("Loading the properties file: " + FILE_PATH);
 			configuration = new PropertiesConfiguration(FILE_PATH);
+			configuration.setAutoSave(true);
 		} catch (ConfigurationException e) {
 			LOGGER.error("Unable to load {} file", FILE_PATH, e);
 		}

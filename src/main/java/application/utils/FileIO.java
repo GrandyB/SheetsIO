@@ -1,7 +1,7 @@
 /**
  * FileIO.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  */
-package application.services.old;
+package application.utils;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -28,7 +28,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.AppUtil;
 import application.exceptions.UnableToLoadRemoteURLException;
 import application.panels.ConfigPanel;
 

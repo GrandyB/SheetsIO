@@ -31,13 +31,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import application.AppUtil;
 import application.IApplicationOps;
 import application.events.ApiKeySetEvent;
 import application.events.AppInitialisedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
+import application.utils.AppUtil;
 
 public class ApiKeyPanelTest {
 	private static final String SAMPLE_KEY = "123456";

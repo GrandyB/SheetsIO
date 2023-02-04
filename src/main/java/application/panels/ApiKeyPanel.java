@@ -21,13 +21,13 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import application.AppUtil;
+import application.data.GoogleSheetsRepository;
 import application.events.ApiKeySetEvent;
 import application.events.AppInitialisedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.models.ApiKeyStatus;
-import application.models.PropertiesHolder;
 import lombok.NoArgsConstructor;
 
 /**
@@ -40,6 +40,9 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger(ApiKeyPanel.class);
 
+	@Autowired
+	private GoogleSheetsRepository googleSheetsRepository;
+
 	public interface Gui extends BasePanel.Gui {
 		/** Setup the status circle to reflect the given status. */
 		void setCircle(ApiKeyStatus status);
@@ -51,33 +54,17 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 		void showHelpLink(boolean show);
 	}
 
-	/** Alternative DI constructor, for test use. */
-	public ApiKeyPanel(PropertiesHolder props, AppUtil util) {
-		super(util, props);
-	}
-
 	/** Handle the press of the 'set' apiKey button. */
 	public void handleSetApiKeyPress(String potentialKey) {
-		getProps().setProperty(PropertiesHolder.API_KEY, potentialKey);
-		try {
-			getProps().flush();
-		} catch (Exception e) {
-			updateUI(ApiKeyStatus.ERROR);
-			handleException(e);
-		}
-
 		if (potentialKey == null || potentialKey.trim().isEmpty()) {
 			updateUI(ApiKeyStatus.MISSING);
 			getGui().showErrorDialog("No apiKey given", "Please provide an apiKey");
 			return;
 		} else {
-			// Get the "sample"/test URL and try out a connection
-			String url = String.format(AppUtil.SPREADSHEET_URL_FORMAT,
-					getProps().getProperty(PropertiesHolder.API_KEY_TEST_SPREADSHEET_ID),
-					getProps().getProperty(PropertiesHolder.API_KEY_TEST_WORKBOOK_ID), potentialKey);
+			getAppProps().setApiKey(potentialKey);
 
 			try {
-				getAppUtil().getGoogleSheetsData(url);
+				googleSheetsRepository.getGoogleSheetsData(url);
 				updateUI(ApiKeyStatus.LOADED);
 			} catch (GoogleSheetsException | IOException e) {
 				updateUI(ApiKeyStatus.ERROR);
@@ -94,7 +81,7 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 
 	@Subscribe
 	public void handleAppInitialised(AppInitialisedEvent e) {
-		String key = getProps().getProperty(PropertiesHolder.API_KEY);
+		String key = getAppProps().getApiKey();
 		getGui().setApiKeyField(key);
 		handleSetApiKeyPress(key);
 	}

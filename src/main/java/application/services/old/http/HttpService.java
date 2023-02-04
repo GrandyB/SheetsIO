@@ -36,7 +36,7 @@ import com.sun.net.httpserver.HttpServer;
 import application.models.CellWrapper;
 import application.models.FileExtension.FileExtensionType;
 import application.models.PropertiesHolder;
-import application.services.old.SheetCache;
+import application.models.SheetCache;
 import application.services.old.http.ConnectionRequest.ConnectionRequestType;
 import application.threads.ThreadCollector;
 import application.threads.UpdateRunnable;

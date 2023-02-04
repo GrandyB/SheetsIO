@@ -22,14 +22,12 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.AppUtil;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
-import application.models.PropertiesHolder;
-import application.services.old.FileIO;
 import application.services.old.FileUpdater;
 import application.threads.ThreadCollector;
 import application.threads.UpdateRunnable;
+import application.utils.FileIO;
 
 /**
  * Logic base for the config section.
@@ -61,9 +59,8 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	}
 
 	/** Dependency injection, for use in tests. */
-	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable, AppUtil appUtil,
-			PropertiesHolder props) {
-		super(appUtil, props);
+	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable) {
+		super();
 		this.configHolder = configHolder;
 		this.fileIO = fileIO;
 		this.updateRunnable = updateRunnable;
@@ -100,7 +97,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		}
 
 		// Load the previous config if there is one
-		String previousConfigPath = getProps().getProperty(PropertiesHolder.LAST_CONFIG);
+		String previousConfigPath = getAppProps().getLastConfigLocation();
 		if (previousConfigPath != null && !previousConfigPath.isEmpty()) {
 			handleConfigSelection(new File(previousConfigPath));
 		}
@@ -131,13 +128,7 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		getGui().setAutoUpdateCheckState(this.configHolder.isAutoUpdate());
 
 		// Set 'last config' option in application.properties
-		getProps().setProperty(PropertiesHolder.LAST_CONFIG, file.getAbsolutePath());
-		try {
-			getProps().flush();
-		} catch (IOException e) {
-			LOGGER.error("Unable to set the property '{}' to '{}': {}", PropertiesHolder.LAST_CONFIG,
-					file.getAbsolutePath(), e);
-		}
+		getAppProps().setLastConfigLocation(file.getAbsolutePath());
 	}
 
 	/** Handle a click of the 'reload' config button in the UI. */

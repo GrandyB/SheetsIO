@@ -19,10 +19,10 @@ package application.guis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.AppUtil;
 import application.IApplicationOps;
 import application.panels.BasePanel;
 import application.panels.IPanel;
+import application.utils.AppUtil;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -76,8 +76,8 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 	@Override
 	public void showErrorDialog(String header, String message) {
 		// Remove all instances of the user's API key
-		String sanitisedMessage = AppUtil.get().sanitiseApiKey(header);
-		String errorMessage = AppUtil.get().sanitiseApiKey(message);
+		String sanitisedMessage = AppUtil.sanitiseApiKey(panel.getAppProps().getApiKey(), header);
+		String errorMessage = AppUtil.sanitiseApiKey(panel.getAppProps().getApiKey(), message);
 		/*
 		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
 		 * which is separate to the JavaFX application thread; Platform.runLater allows

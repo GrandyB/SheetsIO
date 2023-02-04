@@ -19,16 +19,18 @@ package application.panels;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import com.google.gson.JsonSyntaxException;
 
-import application.AppUtil;
 import application.IApplicationOps;
 import application.IExceptionHandler;
+import application.configuration.ApplicationProperties;
 import application.events.ConfigReloadedEvent;
 import application.exceptions.GoogleSheetsException;
 import application.exceptions.JsonValidationException;
-import application.models.PropertiesHolder;
+import application.utils.AppUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -55,15 +57,13 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	@Setter
 	private IApplicationOps app;
 
+	@Autowired
 	@Getter
-	private final AppUtil appUtil;
-	@Getter
-	private final PropertiesHolder props;
+	private ApplicationProperties appProps;
 
-	public BasePanel() {
-		appUtil = AppUtil.get();
-		props = PropertiesHolder.get();
-	}
+	@Autowired
+	@Getter
+	private ApplicationContext applicationContext;
 
 	public interface Gui {
 		/** Perform initialisation of the Gui. */
@@ -121,9 +121,9 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 		error.append(GENERIC_ERROR_END);
 
 		// Remove all instances of the user's API key
-		String sanitisedMessage = AppUtil.get().sanitiseApiKey(headerText);
+		String sanitisedMessage = AppUtil.sanitiseApiKey(getAppProps().getApiKey(), headerText);
 		LOGGER.error(sanitisedMessage);
-		String errorMessage = AppUtil.get().sanitiseApiKey(error.toString());
+		String errorMessage = AppUtil.sanitiseApiKey(getAppProps().getApiKey(), error.toString());
 		LOGGER.error(errorMessage);
 		getGui().showErrorDialog(sanitisedMessage, errorMessage);
 	}

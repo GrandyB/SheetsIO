@@ -14,13 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.services;
+package application.services.file;
+
+import org.springframework.stereotype.Service;
 
 /**
- * Service responsible for loading in SheetsIO configuration json files.
+ * Service responsible for writing out text files.
  *
  * @author Mark "Grandy" Bishop
  */
-public class ConfigurationService {
+@Service
+public class TextFileService {
 
 }

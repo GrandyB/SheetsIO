@@ -23,6 +23,8 @@ import java.net.MalformedURLException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import application.utils.AppUtil;
+
 public class AppUtilTest {
 
 	@Test

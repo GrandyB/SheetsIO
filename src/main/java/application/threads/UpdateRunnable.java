@@ -26,7 +26,7 @@ import application.Main;
 import application.exceptions.IllegalFileExtensionException;
 import application.models.ConfigHolder;
 import application.models.PropertiesHolder;
-import application.services.old.UpdateController;
+import application.services.UpdateService;
 
 /**
  * Meat of the thread running the update loop. Runs continuously based on the
@@ -38,7 +38,7 @@ import application.services.old.UpdateController;
 public class UpdateRunnable extends IntervalRunnable {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
 
-	private UpdateController updater;
+	private UpdateService updater;
 	private boolean runOnce = false;
 
 	public UpdateRunnable(IExceptionHandler handler) {
@@ -59,7 +59,7 @@ public class UpdateRunnable extends IntervalRunnable {
 		this.unpause();
 
 		if (this.updater == null) {
-			this.updater = new UpdateController();
+			this.updater = new UpdateService();
 		}
 		this.updater.setConfig(fromScratch);
 	}

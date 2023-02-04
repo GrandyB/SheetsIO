@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.services.old;
+package application.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import application.models.CellUpdate;
-import application.models.CellWrapper;
+import org.springframework.stereotype.Component;
+
 import application.models.json.Config;
 import application.models.json.GoogleSheetsResponse;
 
@@ -35,6 +35,7 @@ import application.models.json.GoogleSheetsResponse;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class SheetCache {
 	private Map<CellWrapper, String> values = new HashMap<>();
 

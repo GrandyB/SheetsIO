@@ -34,8 +34,8 @@ import application.models.CellWrapper;
 import application.models.ConfigHolder;
 import application.models.json.CellBuilder;
 import application.models.json.Config;
-import application.services.old.FileIO;
 import application.services.old.FileUpdater;
+import application.utils.FileIO;
 
 public class FileUpdaterTest {
 	private static final String FOLDER_NAME = "exampleFolderName";
