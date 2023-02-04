@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,8 +83,8 @@ public class AppUtil {
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
 		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
-			return new GsonBuilder().create().fromJson(new InputStreamReader(conn.getInputStream()),
-					GoogleSheetsResponse.class);
+			return new GsonBuilder().create().fromJson(
+					new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8), GoogleSheetsResponse.class);
 		} else {
 			StringBuilder sb = AppUtil.getMessageFromStream(conn.getErrorStream());
 			throw GoogleSheetsException.fromJsonString(url, sb.toString());

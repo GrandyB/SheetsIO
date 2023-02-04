@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +24,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,7 +68,7 @@ public class FileIO {
 	 *             if there's an error during writing to file
 	 */
 	public void writeTextFile(String filePath, String newValue) throws IOException {
-		FileWriter myWriter = new FileWriter(filePath);
+		FileWriterWithEncoding myWriter = new FileWriterWithEncoding(filePath, "UTF-8", false);
 		myWriter.write(newValue);
 		myWriter.close();
 	}

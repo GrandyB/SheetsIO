@@ -30,6 +30,7 @@ https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting</value>
 </skeletonProperties>
 <skeletonProperties>
 <key>URL</key>
+<value></value>
 </skeletonProperties>
 <skeletonProperties>
 <key>SingleProcess</key>
@@ -45,6 +46,6 @@ https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting</value>
 </skeletonProperties>
 <skeletonProperties>
 <key>Debug</key>
-<value>1</value>
+<value>0</value>
 </skeletonProperties>
 </jsmoothproject>
