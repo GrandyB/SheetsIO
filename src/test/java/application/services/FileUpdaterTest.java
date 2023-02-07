@@ -31,11 +31,10 @@ import org.mockito.MockitoAnnotations;
 
 import application.models.CellUpdate;
 import application.models.CellWrapper;
-import application.models.ConfigHolder;
+import application.models.ConfigurationFile;
 import application.models.json.CellBuilder;
 import application.models.json.Config;
 import application.services.old.FileUpdater;
-import application.utils.FileIO;
 
 public class FileUpdaterTest {
 	private static final String FOLDER_NAME = "exampleFolderName";
@@ -43,7 +42,7 @@ public class FileUpdaterTest {
 	private static final String TXT_EXTENSION = "txt";
 
 	@Mock
-	private FileIO io;
+	private FileIOService io;
 	@Mock
 	private Config config;
 
@@ -62,7 +61,7 @@ public class FileUpdaterTest {
 		cells.add(exampleCell);
 
 		Mockito.when(config.getProjectName()).thenReturn(FOLDER_NAME);
-		ConfigHolder.get().setupConfigForTest(config, cells);
+		ConfigurationFile.get().setupConfigForTest(config, cells);
 
 		fileUpdater = new FileUpdater(io);
 	}
@@ -98,8 +97,8 @@ public class FileUpdaterTest {
 				new CellBuilder().withName(FILE_NAME + "2").withCell("B8").withFileExtension(TXT_EXTENSION).build());
 		updatedCells.add(new CellUpdate(b8, "newVal2"));
 
-		ConfigHolder.get().getCells().add(a8);
-		ConfigHolder.get().getCells().add(b8);
+		ConfigurationFile.get().getCells().add(a8);
+		ConfigurationFile.get().getCells().add(b8);
 
 		fileUpdater.updateFiles(updatedCells);
 		Mockito.verify(io).writeTextFile(fileUpdater.createFilePath(FOLDER_NAME, a8), "newVal1");
@@ -118,8 +117,8 @@ public class FileUpdaterTest {
 		CellWrapper a8v2 = new CellWrapper(
 				new CellBuilder().withName(FILE_NAME + "2").withCell("A8").withFileExtension(TXT_EXTENSION).build());
 
-		ConfigHolder.get().getCells().add(a8v1);
-		ConfigHolder.get().getCells().add(a8v2);
+		ConfigurationFile.get().getCells().add(a8v1);
+		ConfigurationFile.get().getCells().add(a8v2);
 
 		// One update (that would in the app come from the cache/google sheets update
 		updatedCells.add(new CellUpdate(a8v1, "newVal"));

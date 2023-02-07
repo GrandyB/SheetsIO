@@ -59,11 +59,11 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 
 	@Autowired
 	@Getter
-	private ApplicationProperties appProps;
+	private ApplicationContext applicationContext;
 
 	@Autowired
 	@Getter
-	private ApplicationContext applicationContext;
+	private ApplicationProperties appProps;
 
 	public interface Gui {
 		/** Perform initialisation of the Gui. */

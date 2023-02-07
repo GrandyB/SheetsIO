@@ -21,13 +21,13 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import application.exceptions.IllegalFileExtensionException;
-import application.models.ConfigHolder;
+import application.models.ConfigurationFile;
+import application.services.FileIOService;
 import application.services.old.FileUpdater;
-import application.threads.ThreadCollector;
 import application.threads.UpdateRunnable;
-import application.utils.FileIO;
 
 /**
  * Logic base for the config section.
@@ -40,26 +40,15 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	public static final String LOGS_FOLDER = "logs";
 	public static final String TEMP_FOLDER = "temp";
 
+	@Autowired
+	private ConfigurationFile configFile;
+
 	private UpdateRunnable updateRunnable;
-	private ConfigHolder configHolder;
-	private FileIO fileIO;
-
-	/** Primary constructor. */
-	public ConfigPanel() {
-		super();
-		this.configHolder = ConfigHolder.get();
-		this.fileIO = new FileIO();
-
-		// Create/begin the update thread
-		if (updateRunnable == null) {
-			// Ensure only ever have one
-			updateRunnable = ThreadCollector.registerUpdateLoop(new UpdateRunnable(this));
-		}
-		new Thread(this.updateRunnable).start();
-	}
+	private ConfigurationFile configHolder;
+	private FileIOService fileIO;
 
 	/** Dependency injection, for use in tests. */
-	public ConfigPanel(ConfigHolder configHolder, FileIO fileIO, UpdateRunnable updateRunnable) {
+	public ConfigPanel(ConfigurationFile configHolder, FileIOService fileIO, UpdateRunnable updateRunnable) {
 		super();
 		this.configHolder = configHolder;
 		this.fileIO = fileIO;

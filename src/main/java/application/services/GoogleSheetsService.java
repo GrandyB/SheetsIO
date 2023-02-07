@@ -16,7 +16,19 @@
  */
 package application.services;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import application.data.GoogleSheetsRepository;
+import application.exceptions.GoogleSheetsException;
+import application.models.CellUpdate;
+import application.models.CellWrapper;
+import application.models.ConfigurationFile;
+import application.models.SheetCache;
+import application.models.json.GoogleSheetsResponse;
 
 /**
  * Service responsible for calls to the {@link GoogleSheetsRepository} and
@@ -24,6 +36,33 @@ import application.data.GoogleSheetsRepository;
  *
  * @author Mark "Grandy" Bishop
  */
-public class GoogleSheetsService {
+public class GoogleSheetsService extends AbstractService {
 
+	@Autowired
+	private GoogleSheetsRepository googleSheetsRepository;
+	@Autowired
+	private ConfigurationFile configurationFile;
+
+	@Autowired
+	private SheetCache cache;
+
+	/**
+	 * Update the cache of cells from the Google Sheet.
+	 * 
+	 * @return List<{@link CellUpdate}> a list of changed elements that need
+	 *         attention
+	 * @throws IOException
+	 *             when opening a connection
+	 * @throws GoogleSheetsException
+	 *             any custom exceptions
+	 */
+	public List<CellUpdate> updateCache() throws IOException, GoogleSheetsException {
+		String sheetUrl = googleSheetsRepository.getGoogleRequestUrl(configurationFile.getSpreadsheetId(),
+				configurationFile.getWorksheetName(), getAppProps().getApiKey());
+		GoogleSheetsResponse data = googleSheetsRepository.getGoogleSheetsData(sheetUrl);
+		Map<CellWrapper, String> fullValueMap = data.getMutatedRowColumnData();
+
+		// Update the cache
+		return this.cache.update(fullValueMap);
+	}
 }

@@ -30,10 +30,10 @@ import application.exceptions.ImageReadException;
 import application.exceptions.UnableToLoadRemoteURLException;
 import application.models.CellUpdate;
 import application.models.CellWrapper;
-import application.models.ConfigHolder;
+import application.models.ConfigurationFile;
 import application.models.FileExtension;
 import application.models.FileExtension.FileExtensionType;
-import application.utils.FileIO;
+import application.services.FileIOService;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -48,7 +48,7 @@ public class FileUpdater {
 
 	public static final String FOLDER_PREFIX = "files";
 
-	private final FileIO fileIO;
+	private final FileIOService fileIO;
 	private File folder;
 
 	/**
@@ -60,7 +60,7 @@ public class FileUpdater {
 	 * @throws IllegalFileExtensionException
 	 */
 	public void setup() throws IOException, IllegalFileExtensionException {
-		assert ConfigHolder.get().getProjectName() != null : "projectName cannot be null";
+		assert ConfigurationFile.get().getProjectName() != null : "projectName cannot be null";
 
 		cleanExistingFolderIfExists();
 		writeFolders();
@@ -83,7 +83,7 @@ public class FileUpdater {
 			 * could theoretically have multiple pieces of cell config all wanting to be
 			 * updated when the value changes. Here, we look up these multiple pieces.
 			 */
-			List<CellWrapper> allWrappersForCell = ConfigHolder.get().getCells().stream()
+			List<CellWrapper> allWrappersForCell = ConfigurationFile.get().getCells().stream()
 					.filter(cw -> cw.equals(cellWrapper)) //
 					.collect(Collectors.toList());
 			for (CellWrapper w : allWrappersForCell) {
@@ -94,7 +94,7 @@ public class FileUpdater {
 
 	public void updateFile(CellWrapper cellWrapper, String newValue) throws Exception {
 
-		String destFilePath = createFilePath(ConfigHolder.get().getProjectName(), cellWrapper);
+		String destFilePath = createFilePath(ConfigurationFile.get().getProjectName(), cellWrapper);
 		FileExtension ext = cellWrapper.getFileExtension();
 		switch (ext.getType()) {
 		case TEXT:
@@ -167,7 +167,7 @@ public class FileUpdater {
 
 	/** Create folder for project if it doesn't exist. */
 	private void writeFolders() throws IOException {
-		String folderPath = createFolderPath(ConfigHolder.get().getProjectName());
+		String folderPath = createFolderPath(ConfigurationFile.get().getProjectName());
 		this.folder = fileIO.createFolder(folderPath);
 	}
 
@@ -179,15 +179,15 @@ public class FileUpdater {
 	 *             if
 	 */
 	private void createInitialFiles() throws IOException, IllegalFileExtensionException {
-		for (CellWrapper cellWrapper : ConfigHolder.get().getCells()) {
+		for (CellWrapper cellWrapper : ConfigurationFile.get().getCells()) {
 			if (cellWrapper.getFileExtension().isForFile()) {
-				fileIO.writeTextFile(createFilePath(ConfigHolder.get().getProjectName(), cellWrapper), "");
+				fileIO.writeTextFile(createFilePath(ConfigurationFile.get().getProjectName(), cellWrapper), "");
 			}
 		}
 	}
 
 	private void cleanExistingFolderIfExists() throws IOException {
-		String folderPath = createFolderPath(ConfigHolder.get().getProjectName());
+		String folderPath = createFolderPath(ConfigurationFile.get().getProjectName());
 		File folder = new File(folderPath);
 		if (folder.exists()) {
 			this.folder = folder;

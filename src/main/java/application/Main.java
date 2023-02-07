@@ -28,7 +28,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import application.events.AppInitialisedEvent;
 import application.guis.MainGui;
 import application.models.PropertiesHolder;
-import application.sheetsio.SheetsIOApplication;
 import application.threads.ThreadCollector;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -47,7 +46,7 @@ public class Main extends Application implements IApplicationOps {
 
 	@Override
 	public void init() throws Exception {
-		SpringApplicationBuilder builder = new SpringApplicationBuilder(SheetsIOApplication.class);
+		SpringApplicationBuilder builder = new SpringApplicationBuilder(Main.class);
 		builder.application().setWebApplicationType(WebApplicationType.NONE);
 		builder.build();
 	}

@@ -18,21 +18,20 @@ package application.services;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import application.data.GoogleSheetsRepository;
 import application.models.CellUpdate;
-import application.models.CellWrapper;
-import application.models.SheetCache;
-import application.models.json.GoogleSheetsResponse;
+import application.models.ConfigurationFile;
 import application.services.old.FileUpdater;
-import application.utils.FileIO;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Service responsible for the thread that updates the files, using data from
@@ -40,17 +39,35 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Mark "Grandy" Bishop
  */
-@RequiredArgsConstructor
-public class UpdateService {
+@Service
+public class UpdateService extends AbstractService {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateService.class);
 
 	@Autowired
-	private GoogleSheetsRepository googleSheetsRepository;
+	private GoogleSheetsService googleSheetsService;
+
+	private final FileUpdater fileUpdater = new FileUpdater(new FileIOService()); // FileUpdateRepository
 
 	@Autowired
-	private SheetCache cache;
+	private ConfigurationFile configurationFile;
+	private Timer timer = new Timer();
 
-	private final FileUpdater fileUpdater = new FileUpdater(new FileIO());
+	@PostConstruct
+	public void start() {
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				if (configurationFile.isAutoUpdate()) {
+					update();
+				}
+			}
+		}, 0, getAppProps().getUpdateInterval());
+	}
+
+	public void updateInterval(int newInterval) {
+		timer.cancel();
+		start();
+	}
 
 	/**
 	 * Perform an update loop, based on the given config.
@@ -59,23 +76,12 @@ public class UpdateService {
 	 *             should the {@link FileUpdater} fail
 	 */
 	public void update() throws Exception {
-		List<CellUpdate> updatedCells = updateCache(getLatestState());
-		if (updatedCells.isEmpty()) {
-			LOGGER.debug("Not performing file update(s) - no values to update.");
-			return;
-		}
+		List<CellUpdate> updatedCells = googleSheetsService.updateCache();
 
 		// Update applicable files
 		LOGGER.debug("Performing file update(s)");
 		fileUpdater.updateFiles(updatedCells.stream() //
 				.filter(cu -> cu.getCellWrapper().getFileExtension().isForFile()) //
 				.collect(Collectors.toList()));
-	}
-
-	private List<CellUpdate> updateCache(GoogleSheetsResponse data) {
-		Map<CellWrapper, String> fullValueMap = data.getMutatedRowColumnData();
-
-		// Update the cache
-		return this.cache.update(fullValueMap);
 	}
 }

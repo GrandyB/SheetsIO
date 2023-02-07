@@ -1,5 +1,5 @@
 /**
- * ConfigurationService.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2023.
+ * AbstractRepository.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2023.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,16 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package application.services.file;
+package application.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import application.configuration.ApplicationProperties;
+import lombok.Getter;
+
 /**
- * Service responsible for writing out text files.
+ * Parent class for services. Has basic fields for access to context and
+ * application properties.
  *
  * @author Mark "Grandy" Bishop
  */
 @Service
-public class TextFileService {
+public abstract class AbstractService {
 
+	@Autowired
+	@Getter
+	private ApplicationContext context;
+
+	@Autowired
+	@Getter
+	private ApplicationProperties appProps;
 }

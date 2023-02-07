@@ -20,11 +20,12 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import application.IExceptionHandler;
 import application.Main;
 import application.exceptions.IllegalFileExtensionException;
-import application.models.ConfigHolder;
+import application.models.ConfigurationFile;
 import application.models.PropertiesHolder;
 import application.services.UpdateService;
 
@@ -35,6 +36,7 @@ import application.services.UpdateService;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class UpdateRunnable extends IntervalRunnable {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateRunnable.class);
 
@@ -48,8 +50,8 @@ public class UpdateRunnable extends IntervalRunnable {
 	@Override
 	public synchronized void perform() throws Exception {
 		LOGGER.trace("Updater: {}\n" + "Auto update: {}\n" + "RunOnce: {}", this.updater,
-				ConfigHolder.get().isAutoUpdate(), this.runOnce);
-		if (this.updater != null && (ConfigHolder.get().isAutoUpdate() || this.runOnce)) {
+				ConfigurationFile.get().isAutoUpdate(), this.runOnce);
+		if (this.updater != null && (ConfigurationFile.get().isAutoUpdate() || this.runOnce)) {
 			this.runOnce = false;
 			updater.update();
 		}

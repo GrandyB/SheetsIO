@@ -18,8 +18,13 @@ package application.threads;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import application.IExceptionHandler;
+import application.configuration.ApplicationProperties;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -29,9 +34,19 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 @RequiredArgsConstructor
 public abstract class IntervalRunnable implements Runnable {
 	private static final Logger LOGGER = LogManager.getLogger(IntervalRunnable.class);
+
+	@Autowired
+	@Getter
+	private ApplicationContext applicationContext;
+
+	@Autowired
+	@Getter
+	private ApplicationProperties appProps;
+
 	private boolean doStop = false;
 
 	private final IExceptionHandler exceptionHandler;

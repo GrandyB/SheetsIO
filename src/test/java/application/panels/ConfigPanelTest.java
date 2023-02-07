@@ -31,12 +31,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import application.IApplicationOps;
-import application.models.ConfigHolder;
+import application.models.ConfigurationFile;
 import application.models.PropertiesHolder;
+import application.services.FileIOService;
 import application.services.old.FileUpdater;
 import application.threads.UpdateRunnable;
 import application.utils.AppUtil;
-import application.utils.FileIO;
 
 public class ConfigPanelTest {
 
@@ -47,9 +47,9 @@ public class ConfigPanelTest {
 	@Mock
 	private ConfigPanel.Gui gui;
 	@Mock
-	private FileIO fileIO;
+	private FileIOService fileIO;
 	@Mock
-	private ConfigHolder configHolder;
+	private ConfigurationFile configHolder;
 	@Mock
 	private UpdateRunnable updateRunnable;
 	@Mock

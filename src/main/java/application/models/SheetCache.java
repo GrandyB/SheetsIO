@@ -71,8 +71,9 @@ public class SheetCache {
 			String newVal = updatedValueMap.get(cacheEntry.getKey());
 			String cacheValue = cacheEntry.getValue();
 
-			if (newVal == null) {
+			if (newVal == null || isGoogleSheetErrorCode(newVal)) {
 				// We didn't find the cell (from config) in the update (from sheet)
+				// OR the value is an error code; either way, treat it as empty
 				// TODO Might want to request a range (e.g. A1:B3) in the API request itself
 				newVal = "";
 			}
@@ -99,5 +100,22 @@ public class SheetCache {
 	 */
 	public Optional<CellWrapper> findByName(String name) {
 		return values.keySet().stream().filter(cw -> name.equals(cw.getName())).findFirst();
+	}
+
+	/** @return whether the value is a known cell error code. */
+	private boolean isGoogleSheetErrorCode(String value) {
+		switch (value.trim().toLowerCase()) {
+		case "#n/a":
+		case "#div/0!":
+		case "#name?":
+		case "#null!":
+		case "#num!":
+		case "#ref!":
+		case "#value!":
+		case "#error!":
+			return true;
+		default:
+			return false;
+		}
 	}
 }

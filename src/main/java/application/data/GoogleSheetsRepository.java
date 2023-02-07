@@ -80,4 +80,9 @@ public class GoogleSheetsRepository extends AbstractRepository {
 			return false;
 		}
 	}
+
+	/** @return a fully formatted request URL for a spreadsheet. */
+	public String getGoogleRequestUrl(String spreadsheetId, String workbookId, String apiKey) {
+		return String.format(SPREADSHEET_URL_FORMAT, spreadsheetId, AppUtil.encodeUrlContent(workbookId), apiKey);
+	}
 }

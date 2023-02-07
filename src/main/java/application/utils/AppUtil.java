@@ -28,6 +28,8 @@ import java.net.URISyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.services.FileIOService;
+
 /**
  * Utility methods to perform common actions.
  * 
@@ -52,7 +54,7 @@ public class AppUtil {
 	}
 
 	/**
-	 * @return a safe, escaped {@link URI} for use in {@link FileIO} when
+	 * @return a safe, escaped {@link URI} for use in {@link FileIOService} when
 	 *         downloading files.
 	 */
 	public static URI encodeForUrl(String url)

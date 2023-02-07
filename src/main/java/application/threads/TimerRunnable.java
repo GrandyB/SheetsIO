@@ -24,8 +24,8 @@ import org.apache.logging.log4j.Logger;
 
 import application.IExceptionHandler;
 import application.panels.TimerPanel;
+import application.services.FileIOService;
 import application.services.old.FileUpdater;
-import application.utils.FileIO;
 import lombok.Setter;
 
 /**
@@ -38,7 +38,7 @@ public class TimerRunnable extends IntervalRunnable {
 
 	private static final Logger LOGGER = LogManager.getLogger(TimerRunnable.class);
 
-	private FileIO fileIO = new FileIO();
+	private FileIOService fileIO = new FileIOService();
 	@Setter
 	private TimerPanel timer;
 

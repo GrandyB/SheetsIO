@@ -1,7 +1,7 @@
 /**
  * FileIO.java is part of the "SheetsIO" project (c) by Mark "Grandy" Bishop, 2020.
  */
-package application.utils;
+package application.services;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,11 +24,14 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import application.exceptions.UnableToLoadRemoteURLException;
 import application.panels.ConfigPanel;
+import application.utils.AppUtil;
 
 /**
  * Encapsulate all file/folder-related operations. Not final as needs to be
@@ -37,8 +39,9 @@ import application.panels.ConfigPanel;
  *
  * @author Mark "Grandy" Bishop
  */
-public class FileIO {
-	private static final Logger LOGGER = LogManager.getLogger(FileIO.class);
+@Service
+public class FileIOService extends AbstractService {
+	private static final Logger LOGGER = LogManager.getLogger(FileIOService.class);
 
 	/**
 	 * Creates a folder from a path.
@@ -67,7 +70,7 @@ public class FileIO {
 	 *             if there's an error during writing to file
 	 */
 	public void writeTextFile(String filePath, String newValue) throws IOException {
-		FileWriter myWriter = new FileWriter(filePath);
+		FileWriterWithEncoding myWriter = new FileWriterWithEncoding(filePath, "UTF-8");
 		myWriter.write(newValue);
 		myWriter.close();
 	}
