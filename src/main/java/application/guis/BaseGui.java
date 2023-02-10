@@ -22,12 +22,8 @@ import org.apache.logging.log4j.Logger;
 import application.IApplicationOps;
 import application.panels.BasePanel;
 import application.panels.IPanel;
-import application.utils.AppUtil;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Control;
 import javafx.scene.layout.Pane;
 import lombok.AccessLevel;
@@ -72,25 +68,6 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 
 	/** Populate the layout. */
 	protected abstract void doLayout();
-
-	@Override
-	public void showErrorDialog(String header, String message) {
-		// Remove all instances of the user's API key
-		String sanitisedMessage = AppUtil.sanitiseApiKey(panel.getAppProps().getApiKey(), header);
-		String errorMessage = AppUtil.sanitiseApiKey(panel.getAppProps().getApiKey(), message);
-		/*
-		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
-		 * which is separate to the JavaFX application thread; Platform.runLater allows
-		 * the code to be ran on the proper thread.
-		 */
-		Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("SheetsIO error");
-			alert.setHeaderText(sanitisedMessage);
-			alert.setContentText(errorMessage);
-			alert.showAndWait();
-		});
-	}
 
 	/**
 	 * Disable the given {@link Control} for {@link #DISABLE_CONTROL_TIME} millis.

@@ -22,15 +22,11 @@ import org.greenrobot.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import com.google.gson.JsonSyntaxException;
-
 import application.IApplicationOps;
-import application.IExceptionHandler;
 import application.configuration.ApplicationProperties;
+import application.configuration.TransientProperties;
 import application.events.ConfigReloadedEvent;
-import application.exceptions.GoogleSheetsException;
-import application.exceptions.JsonValidationException;
-import application.utils.AppUtil;
+import application.services.ExceptionHandlerService;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +38,8 @@ import lombok.Setter;
  * @author Mark "Grandy" Bishop
  */
 @RequiredArgsConstructor
-public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, IExceptionHandler {
+public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G> {
 	private static final Logger LOGGER = LogManager.getLogger(BasePanel.class);
-
-	private static final int MAX_EXCEPTION_STACK_LINES = 10;
-
-	public static final String GENERIC_ERROR_END = "\nIf unable to fix locally, please raise an issue with today's log file (in /logs) and any details on how to reproduce at https://github.com/GrandyB/SheetsIO/issues";
 
 	@Getter(AccessLevel.PROTECTED)
 	@Setter
@@ -65,14 +57,17 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	@Getter
 	private ApplicationProperties appProps;
 
+	@Autowired
+	@Getter
+	private ExceptionHandlerService exceptionHandler;
+
+	@Autowired
+	@Getter
+	private TransientProperties transientProperties;
+
 	public interface Gui {
 		/** Perform initialisation of the Gui. */
 		void init();
-
-		/**
-		 * Show an error dialog on screen, with the given header/message, but sanitised.
-		 */
-		void showErrorDialog(String header, String message);
 	}
 
 	/**
@@ -84,50 +79,6 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 		getGui().init();
 	}
 
-	@Override
-	public void handleException(Exception e) {
-		String headerText = e.getMessage();
-		StringBuilder error = new StringBuilder();
-
-		if (e instanceof JsonValidationException) {
-			JsonValidationException jsonEx = (JsonValidationException) e;
-			error.append(jsonEx.getSummary());
-			error.append('\n');
-
-		} else if (e instanceof JsonSyntaxException) {
-			error.append("Your json is malformed and needs correcting!\n");
-			error.append(e.getMessage());
-			error.append(
-					"\n\nCheck the line/column numbers in the error above for hints on where your json is failing.\nIf that doesn't help, consider running your config through a validation service such as https://jsonlint.com/\n");
-
-		} else if (e instanceof GoogleSheetsException) {
-			GoogleSheetsException gsEx = (GoogleSheetsException) e;
-			headerText = gsEx.getHeader();
-			error.append(gsEx.getMessage());
-			error.append("\n");
-
-		} else {
-			StackTraceElement[] stack = e.getStackTrace();
-			// If stack smaller than preset length, use that; otherwise limit to defined max
-			for (int i = 0; i < (stack.length > MAX_EXCEPTION_STACK_LINES ? MAX_EXCEPTION_STACK_LINES
-					: stack.length); i++) {
-				error.append(stack[i].toString());
-				error.append('\n');
-			}
-			error.append("...\n");
-
-		}
-
-		error.append(GENERIC_ERROR_END);
-
-		// Remove all instances of the user's API key
-		String sanitisedMessage = AppUtil.sanitiseApiKey(getAppProps().getApiKey(), headerText);
-		LOGGER.error(sanitisedMessage);
-		String errorMessage = AppUtil.sanitiseApiKey(getAppProps().getApiKey(), error.toString());
-		LOGGER.error(errorMessage);
-		getGui().showErrorDialog(sanitisedMessage, errorMessage);
-	}
-
 	@Subscribe
 	public void handleConfigReloadEvent(ConfigReloadedEvent event) {
 		// Do nothing
@@ -136,5 +87,10 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G>, I
 	/** Open a browser window with the given url. */
 	public void openBrowser(String url) {
 		getApp().openBrowser(url);
+	}
+
+	/** Handle an exception. */
+	public void handleException(Exception e) {
+		exceptionHandler.handle(e);
 	}
 }

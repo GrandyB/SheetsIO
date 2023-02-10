@@ -21,14 +21,16 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.EventBus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
+import application.data.FileUpdateRepository;
 import application.events.AppInitialisedEvent;
 import application.guis.MainGui;
 import application.models.PropertiesHolder;
-import application.threads.ThreadCollector;
+import application.services.ExceptionHandlerService;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -44,6 +46,20 @@ import lombok.Getter;
 public class Main extends Application implements IApplicationOps {
 	private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
+	public static final String LOGS_FOLDER = "logs";
+	public static final String TEMP_FOLDER = "temp";
+	public static final String FOLDER_PREFIX = "files";
+
+	@Autowired
+	private FileUpdateRepository fileUpdateRepository;
+	@Autowired
+	private ExceptionHandlerService exceptionHandler;
+
+	@Getter
+	private Stage primaryStage;
+	@Getter
+	private EventBus eventBus = new EventBus();
+
 	@Override
 	public void init() throws Exception {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(Main.class);
@@ -51,16 +67,19 @@ public class Main extends Application implements IApplicationOps {
 		builder.build();
 	}
 
-	@Getter
-	private Stage primaryStage;
-
-	@Getter
-	private EventBus eventBus = new EventBus();
-
 	@Override
 	public void start(Stage stage) throws IOException {
 		this.primaryStage = stage;
 		primaryStage.setTitle("SheetsIO");
+
+		// Create the initial folders
+		try {
+			fileUpdateRepository.createFolder(LOGS_FOLDER);
+			fileUpdateRepository.createFolder(FOLDER_PREFIX);
+			fileUpdateRepository.createFolder(TEMP_FOLDER);
+		} catch (IOException e) {
+			exceptionHandler.handle(e);
+		}
 
 		MainGui mainGui = new MainGui(this);
 
@@ -96,7 +115,6 @@ public class Main extends Application implements IApplicationOps {
 	@Override
 	public void stop() {
 		LOGGER.info("Stage is closing");
-		// Shut down the threads
-		ThreadCollector.stopAllThreads();
+		// TODO: is this still needed?
 	}
 }

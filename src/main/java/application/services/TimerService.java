@@ -16,11 +16,91 @@
  */
 package application.services;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import application.Main;
+import application.data.FileUpdateRepository;
+import application.models.TimerDuration;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
- * Service responsible for access and maintenance of timer threads/output.
+ * Service responsible for access and maintenance of timer update/output.
  *
  * @author Mark "Grandy" Bishop
  */
-public class TimerService {
+@Service
+public class TimerService extends AbstractService {
+	private static final Logger LOGGER = LogManager.getLogger(TimerService.class);
 
+	@Autowired
+	private FileUpdateRepository fileUpdateRepository;
+
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private TimerDuration time;
+
+	@Getter
+	@Setter
+	private boolean running = false;
+
+	@PostConstruct
+	public void setUp() {
+		executor.scheduleWithFixedDelay(() -> this.update(), 0, 1, TimeUnit.SECONDS);
+	}
+
+	@PreDestroy
+	public void tearDown() {
+		executor.shutdownNow();
+	}
+
+	/** @return a String representation of the timer's current value. */
+	public String getDisplay() {
+		return time.getDisplay();
+	}
+
+	private void update() {
+		LOGGER.trace("Perform timer tick");
+		if (running) {
+			time.decrease();
+			try {
+				fileUpdateRepository.writeTextFile(Main.FOLDER_PREFIX + File.separator + "timer.txt",
+						time.getDisplay());
+			} catch (IOException e) {
+				LOGGER.error("Unable to update the timer file", e);
+			}
+
+			if (time.getTotalSeconds() == 0) {
+				// Forcibly stop it once it ends
+				this.running = false;
+			}
+		}
+	}
+
+	/** Reset the timer back to 0. */
+	public void reset() {
+		this.time.update(0);
+	}
+
+	/** Set the time. */
+	public void setTimeAndFormat(int hours, int minutes, int seconds) {
+		this.time.setTimeAndFormat(hours, minutes, seconds);
+	}
+
+	/** Play or pause the timer, and return the new run state. */
+	public boolean playPause() {
+		running = !running;
+		return running;
+	}
 }

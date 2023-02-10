@@ -17,6 +17,8 @@
 package application.services;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,9 +31,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import application.data.FileUpdateRepository;
 import application.models.CellUpdate;
+import application.models.CellWrapper;
 import application.models.ConfigurationFile;
-import application.services.old.FileUpdater;
+import application.models.FileExtension;
+import application.models.FileExtension.FileExtensionType;
+import application.utils.AppUtil;
 
 /**
  * Service responsible for the thread that updates the files, using data from
@@ -45,8 +51,10 @@ public class UpdateService extends AbstractService {
 
 	@Autowired
 	private GoogleSheetsService googleSheetsService;
-
-	private final FileUpdater fileUpdater = new FileUpdater(new FileIOService()); // FileUpdateRepository
+	@Autowired
+	private FileAcquisitionService fileAcquisitionService;
+	@Autowired
+	private FileUpdateRepository fileUpdateRepository;
 
 	@Autowired
 	private ConfigurationFile configurationFile;
@@ -57,8 +65,12 @@ public class UpdateService extends AbstractService {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				if (configurationFile.isAutoUpdate()) {
-					update();
+				if (getTransientProperties().isAutoUpdate()) {
+					try {
+						update();
+					} catch (Exception e) {
+						getExceptionHandler().handle(e);
+					}
 				}
 			}
 		}, 0, getAppProps().getUpdateInterval());
@@ -80,8 +92,83 @@ public class UpdateService extends AbstractService {
 
 		// Update applicable files
 		LOGGER.debug("Performing file update(s)");
-		fileUpdater.updateFiles(updatedCells.stream() //
+		updateFiles(updatedCells.stream() //
 				.filter(cu -> cu.getCellWrapper().getFileExtension().isForFile()) //
 				.collect(Collectors.toList()));
+	}
+
+	/** Update all the files from the Map with their new values. */
+	private void updateFiles(List<CellUpdate> updatedCells) throws Exception {
+		for (CellUpdate entry : updatedCells) {
+			if (!entry.getCellWrapper().getFileExtension().isForFile()) {
+				continue;
+			}
+			CellWrapper cellWrapper = entry.getCellWrapper();
+			String newValue = entry.getNewValue();
+
+			/**
+			 * {@link CellUpdate}s are made up of {@link CellWrapper}s created from changes
+			 * in the Google Sheet - "A1 now has value X". The {@link SheetCache} will only
+			 * ever store one wrapper to a value (uses a Map to store it), but our config
+			 * could theoretically have multiple pieces of cell config all wanting to be
+			 * updated when the value changes. Here, we look up these multiple pieces.
+			 */
+			List<CellWrapper> allWrappersForCell = configurationFile.getCells().stream()
+					.filter(cw -> cw.equals(cellWrapper)) //
+					.collect(Collectors.toList());
+			for (CellWrapper w : allWrappersForCell) {
+				updateFile(w, newValue);
+			}
+		}
+	}
+
+	private void updateFile(CellWrapper cellWrapper, String newValue) throws Exception {
+		String destFilePath = fileUpdateRepository.createFilePath(configurationFile.getProjectName(), cellWrapper);
+		FileExtension ext = cellWrapper.getFileExtension();
+
+		if (FileExtension.TXT.equals(ext)) {
+			fileUpdateRepository.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
+		}
+
+		InputStream file = acquireFileInputStream(newValue);
+		switch (ext.getType()) {
+		case TEXT:
+			/**
+			 * Add padding if applicable (@see {@link CellWrapper#getPadding}), and replace
+			 * GSheet errors with blank values.
+			 */
+			break;
+		case IMAGE:
+			try {
+				fileUpdateRepository.writeImage(file, newValue, destFilePath);
+			} catch (Exception e) {
+				fileUpdateRepository.saveTransparentImage(destFilePath, ext.getType().name());
+			}
+			break;
+		case VIDEO:
+			try {
+				fileUpdateRepository.writeVideo(file, newValue, destFilePath);
+			} catch (Exception e) {
+				// TODO: Throw an actual exception
+			}
+			break;
+		default:
+			throw new IllegalStateException(
+					"Unable to handle " + FileExtensionType.class.getSimpleName() + ": " + ext.getType());
+		}
+	}
+
+	/**
+	 * @return {@link InputStream} of a file, acquired from a remote or local source
+	 *         depending on the URL.
+	 */
+	private InputStream acquireFileInputStream(String url) throws Exception {
+		return isRemote(url) ? fileAcquisitionService.downloadRemoteFile(url)
+				: fileAcquisitionService.downloadRemoteFile(url);
+	}
+
+	private boolean isRemote(String url) throws Exception {
+		URI uri = AppUtil.encodeForUrl(url);
+		return uri.getScheme().equals("file");
 	}
 }

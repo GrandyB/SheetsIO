@@ -16,11 +16,108 @@
  */
 package application.data;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import application.exceptions.JsonValidationException;
+import application.models.CellWrapper;
+import application.models.ConfigurationFile;
+import application.models.json.Cell;
+import application.models.json.Config;
+
 /**
  * Repository responsible for accessing json configuration files.
  *
  * @author Mark "Grandy" Bishop
  */
-public class ConfigurationFileRepository {
+public class ConfigurationFileRepository extends AbstractRepository {
+	private static final Logger LOGGER = LogManager.getLogger(ConfigurationFileRepository.class);
 
+	@Autowired
+	private ConfigurationFile configurationFile;
+
+	/** Load the configuration file. */
+	public void loadConfiguration(File file) throws Exception {
+		if (file == null) {
+			LOGGER.debug("Attempted to load a null configuration file");
+			return;
+		}
+
+		loadFile(file);
+	}
+
+	/**
+	 * Loads the given {@link File} into java beans, which are then accessible from
+	 * this class.
+	 * 
+	 * @throws Exception
+	 *             any exception from config loading.
+	 */
+	public synchronized void loadFile(File file) throws Exception {
+		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
+		LOGGER.debug("Config file has been loaded.");
+		LOGGER.trace(root.toString());
+
+		// Load json into java beans
+		Config conf = new GsonBuilder().create().fromJson(jsonStr, Config.class);
+		LOGGER.debug(conf);
+
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<Config>> violations = validator.validate(conf);
+
+		if (!violations.isEmpty()) {
+			throw new JsonValidationException(violations);
+		}
+
+		configurationFile.setConfig(conf);
+		configurationFile.setLastFile(file);
+
+		configurationFile.getCellWrappers().clear();
+		for (Cell cell : conf.getCells()) {
+			if (cell != null) {
+				configurationFile.getCellWrappers().add(new CellWrapper(cell));
+			} else {
+				LOGGER.debug(
+						"Detected empty/null entry in the 'cells' array; Check that your 'cells' array in config does not have any double commas ,, or a comma after the last element of the array.");
+			}
+		}
+	}
+
+	/**
+	 * Reloads the existing config file, if there is one. If there isn't, nothing
+	 * happens.
+	 * 
+	 * @throws Exception
+	 *             any exception from config loading.
+	 */
+	public synchronized void reload() {
+		File lastFile = configurationFile.getLastFile();
+		if (lastFile != null) {
+			LOGGER.debug("Reloading.");
+			try {
+				loadFile(lastFile);
+			} catch (Exception e) {
+				getExceptionHandler().handle(e);
+			}
+		} else {
+			LOGGER.warn("There is no existing config file loaded");
+		}
+	}
 }

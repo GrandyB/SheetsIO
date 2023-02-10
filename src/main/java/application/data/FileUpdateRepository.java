@@ -32,14 +32,15 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
+import application.Main;
 import application.models.CellWrapper;
 import application.models.FileExtension;
-import application.panels.ConfigPanel;
 
 /**
  * Repository responsible for reading and writing output files.
@@ -61,6 +62,37 @@ public class FileUpdateRepository {
 		FileWriterWithEncoding myWriter = new FileWriterWithEncoding(filePath, "UTF-8");
 		myWriter.write(newValue);
 		myWriter.close();
+	}
+
+	/**
+	 * Downloads file from the url and saves as destinationPath. This is only used
+	 * for video files.
+	 * 
+	 * @param url
+	 *            A full URL, e.g.
+	 *            http://dl5.webmfiles.org/big-buck-bunny_trailer.webm
+	 * @param destinationPath
+	 *            The file path including extension
+	 * @param extension
+	 * @throws IOException
+	 *             Should reading from the URL or writing/converting go awry
+	 */
+	public void writeVideo(InputStream is, String destinationPath, String extension) throws Exception {
+		Instant start = Instant.now();
+		File tempFile = new File(Main.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
+
+		Instant copyStart = Instant.now();
+		FileUtils.copyToFile(is, tempFile);
+		is.close();
+		LOGGER.debug("Copy [{}ms]", Duration.between(copyStart, Instant.now()).toMillis());
+
+		File outputFile = new File(destinationPath);
+		Instant moveStart = Instant.now();
+		Files.move(tempFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		LOGGER.debug("File renamed/moved to '{}' [{}ms]", destinationPath,
+				Duration.between(moveStart, Instant.now()).toMillis());
+
+		LOGGER.debug("Full process [{}ms]\n----------", Duration.between(start, Instant.now()).toMillis());
 	}
 
 	/**
@@ -87,7 +119,7 @@ public class FileUpdateRepository {
 	}
 
 	private File writeImageToTempFolder(InputStream inputStream, String extension) throws IOException {
-		File tempFile = new File(ConfigPanel.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
+		File tempFile = new File(Main.TEMP_FOLDER + "/" + getRandomString(8) + "." + extension);
 
 		Instant readStart = Instant.now();
 		BufferedImage image = ImageIO.read(inputStream);
@@ -184,7 +216,7 @@ public class FileUpdateRepository {
 	 *            the {@link CellWrapper}, for its name and {@link FileExtension}
 	 * @return the file path, using prefix and folder name.
 	 */
-	protected String createFilePath(String folderName, CellWrapper cell) {
+	public String createFilePath(String folderName, CellWrapper cell) {
 		return FOLDER_PREFIX + File.separator + folderName + File.separator + cell.getName() + "."
 				+ cell.getFileExtension().getExtension();
 	}

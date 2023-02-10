@@ -17,30 +17,17 @@
 package application.models;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import application.exceptions.IllegalFileExtensionException;
-import application.exceptions.JsonValidationException;
-import application.models.json.Cell;
 import application.models.json.Config;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Wrapper around {@link Config}, accessing its data and reading in data.
@@ -52,18 +39,19 @@ public class ConfigurationFile {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigurationFile.class);
 
 	/** Cached version of most recent config {@link File}. */
+	@Getter
+	@Setter
 	private File lastFile;
 
-	@Getter
-	private boolean autoUpdate = false;
-
 	/** The latest loaded config. */
+	@Setter
 	private Config config;
 
 	/**
 	 * CellWrappers, made from Cells, used by the rest of the app, wiped/repopulated
 	 * on config load.
 	 */
+	@Getter
 	private List<CellWrapper> cellWrappers = new ArrayList<>();
 
 	public synchronized String getProjectName() {
@@ -88,61 +76,5 @@ public class ConfigurationFile {
 
 	public synchronized boolean isLoaded() {
 		return lastFile != null;
-	}
-
-	public synchronized void setAutoUpdate(boolean update) {
-		LOGGER.debug("Autoupdate set to {}", update);
-		this.autoUpdate = update;
-	}
-
-	/**
-	 * Reloads the most recently successful config file.
-	 * 
-	 * @throws Exception
-	 *             any exception from config loading.
-	 */
-	public synchronized void reload() throws Exception {
-		assert lastFile != null : "There is no existing config file loaded";
-		LOGGER.debug("Reloading.");
-		loadFile(lastFile);
-	}
-
-	/**
-	 * Loads the given {@link File} into java beans, which are then accessible from
-	 * this class.
-	 * 
-	 * @throws Exception
-	 *             any exception from config loading.
-	 */
-	public synchronized void loadFile(File file) throws Exception {
-		String jsonStr = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-		JsonObject root = JsonParser.parseString(jsonStr).getAsJsonObject();
-		LOGGER.debug("Config file has been loaded.");
-		LOGGER.trace(root.toString());
-
-		// Load json into java beans
-		Config conf = new GsonBuilder().create().fromJson(jsonStr, Config.class);
-		LOGGER.debug(conf);
-
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		Validator validator = factory.getValidator();
-		Set<ConstraintViolation<Config>> violations = validator.validate(conf);
-
-		if (!violations.isEmpty()) {
-			throw new JsonValidationException(violations);
-		}
-
-		this.lastFile = file;
-		this.config = conf;
-
-		cellWrappers.clear();
-		for (Cell cell : config.getCells()) {
-			if (cell != null) {
-				cellWrappers.add(new CellWrapper(cell));
-			} else {
-				LOGGER.debug(
-						"Detected empty/null entry in the 'cells' array; Check that your 'cells' array in config does not have any double commas ,, or a comma after the last element of the array.");
-			}
-		}
 	}
 }

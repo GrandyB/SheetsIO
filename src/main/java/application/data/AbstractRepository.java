@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Repository;
 
 import application.configuration.ApplicationProperties;
+import application.services.ExceptionHandlerService;
 import lombok.Getter;
 
 /**
@@ -39,4 +40,8 @@ public abstract class AbstractRepository {
 	@Autowired
 	@Getter
 	private ApplicationProperties appProps;
+
+	@Autowired
+	@Getter
+	private ExceptionHandlerService exceptionHandler;
 }

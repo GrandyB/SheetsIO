@@ -16,14 +16,12 @@
  */
 package application.panels;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import application.models.TimerDuration;
-import application.threads.ThreadCollector;
-import application.threads.TimerRunnable;
+import application.services.TimerService;
 
 /**
  * Timer panel, for all logic surrounding the timer.
@@ -33,11 +31,8 @@ import application.threads.TimerRunnable;
 public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	private static final Logger LOGGER = LogManager.getLogger(TimerPanel.class);
 
-	private TimerRunnable timerRunnable;
-	private TimerDuration time;
-
-	private boolean initialState = true;
-	private boolean isCurrentlyRunning = false;
+	@Autowired
+	private TimerService timerService;
 
 	public interface Gui extends BasePanel.Gui {
 
@@ -48,63 +43,18 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 		void setPlayPauseButtonText(String text);
 	}
 
-	public TimerPanel() {
-		super();
-		this.time = new TimerDuration();
-	}
-
-	/** Dependency injection, for use in tests. */
-	public TimerPanel(TimerDuration time, TimerRunnable timerRunnable) {
-		this.time = time;
-		this.timerRunnable = timerRunnable;
-	}
-
 	@Override
 	public void initialise() {
 		super.initialise();
-		getGui().updatePreview(getDisplay());
-
-		if (this.timerRunnable == null) {
-			// Ensure there is only ever one
-			this.timerRunnable = ThreadCollector.registerRunnable(new TimerRunnable(this));
-		}
-		this.timerRunnable.setTimer(this);
-		new Thread(timerRunnable).start();
-	}
-
-	/**
-	 * Perform a countdown tick, decreasing the time by 1 second.
-	 * 
-	 * @return true if the timer was indeed decreased (false if timer is at 0)
-	 */
-	public boolean decreaseTick() {
-		boolean didDecrease = this.time.decrease();
-		getGui().updatePreview(time.getDisplay());
-		return didDecrease;
-	}
-
-	/** @return the human-readable format of the remaining time. */
-	public String getDisplay() {
-		return time.getDisplay();
+		getGui().updatePreview(timerService.getDisplay());
 	}
 
 	/** Reset the timer. */
 	public void reset() {
 		LOGGER.debug("Resetting timer");
-		int currentTime = time.getTotalSeconds();
-		time.update(0);
-		try {
-			this.timerRunnable.updateFile(true);
-
-			this.initialState = true;
-			this.isCurrentlyRunning = false;
-			getGui().setPlayPauseButtonText("Start");
-		} catch (IOException e) {
-			handleException(e);
-			time.update(currentTime);
-		}
-
-		getGui().updatePreview(time.getDisplay());
+		timerService.reset();
+		getGui().setPlayPauseButtonText("Start");
+		getGui().updatePreview(timerService.getDisplay());
 	}
 
 	/**
@@ -113,13 +63,8 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	 * preview.
 	 */
 	public void handleUpdateButtonClick(int hours, int minutes, int seconds) {
-		time.setTimeAndFormat(hours, minutes, seconds);
-		try {
-			this.timerRunnable.updateFile(false);
-		} catch (IOException e) {
-			handleException(e);
-		}
-		getGui().updatePreview(time.getDisplay());
+		timerService.setTimeAndFormat(hours, minutes, seconds);
+		getGui().updatePreview(timerService.getDisplay());
 	}
 
 	/**
@@ -127,21 +72,9 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	 * fields.
 	 */
 	public void handlePlayPauseButtonPress(int hours, int minutes, int seconds) {
-		if (initialState) {
-			// First time click, setup the time
-			time.setTimeAndFormat(hours, minutes, seconds);
-			initialState = false;
-			LOGGER.debug("Initialising timer.\n{}", time);
-		}
-		if (isCurrentlyRunning) {
-			// We're currently running, so pause
-			timerRunnable.pause();
-			this.isCurrentlyRunning = false;
+		if (timerService.playPause()) {
 			getGui().setPlayPauseButtonText("Resume");
 		} else {
-			// We're not currently running/initial, so start it
-			timerRunnable.unpause();
-			this.isCurrentlyRunning = true;
 			getGui().setPlayPauseButtonText("Pause");
 		}
 	}

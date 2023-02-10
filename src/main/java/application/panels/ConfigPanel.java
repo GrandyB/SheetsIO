@@ -17,17 +17,14 @@
 package application.panels;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import application.exceptions.IllegalFileExtensionException;
+import application.data.ConfigurationFileRepository;
 import application.models.ConfigurationFile;
-import application.services.FileIOService;
-import application.services.old.FileUpdater;
-import application.threads.UpdateRunnable;
+import application.services.UpdateService;
 
 /**
  * Logic base for the config section.
@@ -37,23 +34,12 @@ import application.threads.UpdateRunnable;
 public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigPanel.class);
 
-	public static final String LOGS_FOLDER = "logs";
-	public static final String TEMP_FOLDER = "temp";
-
 	@Autowired
-	private ConfigurationFile configFile;
-
-	private UpdateRunnable updateRunnable;
-	private ConfigurationFile configHolder;
-	private FileIOService fileIO;
-
-	/** Dependency injection, for use in tests. */
-	public ConfigPanel(ConfigurationFile configHolder, FileIOService fileIO, UpdateRunnable updateRunnable) {
-		super();
-		this.configHolder = configHolder;
-		this.fileIO = fileIO;
-		this.updateRunnable = updateRunnable;
-	}
+	private ConfigurationFileRepository configurationFileRepository;
+	@Autowired
+	private UpdateService updateService;
+	@Autowired
+	private ConfigurationFile configurationFile;
 
 	public interface Gui extends BasePanel.Gui {
 		/** Update the directory shown to the user on opening the file chooser. */
@@ -72,18 +58,8 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		void setUpdateNowButtonEnabled(boolean enabled);
 	}
 
-	@Override
-	public void initialise() {
-		super.initialise();
-
-		// Create the initial folders
-		try {
-			fileIO.createFolder(LOGS_FOLDER);
-			fileIO.createFolder(FileUpdater.FOLDER_PREFIX);
-			fileIO.createFolder(ConfigPanel.TEMP_FOLDER);
-		} catch (IOException e) {
-			handleException(e);
-		}
+	public ConfigPanel() {
+		super();
 
 		// Load the previous config if there is one
 		String previousConfigPath = getAppProps().getLastConfigLocation();
@@ -99,22 +75,16 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	 *             if the saving of the 'last selected config' fails.
 	 */
 	public void handleConfigSelection(File file) {
-		if (file == null) {
-			return;
-		}
-
 		try {
-			this.configHolder.loadFile(file);
-			this.updateRunnable.updateConfig(true);
+			configurationFileRepository.loadConfiguration(file);
 		} catch (Exception e) {
-			handleException(e);
+			getExceptionHandler().handle(e);
 			return;
 		}
 
 		getGui().setConfigChooserDirectory(file.getAbsoluteFile().getParentFile());
 		getGui().setConfigLabel(file.getName());
 		getGui().setReloadConfigLinkVisible(true);
-		getGui().setAutoUpdateCheckState(this.configHolder.isAutoUpdate());
 
 		// Set 'last config' option in application.properties
 		getAppProps().setLastConfigLocation(file.getAbsolutePath());
@@ -122,35 +92,21 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 
 	/** Handle a click of the 'reload' config button in the UI. */
 	public void handleReloadLinkClick() {
-		if (this.configHolder.isLoaded()) {
-			try {
-				/*
-				 * Reload backing config file, set it onto the thread, clearing and re-adding
-				 * files into the relevant folder (empty).
-				 */
-				this.configHolder.reload();
-				this.updateRunnable.updateConfig(true);
-			} catch (Exception e) {
-				handleException(e);
-			}
-		}
+		configurationFileRepository.reload();
 	}
 
 	/** Handle a toggle in the auto update checkbox. */
 	public void handleAutoUpdateCheck(boolean selected) {
-		this.configHolder.setAutoUpdate(selected);
-		getGui().setUpdateNowButtonEnabled(!selected);
-		try {
-			if (this.configHolder.isLoaded()) {
-				this.updateRunnable.updateConfig(false);
-			}
-		} catch (IOException | IllegalFileExtensionException e) {
-			handleException(e);
-		}
+		getTransientProperties().setAutoUpdate(selected);
+		// TODO: Event?
 	}
 
 	/** Handle a press of the 'Update Now' button. */
 	public void handleUpdateNowPress() {
-		this.updateRunnable.runOnce();
+		try {
+			updateService.update();
+		} catch (Exception e) {
+			getExceptionHandler().handle(e);
+		}
 	}
 }

@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import application.configuration.ApplicationProperties;
+import application.configuration.TransientProperties;
 import lombok.Getter;
 
 /**
@@ -39,4 +40,12 @@ public abstract class AbstractService {
 	@Autowired
 	@Getter
 	private ApplicationProperties appProps;
+
+	@Autowired
+	@Getter
+	private ExceptionHandlerService exceptionHandler;
+
+	@Autowired
+	@Getter
+	private TransientProperties transientProperties;
 }
