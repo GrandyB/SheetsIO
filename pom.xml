@@ -160,6 +160,25 @@
 			    <configuration>
 			        <mainClass>application.Main</mainClass>
 			    </configuration>
+				<executions>
+	                <execution>
+	                    <!-- Default configuration for running -->
+	                    <id>default-cli</id>
+	                    <configuration>
+	                        <mainClass>application.Main</mainClass>
+	                    </configuration>
+	                </execution>
+	                <execution>
+	                    <!-- Configuration for debugging -->
+	                    <id>debug</id>
+	                    <configuration>
+	                        <options>
+	                            <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8001</option>
+	                        </options>
+	                        <mainClass>application.Main</mainClass>
+	                    </configuration>
+	                </execution>
+	            </executions>
 			</plugin>
 		</plugins>
 	</build>

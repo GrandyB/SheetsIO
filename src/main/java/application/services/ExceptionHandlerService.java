@@ -90,7 +90,8 @@ public class ExceptionHandlerService extends AbstractService {
 		showErrorDialog(sanitisedMessage, errorMessage);
 	}
 
-	private void showErrorDialog(String header, String message) {
+	/** Show a dialog. */
+	public void showErrorDialog(String header, String message) {
 		// Remove all instances of the user's API key
 		String apiKey = getAppProps().getApiKey();
 		String sanitisedMessage = AppUtil.sanitiseApiKey(apiKey, header);

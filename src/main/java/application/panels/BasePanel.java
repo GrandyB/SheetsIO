@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import application.IApplicationOps;
 import application.configuration.ApplicationProperties;
@@ -37,6 +38,7 @@ import lombok.Setter;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 @RequiredArgsConstructor
 public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G> {
 	private static final Logger LOGGER = LogManager.getLogger(BasePanel.class);

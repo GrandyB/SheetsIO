@@ -18,6 +18,8 @@ package application;
 
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.EventBus;
@@ -72,15 +74,6 @@ public class Main extends Application implements IApplicationOps {
 		this.primaryStage = stage;
 		primaryStage.setTitle("SheetsIO");
 
-		// Create the initial folders
-		try {
-			fileUpdateRepository.createFolder(LOGS_FOLDER);
-			fileUpdateRepository.createFolder(FOLDER_PREFIX);
-			fileUpdateRepository.createFolder(TEMP_FOLDER);
-		} catch (IOException e) {
-			exceptionHandler.handle(e);
-		}
-
 		MainGui mainGui = new MainGui(this);
 
 		Scene mainScene = new Scene(mainGui, PropertiesHolder.SCENE_WIDTH, PropertiesHolder.SCENE_HEIGHT);
@@ -89,6 +82,18 @@ public class Main extends Application implements IApplicationOps {
 		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
 		primaryStage.setScene(mainScene);
 		primaryStage.show();
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		// Create the initial folders
+		try {
+			fileUpdateRepository.createFolder(LOGS_FOLDER);
+			fileUpdateRepository.createFolder(FOLDER_PREFIX);
+			fileUpdateRepository.createFolder(TEMP_FOLDER);
+		} catch (IOException e) {
+			exceptionHandler.handle(e);
+		}
 
 		eventBus.post(new AppInitialisedEvent());
 	}

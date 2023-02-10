@@ -69,16 +69,11 @@ public class GoogleSheetsRepository extends AbstractRepository {
 	 * 
 	 * @return true if it connects, false if not
 	 */
-	public boolean testConnection() {
+	public void testConnection() throws Exception {
 		// Get the "sample"/test URL and try out a connection
 		String url = String.format(SPREADSHEET_URL_FORMAT, getAppProps().getTestSpreadsheetID(),
 				getAppProps().getTestWorkbookID(), getAppProps().getApiKey());
-		try {
-			getGoogleSheetsData(url);
-			return true;
-		} catch (GoogleSheetsException | IOException e) {
-			return false;
-		}
+		getGoogleSheetsData(url);
 	}
 
 	/** @return a fully formatted request URL for a spreadsheet. */

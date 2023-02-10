@@ -16,8 +16,6 @@
  */
 package application.panels;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
@@ -26,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import application.data.GoogleSheetsRepository;
 import application.events.ApiKeySetEvent;
 import application.events.AppInitialisedEvent;
-import application.exceptions.GoogleSheetsException;
 import application.models.ApiKeyStatus;
 import lombok.NoArgsConstructor;
 
@@ -58,17 +55,17 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 	public void handleSetApiKeyPress(String potentialKey) {
 		if (potentialKey == null || potentialKey.trim().isEmpty()) {
 			updateUI(ApiKeyStatus.MISSING);
-			getGui().showErrorDialog("No apiKey given", "Please provide an apiKey");
+			getExceptionHandler().showErrorDialog("No apiKey given", "Please provide an apiKey");
 			return;
 		} else {
 			getAppProps().setApiKey(potentialKey);
 
 			try {
-				googleSheetsRepository.getGoogleSheetsData(url);
+				googleSheetsRepository.testConnection();
 				updateUI(ApiKeyStatus.LOADED);
-			} catch (GoogleSheetsException | IOException e) {
+			} catch (Exception e) {
 				updateUI(ApiKeyStatus.ERROR);
-				handleException(e);
+				getExceptionHandler().handle(e);
 			}
 		}
 	}

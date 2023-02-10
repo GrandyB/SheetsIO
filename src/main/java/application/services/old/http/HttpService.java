@@ -38,8 +38,6 @@ import application.models.FileExtension.FileExtensionType;
 import application.models.PropertiesHolder;
 import application.models.SheetCache;
 import application.services.old.http.ConnectionRequest.ConnectionRequestType;
-import application.threads.ThreadCollector;
-import application.threads.UpdateRunnable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -81,7 +79,7 @@ public class HttpService implements HttpHandler {
 	public static HttpService getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new HttpService();
-			ThreadCollector.setHttpService(INSTANCE);
+			// ThreadCollector.setHttpService(INSTANCE);
 		}
 		return INSTANCE;
 	}
@@ -270,19 +268,21 @@ public class HttpService implements HttpHandler {
 	 * Responds to request with a 404 if no update loop present, or 200.
 	 */
 	public void handleUpdateRequest(ConnectionRequest request, HttpExchange httpExchange) throws IOException {
-		Optional<UpdateRunnable> updateLoop = ThreadCollector.getUpdateLoop();
-		int responseCode = 404;
-		if (updateLoop.isPresent()) {
-			LOGGER.debug("Requested an update call from {}", HttpService.class.getName());
-			updateLoop.get().runOnce();
-			responseCode = 200;
-		} else {
-			LOGGER.debug(
-					"Attempted to perform an update using {}'s /update call, but there was no updateLoop available",
-					HttpService.class.getName());
-		}
-		LOGGER.debug("Responding for update with {}", responseCode);
-		httpExchange.sendResponseHeaders(responseCode, -1);
+		// Optional<UpdateRunnable> updateLoop = ThreadCollector.getUpdateLoop();
+		// int responseCode = 404;
+		// if (updateLoop.isPresent()) {
+		// LOGGER.debug("Requested an update call from {}",
+		// HttpService.class.getName());
+		// updateLoop.get().runOnce();
+		// responseCode = 200;
+		// } else {
+		// LOGGER.debug(
+		// "Attempted to perform an update using {}'s /update call, but there was no
+		// updateLoop available",
+		// HttpService.class.getName());
+		// }
+		// LOGGER.debug("Responding for update with {}", responseCode);
+		// httpExchange.sendResponseHeaders(responseCode, -1);
 	}
 
 	/**

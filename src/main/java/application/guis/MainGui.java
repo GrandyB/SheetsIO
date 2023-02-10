@@ -16,6 +16,10 @@
  */
 package application.guis;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
 import application.IApplicationOps;
 import application.models.PropertiesHolder;
 import application.panels.MainPanel;
@@ -27,12 +31,17 @@ import javafx.scene.layout.VBox;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements MainPanel.Gui {
 
 	private VBox mainLayout = new VBox();
 
 	public MainGui(IApplicationOps app) {
 		super(app, new MainPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
+	}
+
+	@PostConstruct
+	public void postConstruct() {
 		getPanel().initialise();
 	}
 
