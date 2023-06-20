@@ -86,6 +86,12 @@ Valid `fileExtension` values:
 - Images: "png", "jpg", "gif"
 - Text: "txt"
 
+## Google Sheet values
+
+Once you have a config setup and loaded into SheetsIO, on update it will use your config assignments to acquire data from the Google Sheet.
+
+If you've specified a cell as being an image, you have the option of using a remove/web hosted image (such as on imgur), or a locally hosted image (e.g. `file://C:/path/to/file.png`). The advantage of using a remotely hosted image is that you can use the `=IMAGE(C4)` style formula in your sheet to preview the image; the advantage of using a locally hosted image is of course that it's a bit faster and not reliant on external hosting.
+
 ## Timer
 
 The timer is a combination of spinners and buttons to control `/files/timer.txt`, which updates each second that the timer is active.
