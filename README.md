@@ -100,5 +100,22 @@ The timer is a combination of spinners and buttons to control `/files/timer.txt`
 - `Update` button forces the countdown to the values in the box; if the timer is running, it'll then continue ticking down but from the new value, if the timer is paused, it'll set this new value but not resume automatically
 - `Reset` button forces the countdown to its starting 00:00 display but does not affect the spinners
 
+## Http webserver
+Any asset that is downloaded and stored in the local file system now **also** is available in URL form for browser sources.
+
+Comes with two (hopefully very self-explanatory) `application.properties` entries:
+- `http.enable=true`- completely disables the webserver from starting if false
+- `http.port=8001` - the port by which you access the webserver
+
+Using the names of the cells in your config you can visit/use 'http://localhost:8001/projectName/cellName' as a browser source, which will serve any/all types of file already existing in SheetsIO (text/image/video) as well as a new 'html' file type.
+
+These webpages are constantly sending mini HEAD requests (every second) to the SheetsIO webserver, asking whether it has the latest version of its content. When it is informed that it does not have the latest, it forces a refresh of the webpage and updates to have the most up to date content.
+
+The 'html' file type allows _any iframe compatible website_ (of which vdoninja is one!) to be switched between. Just put a link in the cell and use the "fileExtension": "html" in config. I'll be looking into ways to improve this as time goes on.
+
+This feature is especially useful for pulling down video files into your productions, as switching out video files in OBS bugs out (hence why video types weren't included as cell types in SheetsIO). Webms are best due to small file size/low time to load.
+
+There's also a couple extra parameters you can add to URLs - `noscale` and `loop`; the former mostly used for images and uses the size of the image instead of stretching it to the browser source size; the latter makes videos loop instead of play once. These can be appended to your url, e.g. `http://localhost:8001/projectName/cellName?noscale` or `.../cellName?loop`.
+
 # Issues?
 Head on over to the [troubleshooting](https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting) wiki page.
