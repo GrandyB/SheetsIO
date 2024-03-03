@@ -117,5 +117,7 @@ This feature is especially useful for pulling down video files into your product
 
 There's also a couple extra parameters you can add to URLs - `noscale` and `loop`; the former mostly used for images and uses the size of the image instead of stretching it to the browser source size; the latter makes videos loop instead of play once. These can be appended to your url, e.g. `http://localhost:8001/projectName/cellName?noscale` or `.../cellName?loop`.
 
+**NOTE:** It is advised to start SheetsIO and update at least once before launching OBS when using this feature, and/or make sure the refresh checkboxes are ticked. If you launch OBS first, it'll try to access your URLs and fail, and launching SheetsIO afterwards doesn't magically fix them. The checkboxes should mean they reload when switching away and back however.
+
 # Issues?
 Head on over to the [troubleshooting](https://github.com/GrandyB/SheetsIO/wiki/Troubleshooting) wiki page.
