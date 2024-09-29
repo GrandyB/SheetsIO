@@ -20,19 +20,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import application.data.GoogleSheetsRepository;
 import application.events.ApiKeySetEvent;
 import application.events.AppInitialisedEvent;
 import application.models.ApiKeyStatus;
-import lombok.NoArgsConstructor;
 
 /**
  * Logic for the apiKey entry gui.
  *
  * @author Mark "Grandy" Bishop
  */
-@NoArgsConstructor
+@Component
 public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger(ApiKeyPanel.class);

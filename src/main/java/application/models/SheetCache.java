@@ -23,10 +23,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import org.springframework.stereotype.Component;
-
 import application.models.json.Config;
 import application.models.json.GoogleSheetsResponse;
+import application.utils.Prototype;
 
 /**
  * Keep track of current values from the google spreadsheet; when an update
@@ -35,14 +34,14 @@ import application.models.json.GoogleSheetsResponse;
  *
  * @author Mark "Grandy" Bishop
  */
-@Component
+@Prototype
 public class SheetCache {
 	private Map<CellWrapper, String> values = new HashMap<>();
 
 	/**
-	 * Prep the cache with the {@link CellWrapper} of the cells we're interested in
-	 * from our {@link Config}. This should be the only place we're changing the
-	 * cache's size.
+	 * Prep the cache with the {@link CellWrapper} of the cells we're interested
+	 * in from our {@link Config}. This should be the only place we're changing
+	 * the cache's size.
 	 *
 	 * Should be called each time config is updated, to wipe the cache clean and
 	 * prep it for the next config.
@@ -53,11 +52,12 @@ public class SheetCache {
 	}
 
 	/**
-	 * Update the cache, provide a list of changed cell info (from the data source)
-	 * so we can update files.
+	 * Update the cache, provide a list of changed cell info (from the data
+	 * source) so we can update files.
 	 *
 	 * @param updatedValueMap
-	 *            mutated from {@link GoogleSheetsResponse}, the raw data in full
+	 *            mutated from {@link GoogleSheetsResponse}, the raw data in
+	 *            full
 	 * @return a Map of {@link CellWrapper} to String for the changed cells and
 	 *         their new values
 	 */
@@ -72,9 +72,11 @@ public class SheetCache {
 			String cacheValue = cacheEntry.getValue();
 
 			if (newVal == null || isGoogleSheetErrorCode(newVal)) {
-				// We didn't find the cell (from config) in the update (from sheet)
+				// We didn't find the cell (from config) in the update (from
+				// sheet)
 				// OR the value is an error code; either way, treat it as empty
-				// TODO Might want to request a range (e.g. A1:B3) in the API request itself
+				// TODO Might want to request a range (e.g. A1:B3) in the API
+				// request itself
 				newVal = "";
 			}
 

@@ -17,7 +17,10 @@
 package application.panels;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import application.IApplicationOps;
 import application.events.ApiKeySetEvent;
 import application.models.ApiKeyStatus;
 
@@ -27,7 +30,11 @@ import application.models.ApiKeyStatus;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class MainPanel extends BasePanel<MainPanel.Gui> {
+
+	@Autowired
+	private IApplicationOps ops;
 
 	public interface Gui extends BasePanel.Gui {
 		void enableMainLayout(boolean enable);

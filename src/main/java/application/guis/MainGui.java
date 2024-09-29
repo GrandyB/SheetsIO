@@ -18,9 +18,9 @@ package application.guis;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import application.IApplicationOps;
 import application.models.PropertiesHolder;
 import application.panels.MainPanel;
 import javafx.scene.layout.VBox;
@@ -36,8 +36,9 @@ public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements 
 
 	private VBox mainLayout = new VBox();
 
-	public MainGui(IApplicationOps app) {
-		super(app, new MainPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
+	@Autowired
+	public MainGui(MainPanel panel) {
+		super(panel);
 	}
 
 	@PostConstruct
@@ -50,14 +51,12 @@ public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements 
 		getRoot().getStyleClass().add("root");
 		getRoot().setSpacing(PropertiesHolder.LAYOUT_SPACING);
 
-		getLayout().add(new ApiKeyGui(getPanel().getApp()));
+		getLayout().add(getAppContext().getBean(ApiKeyGui.class));
 
 		mainLayout.setSpacing(PropertiesHolder.LAYOUT_SPACING);
-		ConfigGui configGui = new ConfigGui(getPanel().getApp());
-		mainLayout.getChildren().add(configGui);
+		mainLayout.getChildren().add(getAppContext().getBean(ConfigGui.class));
 
-		TimerGui timer = new TimerGui(getPanel().getApp());
-		mainLayout.getChildren().add(timer);
+		mainLayout.getChildren().add(getAppContext().getBean(TimerGui.class));
 		getLayout().add(mainLayout);
 	}
 

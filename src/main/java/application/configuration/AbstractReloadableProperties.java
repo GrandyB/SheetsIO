@@ -24,7 +24,6 @@ import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.reloading.InvariantReloadingStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -34,7 +33,6 @@ import lombok.Setter;
  *
  * @author Mark "Grandy" Bishop
  */
-@Component
 public abstract class AbstractReloadableProperties {
 	private static final Logger LOGGER = LogManager.getLogger(AbstractReloadableProperties.class);
 	protected static final String FILE_PATH = "application.properties";

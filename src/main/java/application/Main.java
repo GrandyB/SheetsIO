@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContext;
 
 import application.data.FileUpdateRepository;
 import application.events.AppInitialisedEvent;
@@ -58,6 +59,9 @@ public class Main extends Application implements IApplicationOps {
 	private ExceptionHandlerService exceptionHandler;
 
 	@Getter
+	private ApplicationContext appContext;
+
+	@Getter
 	private Stage primaryStage;
 	@Getter
 	private EventBus eventBus = new EventBus();
@@ -66,7 +70,10 @@ public class Main extends Application implements IApplicationOps {
 	public void init() throws Exception {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(Main.class);
 		builder.application().setWebApplicationType(WebApplicationType.NONE);
-		builder.build();
+		appContext = builder.build().run();
+		appContext.getAutowireCapableBeanFactory().autowireBean(this);
+		appContext.getAutowireCapableBeanFactory().autowireBean(appContext);
+		appContext.getAutowireCapableBeanFactory().autowireBean(eventBus);
 	}
 
 	@Override
@@ -74,8 +81,7 @@ public class Main extends Application implements IApplicationOps {
 		this.primaryStage = stage;
 		primaryStage.setTitle("SheetsIO");
 
-		MainGui mainGui = new MainGui(this);
-
+		MainGui mainGui = appContext.getBean(MainGui.class);
 		Scene mainScene = new Scene(mainGui, PropertiesHolder.SCENE_WIDTH, PropertiesHolder.SCENE_HEIGHT);
 		mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setResizable(false);

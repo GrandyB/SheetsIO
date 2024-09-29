@@ -16,7 +16,9 @@
  */
 package application.guis;
 
-import application.IApplicationOps;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import application.models.ApiKeyStatus;
 import application.models.PropertiesHolder;
 import application.panels.ApiKeyPanel;
@@ -36,6 +38,7 @@ import javafx.scene.text.Text;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> implements ApiKeyPanel.Gui {
 	private static final String HELP_LINK = "https://github.com/GrandyB/SheetsIO#apikey";
 
@@ -44,9 +47,9 @@ public class ApiKeyGui extends BaseGui<ApiKeyPanel, ApiKeyPanel.Gui, VBox> imple
 	private TextField apiKeyInput = new TextField();
 	private Hyperlink helpLink = new Hyperlink("Help");
 
-	public ApiKeyGui(IApplicationOps ops) {
-		super(ops, new ApiKeyPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
-		getPanel().initialise();
+	@Autowired
+	public ApiKeyGui(ApiKeyPanel panel) {
+		super(panel);
 	}
 
 	@Override

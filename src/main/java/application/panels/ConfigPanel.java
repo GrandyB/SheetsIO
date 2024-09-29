@@ -18,11 +18,10 @@ package application.panels;
 
 import java.io.File;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import application.data.ConfigurationFileRepository;
 import application.services.UpdateService;
@@ -32,6 +31,7 @@ import application.services.UpdateService;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigPanel.class);
 
@@ -41,7 +41,9 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 	private UpdateService updateService;
 
 	public interface Gui extends BasePanel.Gui {
-		/** Update the directory shown to the user on opening the file chooser. */
+		/**
+		 * Update the directory shown to the user on opening the file chooser.
+		 */
 		void setConfigChooserDirectory(File file);
 
 		/** Set the 'currently loaded config' label. */
@@ -57,8 +59,8 @@ public class ConfigPanel extends BasePanel<ConfigPanel.Gui> {
 		void setUpdateNowButtonEnabled(boolean enabled);
 	}
 
-	@PostConstruct
-	public void postConstruct() {
+	@Override
+	public void initialise() {
 		// Load the previous config if there is one
 		String previousConfigPath = getAppProps().getLastConfigLocation();
 		if (previousConfigPath != null && !previousConfigPath.isEmpty()) {

@@ -18,6 +18,7 @@ package application.services;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -34,6 +35,7 @@ import javafx.scene.control.Alert.AlertType;
  *
  * @author Mark "Grandy" Bishop
  */
+@Service
 public class ExceptionHandlerService extends AbstractService {
 	private static final Logger LOGGER = LogManager.getLogger(ExceptionHandlerService.class);
 
@@ -70,7 +72,8 @@ public class ExceptionHandlerService extends AbstractService {
 
 		} else {
 			StackTraceElement[] stack = e.getStackTrace();
-			// If stack smaller than preset length, use that; otherwise limit to defined max
+			// If stack smaller than preset length, use that; otherwise limit to
+			// defined max
 			for (int i = 0; i < (stack.length > MAX_EXCEPTION_STACK_LINES ? MAX_EXCEPTION_STACK_LINES
 					: stack.length); i++) {
 				error.append(stack[i].toString());
@@ -98,9 +101,10 @@ public class ExceptionHandlerService extends AbstractService {
 		String errorMessage = AppUtil.sanitiseApiKey(apiKey, message);
 
 		/*
-		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and beyond,
-		 * which is separate to the JavaFX application thread; Platform.runLater allows
-		 * the code to be ran on the proper thread when it is able.
+		 * Exceptions can be thrown within our {@link UpdateRunnable} thread and
+		 * beyond, which is separate to the JavaFX application thread;
+		 * Platform.runLater allows the code to be ran on the proper thread when
+		 * it is able.
 		 */
 		Platform.runLater(() -> {
 			Alert alert = new Alert(AlertType.ERROR);

@@ -55,6 +55,8 @@ public class UpdateService extends AbstractService {
 	private FileAcquisitionService fileAcquisitionService;
 	@Autowired
 	private FileUpdateRepository fileUpdateRepository;
+	@Autowired
+	private ExceptionHandlerService exceptionHandler;
 
 	@Autowired
 	private ConfigurationFile configurationFile;
@@ -69,7 +71,7 @@ public class UpdateService extends AbstractService {
 					try {
 						update();
 					} catch (Exception e) {
-						getExceptionHandler().handle(e);
+						exceptionHandler.handle(e);
 					}
 				}
 			}
@@ -107,11 +109,12 @@ public class UpdateService extends AbstractService {
 			String newValue = entry.getNewValue();
 
 			/**
-			 * {@link CellUpdate}s are made up of {@link CellWrapper}s created from changes
-			 * in the Google Sheet - "A1 now has value X". The {@link SheetCache} will only
-			 * ever store one wrapper to a value (uses a Map to store it), but our config
-			 * could theoretically have multiple pieces of cell config all wanting to be
-			 * updated when the value changes. Here, we look up these multiple pieces.
+			 * {@link CellUpdate}s are made up of {@link CellWrapper}s created
+			 * from changes in the Google Sheet - "A1 now has value X". The
+			 * {@link SheetCache} will only ever store one wrapper to a value
+			 * (uses a Map to store it), but our config could theoretically have
+			 * multiple pieces of cell config all wanting to be updated when the
+			 * value changes. Here, we look up these multiple pieces.
 			 */
 			List<CellWrapper> allWrappersForCell = configurationFile.getCells().stream()
 					.filter(cw -> cw.equals(cellWrapper)) //
@@ -134,8 +137,8 @@ public class UpdateService extends AbstractService {
 		switch (ext.getType()) {
 		case TEXT:
 			/**
-			 * Add padding if applicable (@see {@link CellWrapper#getPadding}), and replace
-			 * GSheet errors with blank values.
+			 * Add padding if applicable (@see {@link CellWrapper#getPadding}),
+			 * and replace GSheet errors with blank values.
 			 */
 			break;
 		case IMAGE:
@@ -159,8 +162,8 @@ public class UpdateService extends AbstractService {
 	}
 
 	/**
-	 * @return {@link InputStream} of a file, acquired from a remote or local source
-	 *         depending on the URL.
+	 * @return {@link InputStream} of a file, acquired from a remote or local
+	 *         source depending on the URL.
 	 */
 	private InputStream acquireFileInputStream(String url) throws Exception {
 		return isRemote(url) ? fileAcquisitionService.downloadRemoteFile(url)

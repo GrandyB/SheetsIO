@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -45,6 +46,7 @@ import application.models.json.Config;
  *
  * @author Mark "Grandy" Bishop
  */
+@Repository
 public class ConfigurationFileRepository extends AbstractRepository {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigurationFileRepository.class);
 
@@ -62,8 +64,8 @@ public class ConfigurationFileRepository extends AbstractRepository {
 	}
 
 	/**
-	 * Loads the given {@link File} into java beans, which are then accessible from
-	 * this class.
+	 * Loads the given {@link File} into java beans, which are then accessible
+	 * from this class.
 	 * 
 	 * @throws Exception
 	 *             any exception from config loading.
@@ -101,8 +103,8 @@ public class ConfigurationFileRepository extends AbstractRepository {
 	}
 
 	/**
-	 * Reloads the existing config file, if there is one. If there isn't, nothing
-	 * happens.
+	 * Reloads the existing config file, if there is one. If there isn't,
+	 * nothing happens.
 	 * 
 	 * @throws Exception
 	 *             any exception from config loading.

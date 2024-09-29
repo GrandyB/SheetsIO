@@ -28,6 +28,7 @@ import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import application.exceptions.UnableToLoadRemoteURLException;
 import application.utils.AppUtil;
@@ -38,6 +39,7 @@ import application.utils.AppUtil;
  *
  * @author Mark "Grandy" Bishop
  */
+@Service
 public class FileAcquisitionService {
 	private static final Logger LOGGER = LogManager.getLogger(FileAcquisitionService.class);
 
@@ -54,7 +56,8 @@ public class FileAcquisitionService {
 			throws MalformedURLException, IOException, UnableToLoadRemoteURLException {
 		LOGGER.debug("Treating '{}' as a remote url", url);
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-		// Provide a User-Agent, without it, many sites block incoming requests with 403
+		// Provide a User-Agent, without it, many sites block incoming requests
+		// with 403
 		conn.addRequestProperty("User-Agent", "SheetsIO");
 		InputStream is;
 		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {

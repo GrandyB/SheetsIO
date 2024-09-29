@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import application.data.GoogleSheetsRepository;
 import application.exceptions.GoogleSheetsException;
@@ -36,6 +37,7 @@ import application.models.json.GoogleSheetsResponse;
  *
  * @author Mark "Grandy" Bishop
  */
+@Service
 public class GoogleSheetsService extends AbstractService {
 
 	@Autowired

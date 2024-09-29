@@ -22,10 +22,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import application.exceptions.IllegalFileExtensionException;
 import application.models.json.Config;
+import application.utils.Prototype;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +34,7 @@ import lombok.Setter;
  *
  * @author Mark "Grandy" Bishop
  */
-@Component
+@Prototype
 public class ConfigurationFile {
 	private static final Logger LOGGER = LogManager.getLogger(ConfigurationFile.class);
 
@@ -48,8 +48,8 @@ public class ConfigurationFile {
 	private Config config;
 
 	/**
-	 * CellWrappers, made from Cells, used by the rest of the app, wiped/repopulated
-	 * on config load.
+	 * CellWrappers, made from Cells, used by the rest of the app,
+	 * wiped/repopulated on config load.
 	 */
 	@Getter
 	private List<CellWrapper> cellWrappers = new ArrayList<>();

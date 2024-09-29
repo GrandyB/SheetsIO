@@ -21,14 +21,13 @@ import org.apache.logging.log4j.Logger;
 import org.greenrobot.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import application.IApplicationOps;
 import application.configuration.ApplicationProperties;
 import application.configuration.TransientProperties;
 import application.events.ConfigReloadedEvent;
 import application.services.ExceptionHandlerService;
-import lombok.AccessLevel;
+import application.utils.Prototype;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,17 +37,18 @@ import lombok.Setter;
  *
  * @author Mark "Grandy" Bishop
  */
-@Component
+@Prototype
 @RequiredArgsConstructor
 public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G> {
 	private static final Logger LOGGER = LogManager.getLogger(BasePanel.class);
 
-	@Getter(AccessLevel.PROTECTED)
+	@Getter
 	@Setter
 	private G gui;
 
 	@Getter
 	@Setter
+	@Autowired
 	private IApplicationOps app;
 
 	@Autowired
@@ -73,12 +73,11 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G> {
 	}
 
 	/**
-	 * Perform any Gui-related initialisation. Use {@link #preInitialise()} for any
-	 * non-Gui related initialisation.
+	 * Perform any Gui-related initialisation. Use {@link #preInitialise()} for
+	 * any non-Gui related initialisation.
 	 */
 	public void initialise() {
 		getApp().getEventBus().register(this);
-		getGui().init();
 	}
 
 	@Subscribe

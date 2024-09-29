@@ -18,7 +18,9 @@ package application.guis;
 
 import java.io.File;
 
-import application.IApplicationOps;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import application.models.PropertiesHolder;
 import application.panels.ConfigPanel;
 import javafx.geometry.Pos;
@@ -35,6 +37,7 @@ import javafx.stage.FileChooser;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> implements ConfigPanel.Gui {
 
 	private final FileChooser configChooser = new FileChooser();
@@ -44,9 +47,9 @@ public class ConfigGui extends BaseGui<ConfigPanel, ConfigPanel.Gui, VBox> imple
 	private final CheckBox autoUpdateCheck = new CheckBox("Auto update");
 	private final Button updateNowButton = new Button("Update now");
 
-	public ConfigGui(IApplicationOps app) {
-		super(app, new ConfigPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
-		getPanel().initialise();
+	@Autowired
+	public ConfigGui(ConfigPanel panel) {
+		super(panel);
 	}
 
 	@Override

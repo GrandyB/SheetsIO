@@ -19,6 +19,7 @@ package application.panels;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import application.models.TimerDuration;
 import application.services.TimerService;
@@ -28,6 +29,7 @@ import application.services.TimerService;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	private static final Logger LOGGER = LogManager.getLogger(TimerPanel.class);
 
@@ -58,9 +60,9 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	}
 
 	/**
-	 * When the update button is clicked, the values from the three spinners is sent
-	 * here; need to update our {@link TimerDuration}, the underlying file and
-	 * preview.
+	 * When the update button is clicked, the values from the three spinners is
+	 * sent here; need to update our {@link TimerDuration}, the underlying file
+	 * and preview.
 	 */
 	public void handleUpdateButtonClick(int hours, int minutes, int seconds) {
 		timerService.setTimeAndFormat(hours, minutes, seconds);

@@ -16,16 +16,20 @@
  */
 package application.guis;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
-import application.IApplicationOps;
 import application.panels.BasePanel;
-import application.panels.IPanel;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -34,11 +38,16 @@ import lombok.Getter;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L extends Pane> extends Pane
 		implements BasePanel.Gui {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger(BaseGui.class);
 	private static final long DISABLE_CONTROL_TIME = 1000L;
+
+	@Autowired
+	@Getter
+	private ApplicationContext appContext;
 
 	@Getter(AccessLevel.PROTECTED)
 	private P panel;
@@ -46,16 +55,17 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 	private L root;
 
 	@SuppressWarnings("unchecked")
-	public BaseGui(IApplicationOps app, IPanel<G> panel, L root) {
-		panel.setGui((G) this);
-		this.panel = (P) panel;
-		this.panel.setApp(app);
-		this.root = root;
+	@Autowired
+	public BaseGui(P panel) {
+		this.panel = panel;
+		this.panel.setGui((G) this);
+		this.root = (L) new VBox();
 		super.getChildren().add(this.root);
 	}
 
 	/** Sets up the Gui/Panel, to be called at end of child constructor. */
 	@Override
+	@PostConstruct
 	public void init() {
 		setUp();
 		doLayout();
@@ -70,7 +80,8 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 	protected abstract void doLayout();
 
 	/**
-	 * Disable the given {@link Control} for {@link #DISABLE_CONTROL_TIME} millis.
+	 * Disable the given {@link Control} for {@link #DISABLE_CONTROL_TIME}
+	 * millis.
 	 */
 	protected void disableThenReenable(Control ctrl) {
 		new Thread(() -> {

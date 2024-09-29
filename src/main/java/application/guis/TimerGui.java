@@ -16,8 +16,9 @@
  */
 package application.guis;
 
-import application.IApplicationOps;
-import application.models.PropertiesHolder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import application.panels.TimerPanel;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
@@ -33,6 +34,7 @@ import javafx.util.StringConverter;
  *
  * @author Mark "Grandy" Bishop
  */
+@Component
 public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implements TimerPanel.Gui {
 
 	private Spinner<Integer> hours;
@@ -45,9 +47,9 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implemen
 	private Button resetButton = new Button("Reset");
 	private Button updateButton = new Button("Update");
 
-	public TimerGui(IApplicationOps app) {
-		super(app, new TimerPanel(), new VBox(PropertiesHolder.INTERNAL_SPACING));
-		getPanel().initialise();
+	@Autowired
+	public TimerGui(TimerPanel panel) {
+		super(panel);
 	}
 
 	@Override
@@ -89,10 +91,10 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implemen
 	}
 
 	/**
-	 * Spinners are the devil; but thankfully we can kinda bend them to our will. By
-	 * default spinners don't set their internal value when changing their value
-	 * directly (outside of the buttons). However, with some {@link TextFormatter}
-	 * wizardry, they do! ...don't ask.
+	 * Spinners are the devil; but thankfully we can kinda bend them to our
+	 * will. By default spinners don't set their internal value when changing
+	 * their value directly (outside of the buttons). However, with some
+	 * {@link TextFormatter} wizardry, they do! ...don't ask.
 	 * 
 	 * @return Spinner<Integer> a properly instantiated {@link Spinner}.
 	 */

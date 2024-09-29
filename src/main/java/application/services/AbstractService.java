@@ -17,7 +17,6 @@
 package application.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import application.configuration.ApplicationProperties;
@@ -35,15 +34,7 @@ public abstract class AbstractService {
 
 	@Autowired
 	@Getter
-	private ApplicationContext context;
-
-	@Autowired
-	@Getter
 	private ApplicationProperties appProps;
-
-	@Autowired
-	@Getter
-	private ExceptionHandlerService exceptionHandler;
 
 	@Autowired
 	@Getter
