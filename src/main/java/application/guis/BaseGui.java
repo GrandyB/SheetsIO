@@ -67,6 +67,7 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 	@Override
 	@PostConstruct
 	public void init() {
+		getPanel().initialise();
 		setUp();
 		doLayout();
 	}

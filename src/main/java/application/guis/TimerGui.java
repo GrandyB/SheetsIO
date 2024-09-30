@@ -54,19 +54,9 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implemen
 
 	@Override
 	public void setUp() {
-		startPauseButton.setOnAction(a -> {
-			getPanel().handlePlayPauseButtonPress(hours.getValueFactory().getValue(),
-					minutes.getValueFactory().getValue(), seconds.getValueFactory().getValue());
-		});
-
-		resetButton.setOnAction(ev -> {
-			getPanel().reset();
-		});
-
-		updateButton.setOnAction(ev -> {
-			getPanel().handleUpdateButtonClick(hours.getValueFactory().getValue(), minutes.getValueFactory().getValue(),
-					seconds.getValueFactory().getValue());
-		});
+		startPauseButton.setOnAction(a -> getPanel().handlePlayPauseButtonPress());
+		resetButton.setOnAction(ev -> getPanel().reset());
+		updateButton.setOnAction(ev -> getPanel().handleUpdateButtonClick());
 	}
 
 	@Override
@@ -88,6 +78,21 @@ public class TimerGui extends BaseGui<TimerPanel, TimerPanel.Gui, VBox> implemen
 
 		HBox buttons = new HBox(startPauseButton, updateButton, resetButton);
 		getLayout().add(buttons);
+	}
+
+	@Override
+	public int getHours() {
+		return hours.getValueFactory().getValue();
+	}
+
+	@Override
+	public int getMinutes() {
+		return minutes.getValueFactory().getValue();
+	}
+
+	@Override
+	public int getSeconds() {
+		return seconds.getValueFactory().getValue();
 	}
 
 	/**

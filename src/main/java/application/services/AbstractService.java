@@ -16,9 +16,13 @@
  */
 package application.services;
 
+import org.greenrobot.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import application.IApplicationOps;
+import application.Main;
 import application.configuration.ApplicationProperties;
 import application.configuration.TransientProperties;
 import lombok.Getter;
@@ -39,4 +43,17 @@ public abstract class AbstractService {
 	@Autowired
 	@Getter
 	private TransientProperties transientProperties;
+
+	@Autowired
+	@Getter
+	@Lazy
+	private IApplicationOps applicationOps;
+
+	/**
+	 * @return an {@link EventBus} from the {@link IApplicationOps} (
+	 *         {@link Main}).
+	 */
+	protected EventBus getEventBus() {
+		return getApplicationOps().getEventBus();
+	}
 }

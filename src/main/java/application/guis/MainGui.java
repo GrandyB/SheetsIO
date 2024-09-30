@@ -16,8 +16,6 @@
  */
 package application.guis;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,11 +37,6 @@ public class MainGui extends BaseGui<MainPanel, MainPanel.Gui, VBox> implements 
 	@Autowired
 	public MainGui(MainPanel panel) {
 		super(panel);
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		getPanel().initialise();
 	}
 
 	@Override

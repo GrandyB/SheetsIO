@@ -18,9 +18,11 @@ package application.panels;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.greenrobot.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import application.events.TimerUpdateEvent;
 import application.models.TimerDuration;
 import application.services.TimerService;
 
@@ -43,6 +45,12 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 
 		/** Set the play/pause button text. */
 		void setPlayPauseButtonText(String text);
+
+		int getHours();
+
+		int getMinutes();
+
+		int getSeconds();
 	}
 
 	@Override
@@ -64,19 +72,30 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	 * sent here; need to update our {@link TimerDuration}, the underlying file
 	 * and preview.
 	 */
-	public void handleUpdateButtonClick(int hours, int minutes, int seconds) {
-		timerService.setTimeAndFormat(hours, minutes, seconds);
+	public void handleUpdateButtonClick() {
+		timerService.setTimeAndFormat(getGui().getHours(), getGui().getMinutes(), getGui().getSeconds());
 		getGui().updatePreview(timerService.getDisplay());
+	}
+
+	@Subscribe
+	public void handleTimerUpdateEvent(TimerUpdateEvent event) {
+		getGui().updatePreview(event.getTime().getDisplay());
+		if (!event.isRunning()) {
+			getGui().setPlayPauseButtonText("Start");
+		}
 	}
 
 	/**
 	 * Handle a play/pause button press; using the current values of the 3 input
 	 * fields.
 	 */
-	public void handlePlayPauseButtonPress(int hours, int minutes, int seconds) {
-		if (timerService.playPause()) {
+	public void handlePlayPauseButtonPress() {
+		if (timerService.isRunning()) {
+			timerService.setRunning(false);
 			getGui().setPlayPauseButtonText("Resume");
 		} else {
+			timerService.setTimeAndFormat(getGui().getHours(), getGui().getMinutes(), getGui().getSeconds());
+			timerService.setRunning(true);
 			getGui().setPlayPauseButtonText("Pause");
 		}
 	}

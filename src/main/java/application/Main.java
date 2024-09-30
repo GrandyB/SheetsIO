@@ -73,7 +73,6 @@ public class Main extends Application implements IApplicationOps {
 		appContext = builder.build().run();
 		appContext.getAutowireCapableBeanFactory().autowireBean(this);
 		appContext.getAutowireCapableBeanFactory().autowireBean(appContext);
-		appContext.getAutowireCapableBeanFactory().autowireBean(eventBus);
 	}
 
 	@Override

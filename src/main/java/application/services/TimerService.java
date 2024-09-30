@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import application.Main;
 import application.data.FileUpdateRepository;
+import application.events.TimerUpdateEvent;
 import application.models.TimerDuration;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +50,7 @@ public class TimerService extends AbstractService {
 	private FileUpdateRepository fileUpdateRepository;
 
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-	private TimerDuration time;
+	private TimerDuration time = new TimerDuration();
 
 	@Getter
 	@Setter
@@ -71,20 +72,25 @@ public class TimerService extends AbstractService {
 	}
 
 	private void update() {
-		LOGGER.trace("Perform timer tick");
-		if (running) {
-			time.decrease();
-			try {
-				fileUpdateRepository.writeTextFile(Main.FOLDER_PREFIX + File.separator + "timer.txt",
-						time.getDisplay());
-			} catch (IOException e) {
-				LOGGER.error("Unable to update the timer file", e);
-			}
+		try {
+			LOGGER.info("Perform timer tick");
+			if (running) {
+				time.decrease();
+				try {
+					fileUpdateRepository.writeTextFile(Main.FOLDER_PREFIX + File.separator + "timer.txt",
+							time.getDisplay());
+				} catch (IOException e) {
+					LOGGER.error("Unable to update the timer file", e);
+				}
 
-			if (time.getTotalSeconds() == 0) {
-				// Forcibly stop it once it ends
-				this.running = false;
+				if (time.getTotalSeconds() == 0) {
+					// Forcibly stop it once it ends
+					this.running = false;
+				}
+				getEventBus().post(new TimerUpdateEvent(time, this.running));
 			}
+		} catch (Exception e) {
+			LOGGER.error("Error during TimerService#update", e);
 		}
 	}
 
@@ -96,11 +102,5 @@ public class TimerService extends AbstractService {
 	/** Set the time. */
 	public void setTimeAndFormat(int hours, int minutes, int seconds) {
 		this.time.setTimeAndFormat(hours, minutes, seconds);
-	}
-
-	/** Play or pause the timer, and return the new run state. */
-	public boolean playPause() {
-		running = !running;
-		return running;
 	}
 }
