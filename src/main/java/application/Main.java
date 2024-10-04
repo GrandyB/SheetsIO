@@ -28,6 +28,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import application.data.FileUpdateRepository;
 import application.events.AppInitialisedEvent;
@@ -35,6 +36,7 @@ import application.guis.MainGui;
 import application.models.PropertiesHolder;
 import application.services.ExceptionHandlerService;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -125,6 +127,7 @@ public class Main extends Application implements IApplicationOps {
 	@Override
 	public void stop() {
 		LOGGER.info("Stage is closing");
-		// TODO: is this still needed?
+		((ConfigurableApplicationContext) appContext).close();
+		Platform.exit();
 	}
 }

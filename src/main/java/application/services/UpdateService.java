@@ -25,6 +25,7 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,6 +77,11 @@ public class UpdateService extends AbstractService {
 				}
 			}
 		}, 0, getAppProps().getUpdateInterval());
+	}
+
+	@PreDestroy
+	public void preDestroy() {
+		timer.cancel();
 	}
 
 	public void updateInterval(int newInterval) {
