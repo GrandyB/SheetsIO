@@ -58,7 +58,7 @@ public class TimerService extends AbstractService {
 
 	@PostConstruct
 	public void setUp() {
-		executor.scheduleWithFixedDelay(() -> this.update(), 0, 1, TimeUnit.SECONDS);
+		executor.scheduleWithFixedDelay(() -> this.updateLoop(), 0, 1, TimeUnit.SECONDS);
 	}
 
 	@PreDestroy
@@ -71,32 +71,37 @@ public class TimerService extends AbstractService {
 		return time.getDisplay();
 	}
 
-	private void update() {
+	private void updateLoop() {
 		try {
-			LOGGER.info("Perform timer tick");
+			LOGGER.info("Perform timer tick: " + time.getDisplay());
 			if (running) {
-				time.decrease();
-				try {
-					fileUpdateRepository.writeTextFile(Main.FOLDER_PREFIX + File.separator + "timer.txt",
-							time.getDisplay());
-				} catch (IOException e) {
-					LOGGER.error("Unable to update the timer file", e);
-				}
-
-				if (time.getTotalSeconds() == 0) {
-					// Forcibly stop it once it ends
-					this.running = false;
-				}
-				getEventBus().post(new TimerUpdateEvent(time, this.running));
+				updateOnce();
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error during TimerService#update", e);
 		}
 	}
 
+	/** Perform an update regardless of looping state. */
+	public void updateOnce() {
+		time.decrease();
+		try {
+			fileUpdateRepository.writeTextFile(Main.FOLDER_PREFIX + File.separator + "timer.txt", time.getDisplay());
+		} catch (IOException e) {
+			LOGGER.error("Unable to update the timer file", e);
+		}
+
+		if (time.getTotalSeconds() == 0) {
+			// Forcibly stop it once it ends
+			this.running = false;
+		}
+		getEventBus().post(new TimerUpdateEvent(time, this.running));
+	}
+
 	/** Reset the timer back to 0. */
 	public void reset() {
-		this.time.update(0);
+		this.time.setTimeAndFormat(0, 0, 0);
+		updateOnce();
 	}
 
 	/** Set the time. */

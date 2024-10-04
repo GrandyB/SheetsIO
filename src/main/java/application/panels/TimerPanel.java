@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import application.events.TimerUpdateEvent;
 import application.models.TimerDuration;
 import application.services.TimerService;
+import javafx.application.Platform;
 
 /**
  * Timer panel, for all logic surrounding the timer.
@@ -64,7 +65,6 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 		LOGGER.debug("Resetting timer");
 		timerService.reset();
 		getGui().setPlayPauseButtonText("Start");
-		getGui().updatePreview(timerService.getDisplay());
 	}
 
 	/**
@@ -74,15 +74,17 @@ public class TimerPanel extends BasePanel<TimerPanel.Gui> {
 	 */
 	public void handleUpdateButtonClick() {
 		timerService.setTimeAndFormat(getGui().getHours(), getGui().getMinutes(), getGui().getSeconds());
-		getGui().updatePreview(timerService.getDisplay());
+		timerService.updateOnce();
 	}
 
 	@Subscribe
 	public void handleTimerUpdateEvent(TimerUpdateEvent event) {
-		getGui().updatePreview(event.getTime().getDisplay());
-		if (!event.isRunning()) {
-			getGui().setPlayPauseButtonText("Start");
-		}
+		Platform.runLater(() -> {
+			getGui().updatePreview(event.getTime().getDisplay());
+			if (!event.isRunning()) {
+				getGui().setPlayPauseButtonText("Start");
+			}
+		});
 	}
 
 	/**
