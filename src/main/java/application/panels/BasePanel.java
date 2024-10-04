@@ -80,6 +80,11 @@ public abstract class BasePanel<G extends BasePanel.Gui> implements IPanel<G> {
 		getApp().getEventBus().register(this);
 	}
 
+	/** Peform any post-layouting actions. */
+	public void postLayout() {
+		// Do nothing by default
+	}
+
 	@Subscribe
 	public void handleConfigReloadEvent(ConfigReloadedEvent event) {
 		// Do nothing

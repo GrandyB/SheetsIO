@@ -73,7 +73,6 @@ public class TimerService extends AbstractService {
 
 	private void updateLoop() {
 		try {
-			LOGGER.info("Perform timer tick: " + time.getDisplay());
 			if (running) {
 				updateOnce();
 			}
@@ -84,6 +83,7 @@ public class TimerService extends AbstractService {
 
 	/** Perform an update regardless of looping state. */
 	public void updateOnce() {
+		LOGGER.debug("Perform timer update: " + time.getDisplay());
 		time.decrease();
 		try {
 			fileUpdateRepository.writeTextFile(Main.FOLDER_PREFIX + File.separator + "timer.txt", time.getDisplay());

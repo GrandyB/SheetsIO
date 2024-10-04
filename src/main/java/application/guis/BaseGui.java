@@ -70,6 +70,7 @@ public abstract class BaseGui<P extends BasePanel<G>, G extends BasePanel.Gui, L
 		getPanel().initialise();
 		setUp();
 		doLayout();
+		getPanel().postLayout();
 	}
 
 	/** Setup any listeners/actions on components. */

@@ -51,6 +51,11 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 		void showHelpLink(boolean show);
 	}
 
+	@Override
+	public void postLayout() {
+		updateAfterFileLoad();
+	}
+
 	/** Handle the press of the 'set' apiKey button. */
 	public void handleSetApiKeyPress(String potentialKey) {
 		if (potentialKey == null || potentialKey.trim().isEmpty()) {
@@ -78,6 +83,12 @@ public class ApiKeyPanel extends BasePanel<ApiKeyPanel.Gui> {
 
 	@Subscribe
 	public void handleAppInitialised(AppInitialisedEvent e) {
+		// TODO: will this ever get used now? happens before panels/guis are
+		// created
+		updateAfterFileLoad();
+	}
+
+	private void updateAfterFileLoad() {
 		String key = getAppProps().getApiKey();
 		getGui().setApiKeyField(key);
 		handleSetApiKeyPress(key);
