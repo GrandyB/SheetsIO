@@ -38,6 +38,7 @@ import com.google.gson.JsonParser;
 import application.exceptions.JsonValidationException;
 import application.models.CellWrapper;
 import application.models.ConfigurationFile;
+import application.models.SheetCache;
 import application.models.json.Cell;
 import application.models.json.Config;
 
@@ -52,6 +53,10 @@ public class ConfigurationFileRepository extends AbstractRepository {
 
 	@Autowired
 	private ConfigurationFile configurationFile;
+	@Autowired
+	private SheetCache sheetCache;
+	@Autowired
+	private FileUpdateRepository fileUpdateRepository;
 
 	/** Load the configuration file. */
 	public void loadConfiguration(File file) throws Exception {
@@ -98,6 +103,34 @@ public class ConfigurationFileRepository extends AbstractRepository {
 			} else {
 				LOGGER.debug(
 						"Detected empty/null entry in the 'cells' array; Check that your 'cells' array in config does not have any double commas ,, or a comma after the last element of the array.");
+			}
+		}
+		sheetCache.setup(configurationFile.getCellWrappers());
+
+		fileUpdateRepository.cleanExistingFolderIfExists(configurationFile.getProjectName());
+		fileUpdateRepository.createFilesFolder(configurationFile.getProjectName());
+		createInitialFiles(configurationFile);
+	}
+
+	private void createInitialFiles(ConfigurationFile configurationFile) throws Exception {
+		for (CellWrapper cellWrapper : configurationFile.getCells()) {
+			String destFilePath = fileUpdateRepository.createFilePath(configurationFile.getProjectName(), cellWrapper);
+			switch (cellWrapper.getFileExtension()) {
+			case TXT:
+				fileUpdateRepository.writeTextFile(destFilePath, "");
+				break;
+			case BMP:
+			case GIF:
+			case JPEG:
+			case JPG:
+			case PNG:
+				fileUpdateRepository.saveTransparentImage(destFilePath, cellWrapper.getFileExtension().getExtension());
+				break;
+			case MP4:
+			case WEBM:
+			default:
+				// TODO: Should we be providing empty files for video types?
+				LOGGER.info("Not creating default/empty file for {} {} ", cellWrapper.getFileExtension(), cellWrapper);
 			}
 		}
 	}

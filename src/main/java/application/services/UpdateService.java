@@ -137,6 +137,7 @@ public class UpdateService extends AbstractService {
 
 		if (FileExtension.TXT.equals(ext)) {
 			fileUpdateRepository.writeTextFile(destFilePath, cellWrapper.getPadding().insert(0, newValue).toString());
+			return;
 		}
 
 		InputStream file = acquireFileInputStream(newValue);
@@ -151,7 +152,8 @@ public class UpdateService extends AbstractService {
 			try {
 				fileUpdateRepository.writeImage(file, newValue, destFilePath);
 			} catch (Exception e) {
-				fileUpdateRepository.saveTransparentImage(destFilePath, ext.getType().name());
+				LOGGER.warn("Unable to write image '{}' - writing transparent file instead", newValue, e);
+				fileUpdateRepository.saveTransparentImage(destFilePath, ext.getExtension());
 			}
 			break;
 		case VIDEO:
@@ -172,12 +174,8 @@ public class UpdateService extends AbstractService {
 	 *         source depending on the URL.
 	 */
 	private InputStream acquireFileInputStream(String url) throws Exception {
-		return isRemote(url) ? fileAcquisitionService.downloadRemoteFile(url)
-				: fileAcquisitionService.downloadRemoteFile(url);
-	}
-
-	private boolean isRemote(String url) throws Exception {
 		URI uri = AppUtil.encodeForUrl(url);
-		return uri.getScheme().equals("file");
+		return !uri.getScheme().equals("file") ? fileAcquisitionService.downloadRemoteFile(url)
+				: fileAcquisitionService.acquireLocalFile(uri);
 	}
 }

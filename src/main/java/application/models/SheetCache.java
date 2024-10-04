@@ -23,9 +23,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
 import application.models.json.Config;
 import application.models.json.GoogleSheetsResponse;
-import application.utils.Prototype;
 
 /**
  * Keep track of current values from the google spreadsheet; when an update
@@ -34,7 +35,7 @@ import application.utils.Prototype;
  *
  * @author Mark "Grandy" Bishop
  */
-@Prototype
+@Component
 public class SheetCache {
 	private Map<CellWrapper, String> values = new HashMap<>();
 

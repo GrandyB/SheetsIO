@@ -65,8 +65,8 @@ public class FileUpdateRepository {
 	}
 
 	/**
-	 * Downloads file from the url and saves as destinationPath. This is only used
-	 * for video files.
+	 * Downloads file from the url and saves as destinationPath. This is only
+	 * used for video files.
 	 * 
 	 * @param url
 	 *            A full URL, e.g.
@@ -213,7 +213,8 @@ public class FileUpdateRepository {
 	 * @param folderName
 	 *            the name of the project/folder
 	 * @param cell
-	 *            the {@link CellWrapper}, for its name and {@link FileExtension}
+	 *            the {@link CellWrapper}, for its name and
+	 *            {@link FileExtension}
 	 * @return the file path, using prefix and folder name.
 	 */
 	public String createFilePath(String folderName, CellWrapper cell) {
@@ -231,8 +232,8 @@ public class FileUpdateRepository {
 	}
 
 	/**
-	 * Recursively delete the give File (folder) and everything within it (all the
-	 * way down).
+	 * Recursively delete the give File (folder) and everything within it (all
+	 * the way down).
 	 * 
 	 * @throws IOException
 	 *             should deletion fail
@@ -267,5 +268,17 @@ public class FileUpdateRepository {
 		}
 		String saltStr = salt.toString();
 		return saltStr;
+	}
+
+	/**
+	 * Create a folder within /files/ for the given name.
+	 * 
+	 * @param name
+	 *            to give the folder
+	 * @throws IOException
+	 *             if unable to create the folder
+	 */
+	public void createFilesFolder(String name) throws IOException {
+		createFolder(createFolderPath(name));
 	}
 }
