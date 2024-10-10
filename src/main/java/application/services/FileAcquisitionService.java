@@ -16,11 +16,13 @@
  */
 package application.services;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -59,9 +61,33 @@ public class FileAcquisitionService {
 		// Provide a User-Agent, without it, many sites block incoming requests
 		// with 403
 		conn.addRequestProperty("User-Agent", "SheetsIO");
+		conn.setInstanceFollowRedirects(true);
 		InputStream is;
-		if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+		int responseCode = conn.getResponseCode();
+		if (responseCode >= 200 && responseCode < 300) {
 			is = conn.getInputStream();
+			BufferedReader in = new BufferedReader(new InputStreamReader(is));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			// Print the response content
+			System.out.println("Response Content: " + response.toString());
+		} else if (conn.getResponseCode() >= 300 && responseCode < 400) {
+			if (responseCode == HttpURLConnection.HTTP_MOVED_PERM
+					|| responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+				String newUrl = conn.getHeaderField("Location");
+				return downloadRemoteFile(newUrl);
+			} else {
+				return conn.getInputStream();
+			}
+		} else if (responseCode >= 500) {
+			// Don't break the flow of the application, log it
+			return conn.getInputStream();
 		} else {
 			StringBuilder sb = AppUtil.getMessageFromStream(conn.getErrorStream());
 			// Bit hacky but works

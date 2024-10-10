@@ -17,6 +17,7 @@
 package application.services;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import application.models.CellWrapper;
 import application.models.ConfigurationFile;
 import application.models.SheetCache;
 import application.models.json.GoogleSheetsResponse;
+import application.models.json.SkipGoogleSheetsResponse;
 
 /**
  * Service responsible for calls to the {@link GoogleSheetsRepository} and
@@ -62,6 +64,14 @@ public class GoogleSheetsService extends AbstractService {
 		String sheetUrl = googleSheetsRepository.getGoogleRequestUrl(configurationFile.getSpreadsheetId(),
 				configurationFile.getWorksheetName(), getAppProps().getApiKey());
 		GoogleSheetsResponse data = googleSheetsRepository.getGoogleSheetsData(sheetUrl);
+		if (data instanceof SkipGoogleSheetsResponse) {
+			/**
+			 * An error we don't know how to handle has occurred but we want to
+			 * just skip it Debug output should already occur in
+			 * {@link AppUtil#getGootleSheetsData}
+			 */
+			return Collections.emptyList();
+		}
 		Map<CellWrapper, String> fullValueMap = data.getMutatedRowColumnData();
 
 		// Update the cache

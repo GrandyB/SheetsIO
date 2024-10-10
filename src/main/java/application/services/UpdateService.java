@@ -152,6 +152,7 @@ public class UpdateService extends AbstractService {
 			try {
 				fileUpdateRepository.writeImage(file, newValue, destFilePath);
 			} catch (Exception e) {
+				// TODO: Write inputStream content to a log message?
 				LOGGER.warn("Unable to write image '{}' - writing transparent file instead", newValue, e);
 				fileUpdateRepository.saveTransparentImage(destFilePath, ext.getExtension());
 			}
