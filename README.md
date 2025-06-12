@@ -85,6 +85,7 @@ Each cell is formed of:
 Valid `fileExtension` values:
 - Images: "png", "jpg", "gif"
 - Text: "txt"
+- Video: "webm"
 
 ## Google Sheet values
 
