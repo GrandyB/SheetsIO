@@ -4,13 +4,6 @@
 
 ![Image of SheetsIO](https://github.com/GrandyB/SheetsIO/blob/master/.github/ui_screenshot.png)
 
-**Development:**
-Install a Java 17 JDK, clone the repo and then run:
-`.\gradlew.bat shadowJar` (on Windows)
-`.\gradlew shadowJar` (on Mac/Linux)
-
-This will produce a `SheetsIO.jar` file in `/build/libs`.
-
 **Brief:**
 Use Google Sheets as a central and easily updateable backend for all text/images/files in productions.
 
