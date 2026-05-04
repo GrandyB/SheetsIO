@@ -18,7 +18,7 @@ org-junit-jupiter-junit-jupiter-engine = "5.6.2"
 org-junit-platform-junit-platform-launcher = "1.6.2"
 org-mockito-mockito-all = "1.9.5"
 org-openjfx-javafx-controls = "17"
-org-projectlombok-lombok = "1.18.12"
+org-projectlombok-lombok = "1.18.36"
 org-testfx-testfx-core = "4.0.16-alpha"
 org-testfx-testfx-junit5 = "4.0.16-alpha"
 
