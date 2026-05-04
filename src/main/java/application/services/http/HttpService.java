@@ -18,6 +18,7 @@ package application.services.http;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
@@ -164,8 +165,12 @@ public class HttpService implements HttpHandler {
 			httpExchange.getResponseHeaders().add("etag", Integer.toString(cellValue.hashCode()));
 			httpExchange.getResponseHeaders().add("content-type", "text/html");
 			httpExchange.sendResponseHeaders(200, -1);
+		} else if (ConnectionRequestType.LIVEJS.equals(req.getType())) {
+			httpExchange.getResponseHeaders().add("content-type", "application/javascript");
+			httpExchange.sendResponseHeaders(200, -1);
 		} else {
 			LOGGER.debug("Received an unexpected non-HTML HEAD request: {}", req);
+			httpExchange.sendResponseHeaders(404, -1);
 		}
 	}
 
@@ -177,12 +182,26 @@ public class HttpService implements HttpHandler {
 		case HTML:
 			handleHtmlGetRequest(req, httpExchange);
 			break;
+		case LIVEJS:
+			handleLiveJsRequest(httpExchange);
+			break;
 		case FAVICON:
 			// Just ignore it...
 			break;
 		default:
 			throw new IllegalArgumentException(
 					"Unable to handle GET request with " + ConnectionRequestType.class.getName() + " " + req.getType());
+		}
+	}
+
+	private void handleLiveJsRequest(HttpExchange httpExchange) throws IOException {
+		try (InputStream is = getClass().getResourceAsStream("/live.js")) {
+			byte[] content = is.readAllBytes();
+			httpExchange.getResponseHeaders().add("content-type", "application/javascript");
+			httpExchange.sendResponseHeaders(200, content.length);
+			OutputStream out = httpExchange.getResponseBody();
+			out.write(content);
+			out.close();
 		}
 	}
 

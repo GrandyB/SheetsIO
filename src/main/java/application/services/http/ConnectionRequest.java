@@ -83,6 +83,8 @@ public class ConnectionRequest {
 			type = ConnectionRequestType.FAVICON;
 		} else if ("/update".equals(path)) {
 			type = ConnectionRequestType.UPDATE;
+		} else if ("/live.js".equals(path)) {
+			type = ConnectionRequestType.LIVEJS;
 		} else {
 			// Invalid URL, just use HTML
 			type = ConnectionRequestType.HTML;
@@ -109,6 +111,6 @@ public class ConnectionRequest {
 	}
 
 	enum ConnectionRequestType {
-		FILE, HTML, FAVICON, UPDATE;
+		FILE, HTML, FAVICON, UPDATE, LIVEJS;
 	}
 }

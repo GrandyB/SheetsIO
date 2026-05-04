@@ -12,3 +12,5 @@ build.fxbuild
 /sampleConfig.json
 /application.properties
 *.properties
+.gradle/
+build/
