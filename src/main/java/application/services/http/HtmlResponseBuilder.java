@@ -27,7 +27,7 @@ public class HtmlResponseBuilder {
 
 	static String CORE_TEMPLATE = "<html>" //
 			+ "	<head>" //
-			+ "		<script type=\"text/javascript\" src=\"http://livejs.com/live.js\"></script>" //
+			+ "		<script type=\"text/javascript\" src=\"https://raw.githubusercontent.com/dreua/LiveJS/refs/heads/main/live.js\"></script>" //
 			+ "		<style>body, iframe { margin: 0; padding: 0; background-color: rgba(0, 0, 0, 0); overflow: hidden; } [scale] </style>" //
 			+ "	</head>" //
 			+ "	<body>" //
