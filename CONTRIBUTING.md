@@ -1,16 +1,16 @@
-# Setup
+# Contributing
 
-- Clone project
-- Import existing Maven project in Eclipse
+## Initial setup
+* The only prerequisite for building this project is having a Java 17 SDK installed. Gradle usually does a good job at discovering Java SDKs automatically; you can force a specific JDK by uncommenting the line in [gradle.properties](gradle.properties).
+* You don't need to install Gradle - the Gradle Wrapper files (`./gradlew` and `./gradlew.bat`) will install Gradle on your system automatically.
+* Once done, you can build a shaded ("fat") JAR with `./gradlew shadowJar`.
+* You do not need to install JavaFX separately - this is handled by Gradle.
+* You do not need to use a specific IDE. In this project, there are IntelliJ IDEA project files due to its prevalance.
 
-# Creating releases
+## Running
+You can run the application with either of these commands (assuming Java 17 or newer) - one being with a Log4j config, another without:
+* `java -Dlog4j.configurationFile=resources/log4j2.xml -jar build/libs/SheetsIO.jar application.Main`
+* `java -jar build/libs/SheetsIO.jar application.Main`
 
-## .jar file
-In eclipse, File > Export (Java > Runnable .jar) > Extract required libraries into generated JAR (I send it to `/dist/dist.jar`)
-
-## to EXE
-Using [Jsmooth 0.9.9-7](https://sourceforge.net/projects/jsmooth/files/jsmooth/0.9.9-7/):
-
-1. Can load [pre-built config](https://github.com/GrandyB/SheetsIO/blob/master/SheetsIO-exe-packager.jsmooth) from the repo
-1. Run jsmooth compile (if you didn't use `/dist/dist.jar` as destination for your `.jar` file from Eclipse, supply what you _did_ use within the 'Application' tab of the UI)
- 
+## Contributing
+Test your changes and ensure code/documentation styles match.
