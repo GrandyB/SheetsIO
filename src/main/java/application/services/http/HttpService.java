@@ -223,9 +223,9 @@ public class HttpService implements HttpHandler {
 
 		String path = System.getProperty("user.dir") + "/files" + req.getFullRequest();
 		File file = new File(path);
-		httpExchange.sendResponseHeaders(200, file.length());
 		httpExchange.getResponseHeaders().add("content-type",
 				Files.probeContentType(Paths.get(file.getAbsolutePath())));
+		httpExchange.sendResponseHeaders(200, file.length());
 
 		OutputStream outputStream = httpExchange.getResponseBody();
 		Files.copy(file.toPath(), outputStream);
