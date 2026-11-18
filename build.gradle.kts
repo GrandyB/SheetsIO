@@ -47,6 +47,10 @@ application {
     mainClass.set("application.Launcher")
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 tasks.withType<JavaCompile> {
     options.isFork = true
     options.forkOptions.jvmArgs = mutableListOf(

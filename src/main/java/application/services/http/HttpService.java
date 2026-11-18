@@ -186,7 +186,9 @@ public class HttpService implements HttpHandler {
 			handleLiveJsRequest(httpExchange);
 			break;
 		case FAVICON:
-			// Just ignore it...
+			// Complete the request so browser connection slots remain available for updates.
+			httpExchange.sendResponseHeaders(204, -1);
+			httpExchange.close();
 			break;
 		default:
 			throw new IllegalArgumentException(
