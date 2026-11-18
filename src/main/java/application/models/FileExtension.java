@@ -31,11 +31,11 @@ public enum FileExtension {
 	PNG(FileExtensionType.IMAGE, "image/png"),
 	JPG(FileExtensionType.IMAGE, "image/jpeg"),
 	JPEG(FileExtensionType.IMAGE, "image/jpeg"),
-	GIF(FileExtensionType.IMAGE, "image/gif"),
+	GIF(FileExtensionType.IMAGE, "image/gif", true), // ImageIO culls anim frames if not
 	BMP(FileExtensionType.IMAGE, "image/bmp"),
 	WEBP(FileExtensionType.IMAGE, "image/webp"),
-	WEBM(FileExtensionType.VIDEO, "video/webm"),
-	MP4(FileExtensionType.VIDEO, "video/mp4"),
+	WEBM(FileExtensionType.VIDEO, "video/webm", true),
+	MP4(FileExtensionType.VIDEO, "video/mp4", true),
 	HTML(FileExtensionType.HTTP, "text/html");
 
 	@Getter
@@ -44,12 +44,18 @@ public enum FileExtension {
 	private String contentType;
 	@Getter
 	private FileExtensionType type;
+	@Getter
+	private boolean preservesOriginalBytes;
 
 	private FileExtension(FileExtensionType type, String contentType) {
+		this(type, contentType, false);
+	}
+
+	private FileExtension(FileExtensionType type, String contentType, boolean preservesOriginalBytes) {
 		this.extension = this.name().toLowerCase();
-		;
 		this.type = type;
 		this.contentType = contentType;
+		this.preservesOriginalBytes = preservesOriginalBytes;
 	}
 
 	public static FileExtension fromRaw(String rawExtension) throws IllegalFileExtensionException {

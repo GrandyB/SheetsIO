@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.AppUtil;
 import application.exceptions.UnableToLoadRemoteURLException;
+import application.models.FileExtension;
 import application.panels.ConfigPanel;
 
 /**
@@ -75,7 +76,8 @@ public class FileIO {
 
 	/**
 	 * Looks up URL for an image, takes its data, converts it to a file of given
-	 * type.
+	 * type. Extensions with {@link FileExtension#isPreservesOriginalBytes()} are
+	 * binary-copied instead of ImageIO-converted (e.g. animated GIFs).
 	 * 
 	 * @param url
 	 *            A full URL, e.g. https://i.imgur.com/jcYxcS4.png
@@ -87,6 +89,10 @@ public class FileIO {
 	 *             Should reading from the URL or writing/converting go awry
 	 */
 	public void downloadAndConvertImage(String url, String destinationPath, String extension) throws Exception {
+		if (FileExtension.fromRaw(extension).isPreservesOriginalBytes()) {
+			downloadAndSaveFile(url, destinationPath, extension);
+			return;
+		}
 
 		InputStream is;
 		URI uri = AppUtil.encodeForUrl(url);
@@ -129,8 +135,9 @@ public class FileIO {
 	}
 
 	/**
-	 * Downloads file from the url and saves as destinationPath. This is only used
-	 * for video files.
+	 * Downloads file from the url and saves as destinationPath without converting.
+	 * Used for video and for image extensions that
+	 * {@link FileExtension#isPreservesOriginalBytes()}.
 	 * 
 	 * @param url
 	 *            A full URL, e.g.

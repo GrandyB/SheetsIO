@@ -37,6 +37,17 @@ public class FileExtensionTest {
 		Assertions.assertEquals("image/webp", ext.getContentType());
 		Assertions.assertEquals(FileExtensionType.IMAGE, ext.getType());
 		Assertions.assertTrue(ext.isForFile());
+		Assertions.assertFalse(ext.isPreservesOriginalBytes());
+	}
+
+	@Test
+	void test_preservesOriginalBytes() throws Exception {
+		Assertions.assertTrue(FileExtension.GIF.isPreservesOriginalBytes());
+		Assertions.assertTrue(FileExtension.WEBM.isPreservesOriginalBytes());
+		Assertions.assertTrue(FileExtension.MP4.isPreservesOriginalBytes());
+		Assertions.assertFalse(FileExtension.PNG.isPreservesOriginalBytes());
+		Assertions.assertFalse(FileExtension.JPG.isPreservesOriginalBytes());
+		Assertions.assertFalse(FileExtension.WEBP.isPreservesOriginalBytes());
 	}
 
 	@Test
