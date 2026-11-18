@@ -2,6 +2,7 @@
 # https://docs.gradle.org/current/userguide/version_catalogs.html#sec::toml-dependencies-format
 
 [versions]
+com-github-usefulness-webp-imageio = "0.11.0"
 com-google-code-gson-gson = "2.8.6"
 commons-io-commons-io = "2.7"
 javax-el-javax-el-api = "3.0.0"
@@ -23,6 +24,7 @@ org-testfx-testfx-core = "4.0.16-alpha"
 org-testfx-testfx-junit5 = "4.0.16-alpha"
 
 [libraries]
+com-github-usefulness-webp-imageio = { module = "com.github.usefulness:webp-imageio", version.ref = "com-github-usefulness-webp-imageio" }
 com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
 commons-io-commons-io = { module = "commons-io:commons-io", version.ref = "commons-io-commons-io" }
 javax-el-javax-el-api = { module = "javax.el:javax.el-api", version.ref = "javax-el-javax-el-api" }

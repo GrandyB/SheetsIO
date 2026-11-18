@@ -26,4 +26,4 @@ if errorlevel 1 (
 )
 
 echo Done: build\libs\SheetsIO.exe
-endlocal
+pause

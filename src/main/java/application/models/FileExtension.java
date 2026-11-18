@@ -33,6 +33,7 @@ public enum FileExtension {
 	JPEG(FileExtensionType.IMAGE, "image/jpeg"),
 	GIF(FileExtensionType.IMAGE, "image/gif"),
 	BMP(FileExtensionType.IMAGE, "image/bmp"),
+	WEBP(FileExtensionType.IMAGE, "image/webp"),
 	WEBM(FileExtensionType.VIDEO, "video/webm"),
 	MP4(FileExtensionType.VIDEO, "video/mp4"),
 	HTML(FileExtensionType.HTTP, "text/html");

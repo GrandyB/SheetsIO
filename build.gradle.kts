@@ -30,6 +30,7 @@ dependencies {
     api(libs.org.apache.logging.log4j.log4j.core)
     api(libs.org.mockito.mockito.all)
     api(libs.org.greenrobot.eventbus)
+    runtimeOnly(libs.com.github.usefulness.webp.imageio)
 
     compileOnly(libs.org.projectlombok.lombok)
     annotationProcessor(libs.org.projectlombok.lombok)
